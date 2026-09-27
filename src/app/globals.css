@@ -1,12 +1,170 @@
 @import "tailwindcss";
 
+/* Paper Lantern Map tokens. Source of truth: DESIGN.md. Light (dawn) is the default; dark (night) follows the system or data-theme. */
 :root {
-  color-scheme: light dark;
+  --canvas: #f4e6cf;
+  --surface: #f9ead3;
+  --surface-2: #efdcc0;
+  --ink: #113c4b;
+  --muted: #6b5a4c;
+  --line: #e0c9a9;
+  --chrome: #10364b;
+  --on-chrome: #f9ead3;
+  --amber: #ffab0b;
+  --on-amber: #113c4b;
+  --stone-dim: #6a8292;
+  --focus: #1f6fd1;
+  --calm: #3e7c6b;
+  --card-shadow: 0 10px 24px -14px rgb(17 60 75 / 0.35);
+  --glow: 0 0 0 6px rgb(255 171 11 / 0.18), 0 6px 18px -6px rgb(255 171 11 / 0.55);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-feedback: 180ms;
+  --dur-ui: 320ms;
+  --dur-scene: 750ms;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas: #0e2231;
+    --surface: #17344a;
+    --surface-2: #1f4059;
+    --ink: #f9ead3;
+    --muted: #b9c6cf;
+    --line: #2c5068;
+    --chrome: #0a1b27;
+    --on-chrome: #f9ead3;
+    --amber: #ffb42e;
+    --on-amber: #0e2231;
+    --stone-dim: #7391a6;
+    --focus: #7fb7ff;
+    --calm: #7cc4ae;
+    --card-shadow: 0 12px 28px -16px rgb(0 0 0 / 0.7);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --canvas: #0e2231;
+  --surface: #17344a;
+  --surface-2: #1f4059;
+  --ink: #f9ead3;
+  --muted: #b9c6cf;
+  --line: #2c5068;
+  --chrome: #0a1b27;
+  --on-chrome: #f9ead3;
+  --amber: #ffb42e;
+  --on-amber: #0e2231;
+  --stone-dim: #7391a6;
+  --focus: #7fb7ff;
+  --calm: #7cc4ae;
+  --card-shadow: 0 12px 28px -16px rgb(0 0 0 / 0.7);
+  color-scheme: dark;
+}
+
+/* Text-size setting: data-text="large" | "larger" on <html>. */
+:root[data-text="large"] {
+  font-size: 115%;
+}
+:root[data-text="larger"] {
+  font-size: 130%;
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-chrome: var(--chrome);
+  --color-on-chrome: var(--on-chrome);
+  --color-amber: var(--amber);
+  --color-on-amber: var(--on-amber);
+  --color-stone-dim: var(--stone-dim);
+  --color-focus: var(--focus);
+  --color-calm: var(--calm);
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
+  --radius-card: 20px;
+  --shadow-card: var(--card-shadow);
+  --shadow-glow: var(--glow);
+  --ease-calm: var(--ease-out);
+}
+
+html {
+  background: var(--canvas);
 }
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, sans-serif;
-  background: Canvas;
-  color: CanvasText;
+  min-height: 100dvh;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  caret-color: var(--amber);
+}
+
+@media (max-width: 767px) {
+  body {
+    font-size: 1.125rem;
+  }
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  text-underline-offset: 0.2em;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--amber) 45%, transparent);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+* {
+  scrollbar-color: var(--stone-dim) transparent;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+:root[data-motion="reduce"] *,
+:root[data-motion="reduce"] *::before,
+:root[data-motion="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
 }
