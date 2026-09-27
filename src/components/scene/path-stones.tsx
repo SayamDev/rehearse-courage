@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { LEVELS } from "@/lib/ladder";
 import { cropAspect, sceneCrop, SCENES, stoneStates, toCropFrame, type CropKind, type StoneState } from "@/lib/scenes";
 import { useCourage } from "@/lib/store";
@@ -63,6 +63,7 @@ export function PathStones({
   crop = "island",
   priority = false,
   previewRecords,
+  overlay,
 }: {
   room: RoomId;
   situationId: string;
@@ -71,6 +72,8 @@ export function PathStones({
   priority?: boolean;
   /** Testing only: overrides the courage store's records so a fixed state (e.g. a mid-progress example) can be rendered without touching real progress. Used by the dev scene lab. */
   previewRecords?: StepRecord[];
+  /** Drawn over the art but under the stones (e.g. Home's night tint), so it never dims the UI. */
+  overlay?: ReactNode;
 }) {
   const store = useCourage();
   const records = previewRecords ?? store.records;
@@ -105,6 +108,7 @@ export function PathStones({
       {...(interactive ? {} : { role: "img", "aria-label": `Path: ${summary}.` })}
     >
       <SceneArt room={room} crop={crop} priority={priority} />
+      {overlay}
 
       {interactive ? (
         <ul role="list" className="m-0 list-none p-0">
