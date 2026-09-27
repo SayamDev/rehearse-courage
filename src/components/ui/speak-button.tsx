@@ -47,8 +47,11 @@ export function SpeakButton({
     }
   };
 
+  // A long press ends when let go, but only once actually listening: a
+  // release while the permission prompt is still up turns it into a tap,
+  // so the first ever hold does not cancel itself.
   const up = () => {
-    if (downAt.current !== null && Date.now() - downAt.current >= HOLD_MS) onStop();
+    if (downAt.current !== null && state === "listening" && Date.now() - downAt.current >= HOLD_MS) onStop();
     downAt.current = null;
   };
 
@@ -65,7 +68,6 @@ export function SpeakButton({
   return (
     <button
       type="button"
-      aria-pressed={live}
       onPointerDown={down}
       onPointerUp={up}
       onPointerCancel={up}

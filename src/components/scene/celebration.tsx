@@ -35,8 +35,7 @@ export function Celebration({
   room,
   situationId,
   level,
-  species,
-  stage,
+  companion,
   skyBefore,
   skyAfter,
   confetti,
@@ -44,8 +43,8 @@ export function Celebration({
   room: RoomId;
   situationId: string;
   level: Level;
-  species: Species;
-  stage: Stage;
+  /** Null when no companion has been chosen: the path and sky still celebrate. */
+  companion: { species: Species; stage: Stage } | null;
   skyBefore: number;
   skyAfter: number;
   confetti: boolean;
@@ -110,16 +109,18 @@ export function Celebration({
             ))
           : null}
 
-        <div
-          className="absolute -translate-x-[125%] -translate-y-[55%]"
-          style={{ left: `${companionAt.x}%`, top: `${companionAt.y}%` }}
-        >
-          <span
-            className="lantern-up absolute -inset-4 rounded-full"
-            style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--amber) 45%, transparent) 0%, transparent 70%)" }}
-          />
-          <Companion species={species} stage={stage} size={56} />
-        </div>
+        {companion ? (
+          <div
+            className="absolute -translate-x-[125%] -translate-y-[55%]"
+            style={{ left: `${companionAt.x}%`, top: `${companionAt.y}%` }}
+          >
+            <span
+              className="lantern-up absolute -inset-4 rounded-full"
+              style={{ background: "radial-gradient(circle, color-mix(in srgb, var(--amber) 45%, transparent) 0%, transparent 70%)" }}
+            />
+            <Companion species={companion.species} stage={companion.stage} size={56} />
+          </div>
+        ) : null}
       </div>
     </div>
   );

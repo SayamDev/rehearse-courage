@@ -54,3 +54,15 @@ export function stepResult(before: StepRecord[], record: StepRecord, newBadges: 
     nextLevel: nextLevel(after, record.situationId),
   };
 }
+
+/**
+ * Which new badge names the step-done heading when several arrive at
+ * once: the one this step is about (Out in the wild for a real-life
+ * mission, then speaking badges), else the first.
+ */
+const HEADLINE_ORDER = ["out-in-the-wild", "hand-up", "said-anyway", "first-words", "typed-first", "room-explorer", "dawn"];
+
+export function headlineBadge(newBadges: string[]): string | null {
+  if (newBadges.length === 0) return null;
+  return HEADLINE_ORDER.find((id) => newBadges.includes(id)) ?? newBadges[0];
+}

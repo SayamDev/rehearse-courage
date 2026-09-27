@@ -6,8 +6,9 @@ import { BADGES } from "@/lib/achievements";
 import type { Stage } from "@/lib/companion";
 import { ROOM_LABEL } from "@/lib/rooms";
 import { cropAspect, sceneCrop, SCENES } from "@/lib/scenes";
-import type { StepResult } from "@/lib/step";
+import { headlineBadge, type StepResult } from "@/lib/step";
 import { useCourage } from "@/lib/store";
+import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { RoomId } from "@/lib/types";
 import { Celebration } from "@/components/scene/celebration";
 import { ButtonLink } from "@/components/ui/button";
@@ -48,10 +49,11 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
     headingRef.current?.focus();
   }, []);
 
-  const heading = result.newBadges.length > 0 ? `${badgeTitle(result.newBadges[0])}.` : "You had a go.";
+  const lead = headlineBadge(result.newBadges);
+  const heading = lead ? `${badgeTitle(lead)}.` : "You had a go.";
   const seconds = secondsLine(result.seconds, result.lastSeconds);
   const grew = result.stageAfter !== result.stageBefore && store.companion;
-  const reduce = store.settings.reduceMotion;
+  const reduce = useReducedMotion();
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 pt-6 md:pt-10">
@@ -64,18 +66,15 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
         className="mx-auto mt-4 max-w-[640px]"
         style={{ width: `min(100%, calc(${cropAspect(SCENES[room], sceneCrop(SCENES[room], "island"))} * max(36dvh, 240px)))` }}
       >
-        {store.companion ? (
-          <Celebration
-            room={room}
-            situationId={result.situationId}
-            level={result.level}
-            species={store.companion.species}
-            stage={result.stageAfter}
-            skyBefore={result.skyBefore}
-            skyAfter={result.skyAfter}
-            confetti={store.settings.confetti && !reduce}
-          />
-        ) : null}
+        <Celebration
+          room={room}
+          situationId={result.situationId}
+          level={result.level}
+          companion={store.companion ? { species: store.companion.species, stage: result.stageAfter } : null}
+          skyBefore={result.skyBefore}
+          skyAfter={result.skyAfter}
+          confetti={store.settings.confetti && !reduce}
+        />
       </div>
 
       <PaperCard className="relative mx-auto -mt-8 max-w-[560px]">

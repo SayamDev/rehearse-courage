@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { lastSpokenSeconds, resolveLevel, stepResult } from "./step";
+import { headlineBadge, lastSpokenSeconds, resolveLevel, stepResult } from "./step";
 import { POINTS } from "./courage";
 import type { StepRecord } from "./types";
 
@@ -70,5 +70,20 @@ describe("stepResult", () => {
     const result = stepResult(before, rec(2, "2026-09-27T10:00:00Z"), []);
     expect(result.stageBefore).toBe("hiding");
     expect(result.stageAfter).toBe("peeking");
+  });
+});
+
+describe("headlineBadge", () => {
+  test("none when nothing new", () => {
+    expect(headlineBadge([])).toBeNull();
+  });
+
+  test("a real-life mission leads with Out in the wild", () => {
+    expect(headlineBadge(["first-words", "out-in-the-wild"])).toBe("out-in-the-wild");
+  });
+
+  test("step badges come before general ones", () => {
+    expect(headlineBadge(["my-own-step", "first-words"])).toBe("first-words");
+    expect(headlineBadge(["back-again"])).toBe("back-again");
   });
 });

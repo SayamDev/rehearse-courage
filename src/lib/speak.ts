@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 /** Analyser sampling interval. */
 export const FRAME_MS = 100;
@@ -27,112 +27,189 @@ export function rms(samples: ArrayLike<number>): number {
 }
 
 export type SpeakState = "idle" | "asking" | "listening" | "done" | "blocked";
+export type SpeakSnapshot = { state: SpeakState; seconds: number; recording: Blob | null };
 
-type Session = {
-  stream: MediaStream;
-  ctx: AudioContext;
-  timer: number;
-  recorder: MediaRecorder | null;
-  chunks: Blob[];
+/** The platform pieces the controller needs, injectable so the lifecycle can be tested without a browser. */
+export type SpeakDeps = {
+  getUserMedia: (() => Promise<MediaStream>) | null;
+  /** Opens an analyser on the stream and returns a way to read the current level and to close it. */
+  openMeter: (stream: MediaStream) => Promise<{ level: () => number; close: () => void }>;
+  /** Starts recording the stream; `done` receives the audio when stopped. Only called while recordings are kept. */
+  record: ((stream: MediaStream, done: (b: Blob) => void) => { stop: () => void }) | null;
+  every: (ms: number, fn: () => void) => () => void;
 };
 
 /**
- * Speaking on the device. Opens the microphone, counts seconds of voice
- * with an AudioContext analyser, and throws the audio away: nothing is
- * uploaded or stored. When `keep` is true (the keepRecordings setting, for
- * Then vs Now in Plan 5) a MediaRecorder also collects the audio into
- * `recording`, still only in memory.
- *
- * "blocked" covers a denied permission, no microphone, and browsers
- * without getUserMedia, so the caller can offer typing instead.
+ * Speaking on the device, as a plain controller (the React hook below
+ * wraps it). Opens the microphone, counts seconds of voice from an
+ * analyser, and releases everything on stop, reset or dispose, including
+ * when any of those happen while the permission prompt is still open.
+ * Nothing is uploaded; audio is only kept in memory when `record` is given.
  */
-export function useSpeak({ keep = false }: { keep?: boolean } = {}) {
-  const [state, setState] = useState<SpeakState>("idle");
-  const [seconds, setSeconds] = useState(0);
-  const [recording, setRecording] = useState<Blob | null>(null);
-  const session = useRef<Session | null>(null);
-  const frames = useRef<number[]>([]);
-  // Guards against stop() arriving while getUserMedia is still asking.
-  const wanted = useRef(false);
+export function createSpeakController(deps: SpeakDeps) {
+  let snap: SpeakSnapshot = { state: "idle", seconds: 0, recording: null };
+  const listeners = new Set<() => void>();
+  let frames: number[] = [];
+  // Bumped by stop/reset/dispose so a start still waiting on the prompt knows it was cancelled.
+  let run = 0;
+  let release: (() => void) | null = null;
+  // The keepRecordings setting, read when speaking starts (it can load after the first render).
+  let keep = false;
 
-  const teardown = useCallback(() => {
-    const s = session.current;
-    session.current = null;
-    if (!s) return;
-    window.clearInterval(s.timer);
-    if (s.recorder && s.recorder.state !== "inactive") s.recorder.stop();
-    s.stream.getTracks().forEach((t) => t.stop());
-    void s.ctx.close().catch(() => {});
-  }, []);
+  const set = (patch: Partial<SpeakSnapshot>) => {
+    snap = { ...snap, ...patch };
+    listeners.forEach((l) => l());
+  };
 
-  const start = useCallback(async () => {
-    if (session.current || wanted.current) return;
-    if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia || typeof AudioContext === "undefined") {
-      setState("blocked");
+  const releaseAll = () => {
+    const r = release;
+    release = null;
+    r?.();
+  };
+
+  async function start() {
+    if (snap.state === "asking" || snap.state === "listening") return;
+    if (!deps.getUserMedia) {
+      set({ state: "blocked" });
       return;
     }
-    wanted.current = true;
-    frames.current = [];
-    setSeconds(0);
-    setRecording(null);
-    setState("asking");
+    const mine = ++run;
+    frames = [];
+    set({ state: "asking", seconds: 0, recording: null });
+
     let stream: MediaStream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream = await deps.getUserMedia();
     } catch {
-      wanted.current = false;
-      setState("blocked");
+      if (mine === run) set({ state: "blocked" });
       return;
     }
-    const ctx = new AudioContext();
-    const analyser = ctx.createAnalyser();
-    analyser.fftSize = 2048;
-    ctx.createMediaStreamSource(stream).connect(analyser);
-    const buf = new Float32Array(analyser.fftSize);
-    const timer = window.setInterval(() => {
-      analyser.getFloatTimeDomainData(buf);
-      frames.current.push(rms(buf));
-      setSeconds(voicedSeconds(frames.current, VOICE_THRESHOLD, FRAME_MS));
-    }, FRAME_MS);
-
-    let recorder: MediaRecorder | null = null;
-    const chunks: Blob[] = [];
-    if (keep && typeof MediaRecorder !== "undefined") {
-      recorder = new MediaRecorder(stream);
-      recorder.ondataavailable = (e) => chunks.push(e.data);
-      recorder.onstop = () => setRecording(new Blob(chunks, { type: recorder?.mimeType }));
-      recorder.start();
-    }
-    session.current = { stream, ctx, timer, recorder, chunks };
-
-    if (!wanted.current) {
-      // stop() was called while the permission prompt was open.
-      teardown();
-      setState("done");
+    const stopTracks = () => stream.getTracks().forEach((t) => t.stop());
+    // Cancelled while the prompt was open: let go of the microphone straight away.
+    if (mine !== run) {
+      stopTracks();
       return;
     }
-    setState("listening");
-  }, [keep, teardown]);
 
-  const stop = useCallback(() => {
-    wanted.current = false;
-    if (!session.current) return;
-    teardown();
-    setSeconds(voicedSeconds(frames.current, VOICE_THRESHOLD, FRAME_MS));
-    setState("done");
-  }, [teardown]);
+    let meter: Awaited<ReturnType<SpeakDeps["openMeter"]>>;
+    try {
+      meter = await deps.openMeter(stream);
+    } catch {
+      stopTracks();
+      if (mine === run) set({ state: "blocked" });
+      return;
+    }
+    if (mine !== run) {
+      meter.close();
+      stopTracks();
+      return;
+    }
 
-  const reset = useCallback(() => {
-    wanted.current = false;
-    teardown();
-    frames.current = [];
-    setSeconds(0);
-    setRecording(null);
-    setState("idle");
-  }, [teardown]);
+    const recorder = keep && deps.record ? deps.record(stream, (b) => set({ recording: b })) : null;
+    const cancelTick = deps.every(FRAME_MS, () => {
+      frames.push(meter.level());
+      set({ seconds: voicedSeconds(frames, VOICE_THRESHOLD, FRAME_MS) });
+    });
+    release = () => {
+      cancelTick();
+      recorder?.stop();
+      meter.close();
+      stopTracks();
+    };
+    set({ state: "listening" });
+  }
 
-  // Always release the microphone when the component goes away.
-  useEffect(() => teardown, [teardown]);
+  /** Stops listening. If still asking for permission, cancels and goes back to idle. */
+  function stop() {
+    run++;
+    if (snap.state === "asking") {
+      set({ state: "idle" });
+      return;
+    }
+    if (snap.state !== "listening") return;
+    releaseAll();
+    set({ state: "done", seconds: voicedSeconds(frames, VOICE_THRESHOLD, FRAME_MS) });
+  }
 
-  return { state, seconds, recording, start, stop, reset };
+  function reset() {
+    run++;
+    releaseAll();
+    frames = [];
+    set({ state: "idle", seconds: 0, recording: null });
+  }
+
+  function dispose() {
+    run++;
+    releaseAll();
+  }
+
+  return {
+    start,
+    stop,
+    reset,
+    dispose,
+    setKeep: (k: boolean) => {
+      keep = k;
+    },
+    get: () => snap,
+    subscribe: (fn: () => void) => {
+      listeners.add(fn);
+      return () => listeners.delete(fn);
+    },
+  };
+}
+
+/** The real browser pieces: getUserMedia, an AudioContext analyser, and MediaRecorder. */
+function browserDeps(): SpeakDeps {
+  const hasMic = typeof navigator !== "undefined" && !!navigator.mediaDevices?.getUserMedia && typeof AudioContext !== "undefined";
+  return {
+    getUserMedia: hasMic ? () => navigator.mediaDevices.getUserMedia({ audio: true }) : null,
+    openMeter: async (stream) => {
+      const ctx = new AudioContext();
+      // Created after the permission prompt, so it can start suspended (Safari, iOS).
+      await ctx.resume().catch(() => {});
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 2048;
+      ctx.createMediaStreamSource(stream).connect(analyser);
+      const buf = new Float32Array(analyser.fftSize);
+      return {
+        level: () => {
+          analyser.getFloatTimeDomainData(buf);
+          return rms(buf);
+        },
+        close: () => void ctx.close().catch(() => {}),
+      };
+    },
+    record:
+      typeof MediaRecorder !== "undefined"
+        ? (stream, done) => {
+            const chunks: Blob[] = [];
+            const rec = new MediaRecorder(stream);
+            rec.ondataavailable = (e) => chunks.push(e.data);
+            rec.onstop = () => done(new Blob(chunks, { type: rec.mimeType }));
+            rec.start();
+            return { stop: () => rec.state !== "inactive" && rec.stop() };
+          }
+        : null,
+    every: (ms, fn) => {
+      const t = window.setInterval(fn, ms);
+      return () => window.clearInterval(t);
+    },
+  };
+}
+
+const IDLE: SpeakSnapshot = { state: "idle", seconds: 0, recording: null };
+
+/**
+ * Speaking on the device for a component. `keep` (the keepRecordings
+ * setting, Then vs Now in Plan 5) also collects the audio in memory as
+ * `recording`. The microphone is always released when the component
+ * goes away.
+ */
+export function useSpeak({ keep = false }: { keep?: boolean } = {}) {
+  const [ctrl] = useState(() => createSpeakController(browserDeps()));
+  useEffect(() => ctrl.setKeep(keep), [ctrl, keep]);
+  const snap = useSyncExternalStore(ctrl.subscribe, ctrl.get, () => IDLE);
+  useEffect(() => () => ctrl.dispose(), [ctrl]);
+  return { ...snap, start: ctrl.start, stop: ctrl.stop, reset: ctrl.reset };
 }
