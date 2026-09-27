@@ -51,3 +51,6 @@ next-env.d.ts
 # Playwright
 /test-results/
 /playwright-report/
+
+# Copied from node_modules at build time (scripts/vendor-webllm.mjs)
+/public/vendor/

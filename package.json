@@ -5,7 +5,9 @@
   "author": "Sayam Ajmal",
   "license": "UNLICENSED",
   "scripts": {
+    "predev": "node scripts/vendor-webllm.mjs",
     "dev": "next dev --port 3330",
+    "prebuild": "node scripts/vendor-webllm.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",

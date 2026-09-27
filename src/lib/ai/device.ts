@@ -1,12 +1,25 @@
 import type { MLCEngine } from "@mlc-ai/web-llm";
 
+type WebLlm = typeof import("@mlc-ai/web-llm");
+
 /**
  * The opt-in AI that runs on this device (WebLLM, a small Qwen model on the
  * graphics chip). Only for 13 and over, only after the person taps
  * Download in Me, and never downloaded on its own. Once downloaded,
- * nothing it does leaves the device. This file is only ever loaded with
- * `import()`, so people who do not use it never download its code.
+ * nothing it does leaves the device. The WebLLM library is served as a
+ * static file from this site (`scripts/vendor-webllm.mjs` copies it at
+ * build time) and imported only in the browser, only when needed: it
+ * stays out of the server bundle and out of everyone else's download.
  */
+
+/** Keep in step with the installed package (checked by a test). */
+export const WEBLLM_VERSION = "0.2.85";
+
+/** Built from the page's origin at run time, so no bundler (Next's or the Cloudflare adapter's) tries to follow it. */
+function loadWebLlm(): Promise<WebLlm> {
+  const url = `${location.origin}/vendor/web-llm.js?v=${WEBLLM_VERSION}`;
+  return import(/* webpackIgnore: true */ /* turbopackIgnore: true */ url);
+}
 
 export const MODEL_F16 = "Qwen2.5-0.5B-Instruct-q4f16_1-MLC";
 export const MODEL_F32 = "Qwen2.5-0.5B-Instruct-q4f32_1-MLC";
@@ -48,7 +61,7 @@ let engine: Promise<MLCEngine> | null = null;
 
 function load(model: string, onProgress?: (fraction: number) => void): Promise<MLCEngine> {
   if (!engine) {
-    engine = import("@mlc-ai/web-llm")
+    engine = loadWebLlm()
       .then((w) => w.CreateMLCEngine(model, { initProgressCallback: (r) => onProgress?.(r.progress) }))
       .catch((err) => {
         engine = null;
@@ -63,7 +76,7 @@ export async function isDownloaded(): Promise<boolean> {
   const model = await supportedModel();
   if (!model) return false;
   try {
-    const w = await import("@mlc-ai/web-llm");
+    const w = await loadWebLlm();
     return await w.hasModelInCache(model);
   } catch {
     return false;
@@ -82,7 +95,7 @@ export async function removeModel(): Promise<void> {
   const current = engine;
   engine = null;
   await current?.then((e) => e.unload()).catch(() => {});
-  const w = await import("@mlc-ai/web-llm");
+  const w = await loadWebLlm();
   for (const model of [MODEL_F16, MODEL_F32]) await w.deleteModelAllInfoInCache(model).catch(() => {});
 }
 
