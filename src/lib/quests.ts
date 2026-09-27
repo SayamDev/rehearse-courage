@@ -10,8 +10,8 @@ export const QUEST_POOL: Quest[] = [
   { id: "type-1", text: "Type one answer", kind: "type", target: 1 },
   { id: "rescue-3", text: "Practise 3 rescue phrases", kind: "rescue", target: 3 },
   { id: "rescue-1", text: "Practise one rescue phrase", kind: "rescue", target: 1 },
-  { id: "kit-1", text: "Try one calm-down tool", kind: "kit", target: 1 },
-  { id: "kit-2", text: "Use a calm-down tool twice", kind: "kit", target: 2 },
+  { id: "kit-1", text: "Try one body kit tool", kind: "kit", target: 1 },
+  { id: "kit-2", text: "Use a body kit tool twice", kind: "kit", target: 2 },
 ];
 
 function hash(s: string): number {
