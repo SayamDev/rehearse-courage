@@ -172,3 +172,18 @@ a {
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
+
+/* Current path stone / destination: a slow 3s pulse ring (DESIGN.md). Reduced
+   motion collapses this to the end frame via the rules above. */
+@keyframes stone-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(255 171 11 / 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgb(255 171 11 / 0);
+  }
+}
+
+.stone-pulse {
+  animation: stone-pulse 3s var(--ease-out) infinite;
+}
