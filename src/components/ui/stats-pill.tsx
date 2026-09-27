@@ -34,7 +34,7 @@ export function StatsPill({ braveDays, points }: { braveDays: number; points: nu
   const braveMain = braveDaysText.suffix.replace(/ this week$/, "");
 
   return (
-    <div className="inline-flex items-stretch divide-x divide-on-chrome/15 overflow-hidden rounded-full bg-chrome text-on-chrome">
+    <div className="inline-flex items-stretch divide-x divide-on-chrome/15 overflow-hidden rounded-full bg-chrome text-on-chrome ring-1 ring-chrome-edge">
       <span className="flex items-center gap-2.5 py-2.5 pl-5 pr-4">
         <CalendarCheck size={24} weight="regular" aria-hidden className="shrink-0 text-amber" />
         <span className="flex flex-col whitespace-nowrap leading-tight">

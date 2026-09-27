@@ -2,16 +2,24 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Leaf, PawPrint, type Icon } from "@phosphor-icons/react";
+import { ArrowLeft } from "@phosphor-icons/react";
 import { act } from "@/lib/store";
 import { setAge, setCompanion, setHardThings } from "@/lib/state";
 import { AGE_OPTIONS, TOTAL_STEPS, hardThingOptions, nextStep, prevStep, toggleHardThing } from "@/lib/onboarding";
 import { SPECIES } from "@/lib/companion";
 import type { AgeBand, HardThing, Species } from "@/lib/types";
+
 import { SceneArt } from "@/components/scene/scene-art";
 import { Companion } from "@/components/scene/companion";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Button } from "@/components/ui/button";
+
+/**
+ * The firefly is the only companion for now: it is the one with art. The
+ * hedgehog and paper fox stay in the code (old saves keep working) and
+ * come back as choices once their art exists.
+ */
+const SPECIES_NOW: Species = "firefly";
 
 // The heading is focused programmatically (tabIndex=-1) purely to move the
 // screen reader's position, not as a visible focus target. outline-none
@@ -21,24 +29,10 @@ import { Button } from "@/components/ui/button";
 // are untouched and keep their normal focus-visible ring.
 const headingClass = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink outline-none";
 
-const COMPANION_ICONS: Partial<Record<Species, Icon>> = { hedgehog: PawPrint, fox: Leaf };
-
 const speciesName = (id: Species) => SPECIES.find((s) => s.id === id)?.name ?? id;
 
-function PlaceholderCompanion({ icon: IconCmp }: { icon: Icon }) {
-  return (
-    <div
-      role="img"
-      aria-hidden
-      className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full border-2 border-white bg-surface-2 text-muted shadow-card"
-    >
-      <IconCmp size={40} weight="regular" aria-hidden />
-    </div>
-  );
-}
-
 /**
- * Four calm screens (age, what feels hard, companion, name) shown one at a
+ * Three calm screens (age, what feels hard, meet your firefly) shown one at a
  * time over the home-class art at night. Nothing here is required: every
  * step can be skipped, and the whole flow can be left half-done (see
  * page.tsx's redirect, which only cares whether a companion exists yet).
@@ -48,7 +42,7 @@ export function FirstVisit() {
   const [step, setStep] = useState(1);
   const [age, setAgeDraft] = useState<AgeBand | null>(null);
   const [hardThings, setHardDraft] = useState<HardThing[]>([]);
-  const [species, setSpeciesDraft] = useState<Species>("firefly");
+  const species = SPECIES_NOW;
   const [name, setNameDraft] = useState("");
   const headingRef = useRef<HTMLHeadingElement>(null);
 
@@ -80,7 +74,7 @@ export function FirstVisit() {
   return (
     <div className="relative mx-auto max-w-[720px] px-4 pb-16 pt-6 sm:pt-14">
       {/* Shorter than other screens' hero art on phones: /start has no bottom
-          nav to absorb Panic now, so the tallest step (companion picker)
+          nav to absorb Panic now, so the tallest step
           needs to fit above Panic's fixed corner without scrolling past it;
           see the overlap check in the fix-1 screenshots/report. */}
       <div className="relative h-[20vh] min-h-[140px] overflow-hidden rounded-card sm:h-[320px]">
@@ -127,13 +121,6 @@ export function FirstVisit() {
           />
         ) : null}
         {step === 3 ? (
-          <StepCompanion
-            headingRef={headingRef}
-            species={species}
-            onPick={(value) => { setSpeciesDraft(value); advance(); }}
-          />
-        ) : null}
-        {step === 4 ? (
           <StepName headingRef={headingRef} species={species} name={name} onNameChange={setNameDraft} onFinish={finish} />
         ) : null}
 
@@ -226,48 +213,6 @@ function StepHardThings({
   );
 }
 
-function StepCompanion({
-  headingRef,
-  species,
-  onPick,
-}: {
-  headingRef: React.RefObject<HTMLHeadingElement | null>;
-  species: Species;
-  onPick: (value: Species) => void;
-}) {
-  return (
-    <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
-        Pick a companion
-      </h1>
-      <p className="mt-2 text-muted">They will keep you company while you practise. You can change this any time.</p>
-      <div className="mt-5 flex flex-col gap-2">
-        {SPECIES.map((option) => {
-          const selected = species === option.id;
-          const IconCmp = COMPANION_ICONS[option.id];
-          return (
-            <button
-              key={option.id}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => onPick(option.id)}
-              className={`flex min-h-11 items-center gap-4 rounded-card border px-4 py-3 text-left transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3 ${
-                selected ? "border-amber bg-surface-2" : "border-line bg-surface-2/60 hover:bg-surface-2"
-              }`}
-            >
-              {IconCmp ? <PlaceholderCompanion icon={IconCmp} /> : <Companion species="firefly" stage="hiding" size={96} />}
-              <span>
-                <span className={`block font-semibold ${selected ? "text-amber" : "text-ink"}`}>{option.name}</span>
-                {IconCmp ? <span className="block text-sm text-muted">Grows up with you</span> : null}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function StepName({
   headingRef,
   species,
@@ -289,10 +234,16 @@ function StepName({
         onFinish();
       }}
     >
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
-        Give them a name
-      </h1>
-      <p className="mt-2 text-muted">Skip to keep the name {placeholder}.</p>
+      <div className="flex items-center gap-4">
+        <Companion species={species} stage="hiding" size={96} />
+        <div>
+          <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
+            Meet your firefly
+          </h1>
+          <p className="mt-1 text-muted">It keeps you company while you practise, and grows braver as you do.</p>
+        </div>
+      </div>
+      <p className="mt-4 text-ink">What would you like to call it? Skip to keep the name {placeholder}.</p>
       <label htmlFor="companion-name" className="mb-2 mt-5 block font-semibold text-ink">
         Name
       </label>

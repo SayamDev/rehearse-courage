@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { ShieldCheck } from "@phosphor-icons/react";
+import { Lifebuoy } from "@phosphor-icons/react";
 import { hidesNav } from "./no-nav-routes";
 
 /**
@@ -13,8 +13,8 @@ import { hidesNav } from "./no-nav-routes";
 // Tailwind needs each arbitrary-value class spelled out as a full literal to
 // pick it up at build time, so the two offsets are whole strings, not
 // interpolated from a shared template.
-const OFFSET_CLASS = "fixed bottom-[var(--panic-offset)] right-3 z-40 flex h-11 items-center gap-2 rounded-full bg-chrome px-4 text-sm font-semibold text-on-chrome transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-on-chrome/10 active:bg-on-chrome/15 sm:right-6";
-const OFFSET_CLASS_START = "fixed bottom-[var(--panic-offset-start)] right-3 z-40 flex h-11 items-center gap-2 rounded-full bg-chrome px-4 text-sm font-semibold text-on-chrome transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-on-chrome/10 active:bg-on-chrome/15 sm:right-6";
+const OFFSET_CLASS = "fixed bottom-[var(--panic-offset)] right-3 z-40 flex h-12 items-center gap-2 rounded-2xl bg-help px-4 font-semibold text-on-help shadow-card transition-[filter] duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:brightness-110 active:brightness-95 sm:right-6";
+const OFFSET_CLASS_START = "fixed bottom-[var(--panic-offset-start)] right-3 z-40 flex h-12 items-center gap-2 rounded-2xl bg-help px-4 font-semibold text-on-help shadow-card transition-[filter] duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:brightness-110 active:brightness-95 sm:right-6";
 
 /** The current URL plus calm=1, keeping the page's own params (e.g. a step's ?level) so nothing behind the dialog changes. */
 export function calmHref(pathname: string, search: string): string {
@@ -32,7 +32,7 @@ function PanicLink({ search }: { search: string }) {
 
   return (
     <Link href={calmHref(pathname, search)} className={className}>
-      <ShieldCheck size={20} weight="regular" aria-hidden />
+      <Lifebuoy size={22} weight="regular" aria-hidden />
       Panic now
     </Link>
   );

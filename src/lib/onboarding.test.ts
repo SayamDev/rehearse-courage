@@ -18,18 +18,18 @@ describe("clampStep / nextStep / prevStep", () => {
   });
 
   test("clamps above TOTAL_STEPS down to TOTAL_STEPS", () => {
-    expect(clampStep(5)).toBe(TOTAL_STEPS);
+    expect(clampStep(4)).toBe(TOTAL_STEPS);
     expect(clampStep(99)).toBe(TOTAL_STEPS);
   });
 
   test("nextStep advances by one and stops at the last step", () => {
     expect(nextStep(1)).toBe(2);
-    expect(nextStep(3)).toBe(4);
-    expect(nextStep(4)).toBe(4);
+    expect(nextStep(2)).toBe(3);
+    expect(nextStep(3)).toBe(3);
   });
 
   test("prevStep goes back by one and stops at the first step", () => {
-    expect(prevStep(4)).toBe(3);
+    expect(prevStep(3)).toBe(2);
     expect(prevStep(2)).toBe(1);
     expect(prevStep(1)).toBe(1);
   });

@@ -49,7 +49,7 @@ export function BottomNav() {
 
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-3 z-30 px-3 sm:px-6">
-      <div className="mx-auto flex h-16 max-w-[1100px] items-stretch justify-between rounded-full bg-chrome px-1 text-on-chrome">
+      <div className="mx-auto flex h-16 max-w-[1100px] items-stretch justify-between rounded-full bg-chrome px-1 text-on-chrome shadow-card ring-1 ring-chrome-edge">
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === active;
           const ItemIcon = item.icon;

@@ -17,7 +17,7 @@ export function MainFrame({ children }: { children: ReactNode }) {
   return (
     <main id="main" className={`min-h-dvh ${noNav ? "pb-[var(--nav-space-start)]" : "pb-[var(--nav-space)]"}`}>
       {children}
-      <p className="mt-12 px-4 text-sm text-muted">© 2026 Sayam Ajmal. All rights reserved.</p>
+      <p className="mx-auto mt-12 max-w-[1100px] px-4 text-sm text-muted">© 2026 Sayam Ajmal. All rights reserved.</p>
     </main>
   );
 }
