@@ -199,3 +199,55 @@ a {
 .stone-pulse {
   animation: stone-pulse 3s var(--ease-out) infinite;
 }
+
+/* Step complete: the new stone lights up with a soft swell of amber. */
+@keyframes stone-light {
+  0% {
+    transform: translate(-50%, -50%) scale(0.4);
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+}
+
+.stone-light {
+  animation: stone-light 900ms var(--ease-out) both;
+}
+
+/* Step complete: the companion's lantern glow brightens once. */
+@keyframes lantern-up {
+  0% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.lantern-up {
+  animation: lantern-up 900ms var(--ease-out) both;
+}
+
+/* Optional paper sparks (settings.confetti). Ends invisible, so reduced
+   motion (end frame) simply shows none. */
+@keyframes spark {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot));
+    opacity: 0;
+  }
+}
+
+.spark {
+  animation: spark 1100ms var(--ease-out) both;
+}
