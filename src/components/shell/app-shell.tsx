@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PanicLayer } from "@/components/calm/panic-view";
 import { BottomNav } from "./bottom-nav";
 import { MainFrame } from "./main-frame";
 import { PanicButton } from "./panic-button";
@@ -20,6 +21,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <MainFrame>{children}</MainFrame>
       <PanicButton />
       <BottomNav />
+      <PanicLayer />
     </>
   );
 }
