@@ -1,5 +1,5 @@
 import Link, { type LinkProps } from "next/link";
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode, Ref } from "react";
 import type { Icon } from "@phosphor-icons/react";
 
 export type ButtonVariant = "primary" | "secondary" | "chrome";
@@ -31,7 +31,8 @@ type ButtonOwnProps = {
   children: ReactNode;
 };
 
-export type ButtonProps = ButtonOwnProps & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children">;
+export type ButtonProps = ButtonOwnProps &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & { ref?: Ref<HTMLButtonElement> };
 
 export function Button({ variant = "primary", size = "lg", icon: IconCmp, children, className = "", ...props }: ButtonProps) {
   return (
