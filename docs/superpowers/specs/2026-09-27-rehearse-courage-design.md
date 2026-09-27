@@ -205,8 +205,32 @@ Site-wide daily caps (from Rehearse `rate-limit.ts`) protect free quotas. Paid p
 
 ### 9.3 Speech
 
-- **Text to speech:** Kokoro on device first (Web Worker, as Rehearse), then device voice.
-- **Speech to text:** on-device Whisper via Transformers.js when downloaded, then Groq Whisper (13 and over only), then browser speech recognition. Under 13 never uses server speech to text.
+**Text to speech** (coach, classmates, rescue phrases):
+
+1. **Kokoro on device** (Web Worker, as Rehearse). Default for everyone.
+2. **Extra on-device voices** (Piper-style ONNX voices in the browser), so the simulated class and friend group have several distinct voices, including younger-sounding classmates. Opt-in download, cached.
+3. **Groq Orpheus** (13 and over only), expressive coach voice.
+4. **Cloudflare Workers AI Deepgram Aura-2** (13 and over only), natural pacing. Shares the small daily Workers AI budget, so it is last among server voices.
+5. **Device voice** (speechSynthesis). Always available.
+
+**Speech to text:**
+
+1. **On-device Whisper** via Transformers.js, when downloaded. The only speech to text for under 13.
+2. **Groq Whisper** (13 and over only).
+3. **Cloudflare Workers AI Whisper** (13 and over only), backup.
+4. **Browser speech recognition** only in on-device mode where the browser supports it. Chrome's default recogniser sends audio to Google, so it is never used for under 13 and is labelled for others.
+5. **Type instead.** Always available.
+
+### 9.3a Free AI that is not used live, and why
+
+- **Gemini free tier:** Google's terms allow using free-tier prompts and replies to improve its products, with human review, and say not to send personal or sensitive information. Unsuitable for anxious users and children speaking about their fears.
+- **Microsoft Copilot:** no free developer API (consumer chat only). GitHub Models was retired in July 2026.
+- **Azure Speech free tier (F0):** generous, and Microsoft does not train on it, but it needs an Azure account with a card. Breaks the no-card rule; revisit only if the maker explicitly decides otherwise.
+- **Mistral free tier:** requires opting in to training. **OpenRouter free models:** logging depends on the upstream provider.
+
+### 9.3b AI at build time (no user data)
+
+Free tools such as Gemini and Copilot may be used by the maker while building, to draft pre-written content: situations, coach lines per age band, rescue phrases, sentence frames, quests, badge text, reframe cards. No user data is ever involved. Every drafted line is reviewed and edited by the maker, checked against the principles in section 1, and stored in `src/lib/content/*`. This gives under-13s and every offline fallback rich, varied content.
 
 ### 9.4 Safety pipeline
 
