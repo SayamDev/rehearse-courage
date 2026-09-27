@@ -18,6 +18,19 @@ export type HardThing =
   | "words"
   | "focus";
 
+export const HARD_THINGS: HardThing[] = [
+  "class",
+  "friends",
+  "presenting",
+  "panic",
+  "blushing",
+  "stuttering",
+  "words",
+  "focus",
+];
+
+export const ROOM_IDS: RoomId[] = ["class", "friends", "presenting"];
+
 export type Species = "firefly" | "hedgehog" | "fox";
 
 export type StepRecord = {
@@ -35,5 +48,7 @@ export type StepRecord = {
 export type CustomStep = { id: string; room: RoomId; text: string; createdAt: string };
 
 export type EventKind = "kit" | "rescue" | "thenNow" | "panic";
+
+export const EVENT_KINDS: EventKind[] = ["kit", "rescue", "thenNow", "panic"];
 
 export type AppEvent = { kind: EventKind; at: string };
