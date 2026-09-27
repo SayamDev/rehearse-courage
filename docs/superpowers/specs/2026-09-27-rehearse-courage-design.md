@@ -213,6 +213,8 @@ Site-wide daily caps (from Rehearse `rate-limit.ts`) protect free quotas. Paid p
 4. **Cloudflare Workers AI Deepgram Aura-2** (13 and over only), natural pacing. Shares the small daily Workers AI budget, so it is last among server voices.
 5. **Device voice** (speechSynthesis). Always available.
 
+**Kid-friendly voices (under 13):** only on-device voices (steps 1, 2 and 5), reading pre-written lines, so nothing is generated and nothing leaves the device. A "Kids" voice set picks the warmest, clearest Kokoro and Piper voices, speaks about 10% slower, and always shows captions. The companion creature has no spoken voice, only soft chirps and sounds (switchable off), so it never sounds like a stranger talking to a child. Classmates in the simulated class use the friendliest voices in the set. Real children's voices are not cloned or recorded.
+
 **Speech to text:**
 
 1. **On-device Whisper** via Transformers.js, when downloaded. The only speech to text for under 13.
