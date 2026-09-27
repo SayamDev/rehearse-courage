@@ -108,6 +108,15 @@ describe("state", () => {
     expect(s.timers).toBe(true);
   });
 
+  test("normalize accepts only known theme values, defaulting to system", () => {
+    expect(normalize({ settings: { theme: "dark" } }).settings.theme).toBe("dark");
+    expect(normalize({ settings: { theme: "light" } }).settings.theme).toBe("light");
+    expect(normalize({ settings: { theme: "system" } }).settings.theme).toBe("system");
+    expect(normalize({ settings: { theme: "neon" } }).settings.theme).toBe("system");
+    expect(normalize({ settings: {} }).settings.theme).toBe("system");
+    expect(DEFAULT_STATE.settings.theme).toBe("system");
+  });
+
   test("setHardThings dedupes", () => {
     expect(setHardThings(DEFAULT_STATE, ["class", "class", "panic"]).hardThings).toEqual(["class", "panic"]);
   });

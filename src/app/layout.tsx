@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Atkinson_Hyperlegible_Next, Bricolage_Grotesque } from "next/font/google";
+import { AppShell } from "@/components/shell/app-shell";
 import "./globals.css";
 
 const bricolage = Bricolage_Grotesque({
@@ -30,11 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bricolage.variable} ${atkinson.variable}`}>
       <body>
-        {children}
-        <footer className="px-4 py-8 text-sm text-muted">
-          <p>Rehearse Courage, a Rehearse project, by Sayam Ajmal.</p>
-          <p>© 2026 Sayam Ajmal. All rights reserved.</p>
-        </footer>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

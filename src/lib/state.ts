@@ -16,6 +16,8 @@ import {
   type StepRecord,
 } from "./types";
 
+export type Theme = "system" | "light" | "dark";
+
 export type Settings = {
   reduceMotion: boolean;
   largeText: boolean;
@@ -25,6 +27,7 @@ export type Settings = {
   timers: boolean;
   /** Off by default: recordings are only kept when the user opts in (Then vs Now). */
   keepRecordings: boolean;
+  theme: Theme;
 };
 
 export type CourageState = {
@@ -54,7 +57,15 @@ export const DEFAULT_STATE: CourageState = {
   earned: [],
   lastSeen: null,
   cameBack: false,
-  settings: { reduceMotion: false, largeText: false, sounds: true, confetti: true, timers: false, keepRecordings: false },
+  settings: {
+    reduceMotion: false,
+    largeText: false,
+    sounds: true,
+    confetti: true,
+    timers: false,
+    keepRecordings: false,
+    theme: "system",
+  },
 };
 
 const AGES: AgeBand[] = ["under13", "teen", "adult"];
@@ -112,7 +123,7 @@ function isValidCompanion(v: unknown): v is { species: Species; name: string } {
   return isObject(v) && SPECIES.some((s) => s.id === v.species) && typeof v.name === "string";
 }
 
-const KNOWN_BOOLEAN_SETTINGS: (keyof Settings)[] = [
+const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme">[] = [
   "reduceMotion",
   "largeText",
   "sounds",
@@ -121,12 +132,15 @@ const KNOWN_BOOLEAN_SETTINGS: (keyof Settings)[] = [
   "keepRecordings",
 ];
 
+const THEMES: Theme[] = ["system", "light", "dark"];
+
 function normalizeSettings(v: unknown): Settings {
   const raw = isObject(v) ? v : {};
   const settings = { ...DEFAULT_STATE.settings };
   for (const key of KNOWN_BOOLEAN_SETTINGS) {
     if (typeof raw[key] === "boolean") settings[key] = raw[key];
   }
+  if (THEMES.includes(raw.theme as Theme)) settings.theme = raw.theme as Theme;
   return settings;
 }
 
