@@ -12,6 +12,8 @@ export const RETURNING = {
   earned: [],
   lastSeen: null,
   cameBack: false,
+  welcomed: true,
+  lastBackup: null,
   settings: {
     reduceMotion: false,
     textSize: "normal",
@@ -22,6 +24,7 @@ export const RETURNING = {
     theme: "system",
     onlineHelp: true,
     deviceModel: false,
+    saveNudgeOff: false,
   },
 };
 
