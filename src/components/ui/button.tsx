@@ -6,7 +6,7 @@ export type ButtonVariant = "primary" | "secondary" | "chrome";
 export type ButtonSize = "lg" | "md";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full text-center font-semibold transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-full text-center font-semibold transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3 disabled:pointer-events-none disabled:bg-surface-2 disabled:text-muted disabled:shadow-none aria-disabled:pointer-events-none aria-disabled:bg-surface-2 aria-disabled:text-muted aria-disabled:shadow-none";
 
 const variants: Record<ButtonVariant, string> = {
   // Only one primary (amber) button per screen, reviewed rather than enforced here.

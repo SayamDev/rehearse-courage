@@ -89,8 +89,8 @@ export function UiGallery() {
         <div className="flex flex-wrap gap-4">
           {BADGES.map((b) => (
             <div key={b.id} className="flex flex-col items-center gap-2">
-              <Sticker badgeId={b.id} earned />
-              <Sticker badgeId={b.id} earned={false} />
+              <Sticker badgeId={b.id} earned eager />
+              <Sticker badgeId={b.id} earned={false} eager />
               <span className="max-w-[6rem] text-center text-xs text-muted">{b.title}</span>
             </div>
           ))}
@@ -100,7 +100,7 @@ export function UiGallery() {
       <Section title="ToolTile">
         <div className="grid gap-3 sm:grid-cols-2">
           {KIT_TILES.map((t) => (
-            <ToolTile key={t.href} {...t} />
+            <ToolTile key={t.href} {...t} eager />
           ))}
         </div>
       </Section>

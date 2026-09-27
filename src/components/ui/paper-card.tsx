@@ -10,7 +10,7 @@ import type { ReactNode } from "react";
 export function PaperCard({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div
-      className={`rounded-card bg-surface p-6 text-ink shadow-card [mask-image:url(/torn-edge.svg)] [mask-size:100%_100%] [mask-repeat:no-repeat] sm:p-8 ${className}`}
+      className={`rounded-card bg-surface p-6 text-ink shadow-card [-webkit-mask-image:url(/torn-edge.svg)] [-webkit-mask-repeat:no-repeat] [-webkit-mask-size:100%_100%] [mask-image:url(/torn-edge.svg)] [mask-repeat:no-repeat] [mask-size:100%_100%] sm:p-8 ${className}`}
     >
       {children}
     </div>

@@ -29,7 +29,9 @@ export function IdeaList({
           <label
             key={idea}
             className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-full border px-4 py-2.5 transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] has-[:focus-visible]:outline-3 has-[:focus-visible]:outline-[var(--focus)] has-[:focus-visible]:outline-offset-3 ${
-              checked ? "border-transparent bg-surface-2 text-ink" : "border-line bg-surface text-ink hover:bg-surface-2/60"
+              checked
+                ? "border-transparent bg-surface-2 text-ink active:bg-line/50"
+                : "border-line bg-surface text-ink hover:bg-surface-2/60 active:bg-surface-2/90"
             }`}
           >
             <input

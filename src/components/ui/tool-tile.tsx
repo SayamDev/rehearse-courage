@@ -13,12 +13,15 @@ export function ToolTile({
   title,
   line,
   helps,
+  eager = false,
 }: {
   href: string;
   art: string;
   title: string;
   line: string;
   helps: string;
+  /** Load the art immediately instead of lazily, for a tile shown above the fold. */
+  eager?: boolean;
 }) {
   return (
     <Link
@@ -26,7 +29,7 @@ export function ToolTile({
       className="group flex items-center gap-4 rounded-card border border-line bg-surface p-4 transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-surface-2 active:bg-surface-2 focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
     >
       <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-surface-2">
-        <Image src={art} alt="" fill sizes="64px" className="object-cover" />
+        <Image src={art} alt="" fill sizes="64px" loading={eager ? "eager" : "lazy"} className="object-cover" />
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-center justify-between gap-2">

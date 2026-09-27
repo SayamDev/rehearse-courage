@@ -15,21 +15,34 @@ export function pointsLabel(n: number): string {
  * the stats row on the home comp. Numbers are tabular so the pill does not
  * jiggle as they change.
  */
+/**
+ * Splits a "<n> ...suffix" label (as returned by braveDaysLabel/pointsLabel)
+ * into the number and the rest, so the number alone can get tabular
+ * styling without re-deriving the pluralised copy in the component.
+ */
+function splitCount(label: string, n: number): { count: string; suffix: string } {
+  const count = String(n);
+  return { count, suffix: label.slice(count.length) };
+}
+
 export function StatsPill({ braveDays, points }: { braveDays: number; points: number }) {
+  const braveDaysText = splitCount(braveDaysLabel(braveDays), braveDays);
+  const pointsText = splitCount(pointsLabel(points), points);
+
   return (
     <div className="inline-flex items-stretch divide-x divide-on-chrome/15 overflow-hidden rounded-full bg-chrome text-on-chrome">
       <span className="flex items-center gap-2 px-4 py-2.5">
         <CalendarCheck size={22} weight="regular" aria-hidden className="text-amber" />
         <span className="text-sm leading-tight">
-          <span className="tabular font-semibold">{braveDays}</span>{" "}
-          <span className="text-on-chrome/85">{braveDays === 1 ? "brave day" : "brave days"} this week</span>
+          <span className="tabular font-semibold">{braveDaysText.count}</span>
+          <span className="text-on-chrome/85">{braveDaysText.suffix}</span>
         </span>
       </span>
       <span className="flex items-center gap-2 px-4 py-2.5">
         <Star size={22} weight="regular" aria-hidden className="text-amber" />
         <span className="text-sm leading-tight">
-          <span className="tabular font-semibold">{points}</span>{" "}
-          <span className="text-on-chrome/85">{points === 1 ? "courage point" : "courage points"}</span>
+          <span className="tabular font-semibold">{pointsText.count}</span>
+          <span className="text-on-chrome/85">{pointsText.suffix}</span>
         </span>
       </span>
     </div>
