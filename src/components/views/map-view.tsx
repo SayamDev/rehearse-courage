@@ -28,7 +28,7 @@ function Island({ room, line }: { room: RoomId; line: string | null }) {
     <li>
       <Link
         href={`/room/${room}`}
-        className="group flex items-center gap-4 rounded-card p-1 transition-transform duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:-translate-y-0.5 active:translate-y-0 md:flex-col md:gap-0 md:p-0"
+        className="group flex items-center gap-4 rounded-card p-1 md:flex-col md:gap-0 md:p-0"
       >
         <span className="relative block h-24 w-24 shrink-0 overflow-hidden rounded-full shadow-card md:aspect-square md:h-auto md:w-full md:rounded-card">
           <Image
@@ -36,7 +36,7 @@ function Island({ room, line }: { room: RoomId; line: string | null }) {
             alt=""
             fill
             sizes="(min-width: 768px) 340px, 96px"
-            className="object-cover object-[50%_35%] transition-[filter] duration-[var(--dur-ui)] group-hover:brightness-105"
+            className="object-cover object-[50%_35%] transition-[filter] duration-[var(--dur-ui)] group-hover:brightness-110"
           />
         </span>
         <span className="flex min-w-0 flex-1 items-center gap-3 rounded-full bg-chrome px-5 py-3 text-on-chrome md:relative md:-mt-10 md:flex-none md:px-6">
@@ -71,7 +71,9 @@ export function MapView() {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 55%, transparent), color-mix(in srgb, var(--chrome) 15%, transparent) 55%, var(--canvas) 98%)",
+              // Deep enough behind the title and subtitle (over clouds on
+              // phones) for AA contrast in both themes, then fading to canvas.
+              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 88%, transparent), color-mix(in srgb, var(--chrome) 72%, transparent) 38%, color-mix(in srgb, var(--chrome) 20%, transparent) 70%, var(--canvas) 98%)",
           }}
         />
       </div>

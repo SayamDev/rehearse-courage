@@ -71,6 +71,15 @@ describe("roomSteps", () => {
     expect(steps.at(-1)).toMatchObject({ id: "custom-1", title: "Ask the librarian", highest: 1, next: 2, custom: true });
   });
 
+  test("leaves out other rooms' custom steps and reports finished steps", () => {
+    const steps = roomSteps(
+      { age: "teen", records: [rec("friends-join", 6)], customSteps: [custom("custom-9", "class", "Ask for help")] },
+      "friends",
+    );
+    expect(steps.some((s) => s.custom)).toBe(false);
+    expect(steps[0]).toMatchObject({ id: "friends-join", highest: 6, next: 6 });
+  });
+
   test("uses the simpler words when age is skipped", () => {
     const steps = roomSteps({ age: null, records: [], customSteps: [] }, "class");
     expect(steps[0].title).toBe("Answer a question");
@@ -94,6 +103,13 @@ describe("defaultStepId", () => {
       ]),
     ).toBe("b");
     expect(defaultStepId([{ ...base, id: "a", highest: 6, next: 6 }])).toBe("a");
+    // A custom step in progress wins over fresh built-in ones.
+    expect(
+      defaultStepId([
+        { ...base, id: "a", highest: 0, next: 1 },
+        { ...base, id: "custom-1", custom: true, highest: 3, next: 4 },
+      ]),
+    ).toBe("custom-1");
     expect(defaultStepId([])).toBeNull();
   });
 });

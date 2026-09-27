@@ -15,6 +15,7 @@ import { PaperCard } from "@/components/ui/paper-card";
 
 const TITLE = "text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]";
 const CARD_TITLE = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)]";
+const EMPTY = "Write a few words first.";
 
 /** One selectable step row. A toggle button (aria-pressed) so the chosen one is announced, not shown by colour alone. */
 function StepRow({ step, selected, onSelect }: { step: RoomStep; selected: boolean; onSelect: () => void }) {
@@ -28,7 +29,7 @@ function StepRow({ step, selected, onSelect }: { step: RoomStep; selected: boole
           selected
             ? "border-ink bg-surface-2 outline outline-2 outline-ink"
             : "border-line bg-surface hover:bg-surface-2 active:bg-line/60"
-        }`}
+        } focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3`}
       >
         <span className="font-semibold text-ink">{step.title}</span>
         <span className="tabular text-muted">
@@ -55,6 +56,8 @@ export function RoomView({ room }: { room: RoomId }) {
   const inputId = useId();
   const messageId = useId();
   const addRef = useRef<HTMLElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // Content renders only after hydration, so the browser's own jump to
   // #add happens before the section exists; do it once it does.
@@ -67,15 +70,21 @@ export function RoomView({ room }: { room: RoomId }) {
   const current = steps.find((s) => s.id === chosenId) ?? steps.find((s) => s.id === defaultStepId(steps));
   const level: Level = chosenLevel ?? current?.next ?? 1;
 
+  // Bring the stones and card into view so choosing a row visibly does
+  // something (they are off screen when the list is reached on a phone).
   const choose = (id: string) => {
     setChosenId(id);
     setChosenLevel(null);
+    const reduce =
+      document.documentElement.dataset.motion === "reduce" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    sceneRef.current?.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
   };
 
   const add = (e: FormEvent) => {
     e.preventDefault();
     if (!draft.trim()) {
-      setMessage("Write a few words first.");
+      setMessage(EMPTY);
+      inputRef.current?.focus();
       return;
     }
     act((s) => addCustomStep(s, room, draft, new Date()));
@@ -101,22 +110,26 @@ export function RoomView({ room }: { room: RoomId }) {
         <>
           {/* Capped by height, keeping the crop's aspect so stones line up. */}
           <div
-            className="mx-auto mt-5 max-w-[720px]"
+            ref={sceneRef}
+            className="mx-auto mt-5 max-w-[720px] scroll-mt-4"
             style={{ width: `min(100%, calc(${cropAspect(SCENES[room], sceneCrop(SCENES[room], "island"))} * max(40dvh, 260px)))` }}
           >
             <PathStones room={room} situationId={current.id} onPick={setChosenLevel} priority />
           </div>
 
           <PaperCard className="relative mx-auto -mt-6 max-w-[560px] md:-mt-10">
-            <p className="text-muted">
-              Step {level} of 6
-            </p>
-            <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{current.title}</h2>
-            <p className="mt-2 text-ink">{LEVELS[level - 1].name}</p>
+            {/* Announced when a row or stone changes what the card shows. */}
+            <div aria-live="polite">
+              <p className="text-muted">
+                Step <span className="tabular">{level}</span> of 6
+              </p>
+              <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{current.title}</h2>
+              <p className="mt-2 text-ink">{LEVELS[level - 1].name}</p>
+            </div>
             <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6" icon={ArrowRight}>
               {level === current.next ? "Continue" : `Practise step ${level}`}
             </ButtonLink>
-            <p className="mt-4 text-muted">Tap a stone to practise a different step.</p>
+            <p className="mt-4 text-muted">Choose a stone to practise a different step.</p>
           </PaperCard>
 
           <section aria-labelledby="steps-heading" className="mx-auto mt-10 max-w-[720px]">
@@ -154,11 +167,13 @@ export function RoomView({ room }: { room: RoomId }) {
                 Add your own step
               </label>
               <p id={`${inputId}-hint`} className="text-muted">
-                For example: ask the librarian for a book.
+                For example: ask the librarian for a book. Up to {MAX_CUSTOM} characters.
               </p>
               <div className="mt-2 flex flex-col gap-3 sm:flex-row">
                 <input
                   id={inputId}
+                  ref={inputRef}
+                  aria-invalid={message === EMPTY}
                   value={draft}
                   maxLength={MAX_CUSTOM}
                   onChange={(e) => {
