@@ -1,6 +1,6 @@
 # Handoff: Rehearse Courage
 
-Last updated: 2026-09-27 (evening, UK time). Read this first in a new session, then `PRODUCT.md`, `DESIGN.md`, and the current plan.
+Last updated: 2026-09-27 (late evening, UK time, cloud session). Read this first in a new session, then `PRODUCT.md`, `DESIGN.md`, and the current plan.
 
 ## What this is
 
@@ -38,15 +38,17 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 | 3 UI primitives (PaperCard, Button, StatsPill, Switch, Sticker, ToolTile, IdeaList) + `/dev/ui` gallery | Done, reviewed |
 | 4 Scenes, PathStones (5 stones + destination as step 6), Companion + `/dev/scenes` lab | Done, reviewed |
 | 5 First visit `/start` | Done, reviewed |
-| 6 Home `/` | **In progress at handoff time.** Check `git log` and `git status` on `plan-3-screens`: if `src/lib/home.ts` / home view are committed, review them; if not, restart Task 6 from its plan section |
-| 7 Map and rooms | Not started |
-| 8 Step runner (speak on device, type instead, crisis check on text) | Not started |
-| 9 Step complete celebration | Not started |
-| 10 Panic now view (`?calm=1`), grounding, `/help` support lines | Not started |
-| 11 Body kit | Not started |
-| 12 Badges and quests | Not started |
-| 13 Me, privacy, about, 404 | Not started |
-| 14 E2E, axe, visual check against comps | Not started |
+| 6 Home `/` | Done, reviewed (merged from `wip-task-6-home`; that branch can be deleted) |
+| 7 Map and rooms | Done, reviewed |
+| 8 Step runner (speak on device, type instead, crisis check on text) | Done, reviewed |
+| 9 Step complete celebration | Done, reviewed |
+| 10 Panic now view (`?calm=1`), grounding, `/help` support lines | Done, reviewed |
+| 11 Body kit | Done, reviewed |
+| 12 Badges and quests | Done, reviewed |
+| 13 Me, privacy, about, 404 | Done, reviewed |
+| 14 E2E, axe, visual check against comps | Done: 14 journeys and 84 axe runs (21 routes, light and dark, 390 and 1280) all pass |
+
+**Next:** open the Plan 3 PR from `plan-3-screens` to `main`, then swap in the missing art (below) when 12ui is available.
 
 ### Decisions made during Plan 3 (not all in the plan text)
 
@@ -59,6 +61,13 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 - Amber glow uses `color-mix(in srgb, var(--amber) N%, transparent)` so dark mode is correct.
 - Unearned badges show a faint outline of their art (never "?", never a lock); badges without art use a neutral placeholder with a Phosphor icon.
 - Friends and Presenting scenes are `provisional: true` in `src/lib/scenes.ts` (use map island art) until their own art exists. Companion uses a crop of `public/art/kit/breathing.webp` until firefly stills exist (`FIREFLY_STILL` map in `src/components/scene/companion.tsx`).
+
+- Microphone logic lives in a plain controller (`createSpeakController` in `src/lib/speak.ts`) wrapped by `useSpeak`, so the open/release lifecycle is unit tested without a DOM.
+- Step 4 coach lines and step 5 pressure lines are pre-written in `src/lib/content/coach.ts` (Plan 4 swaps in live replies for 13 and over).
+- `/help?crisis=1&from=...` is the crisis variant; `safeReturn` in `src/lib/help.ts` guards the "Carry on" link.
+- Kit and Badges headers use `panic.webp` as a stand-in (`ArtHeader`) until header-kit / header-badges exist. Speech tools tile uses an icon until it has art.
+- Text size is still a single "Larger text" switch (115%); DESIGN.md mentions 100/115/130. Decide whether to add a third step.
+- E2E: `PW_CHROMIUM_PATH=/path/to/chromium npm run test:e2e` (omit the variable on a machine where Playwright's own browsers are installed).
 
 ### Art still needed (Task 1)
 
