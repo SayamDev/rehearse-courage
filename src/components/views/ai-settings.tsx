@@ -25,6 +25,7 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
   const [metered, setMetered] = useState(false);
   const removeRef = useRef<HTMLButtonElement>(null);
   const downloadRef = useRef<HTMLButtonElement>(null);
+  const progressRef = useRef<HTMLParagraphElement>(null);
   const moveFocus = useRef<"remove" | "download" | null>(null);
 
   useEffect(() => {
@@ -38,6 +39,11 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
       live = false;
     };
   }, []);
+
+  // The Download button is replaced by the progress bar: keep focus on the page, not lost.
+  useEffect(() => {
+    if (phase === "downloading") progressRef.current?.focus();
+  }, [phase]);
 
   // After a download or removal the pressed button is gone; focus its replacement.
   useEffect(() => {
@@ -63,6 +69,7 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
   };
 
   const remove = async () => {
+    if (phase === "removing") return;
     setPhase("removing");
     await removeModel().catch(() => {});
     set({ deviceModel: false });
@@ -81,7 +88,7 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
     <>
       {phase === "downloading" ? (
         <div className="mt-3">
-          <p id="model-progress-label" className="text-ink">
+          <p id="model-progress-label" ref={progressRef} tabIndex={-1} className="text-ink outline-none">
             Downloading. You can keep using the app.
           </p>
           <div
@@ -110,7 +117,7 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
           </Button>
         </>
       )}
-      <p role="status" className="mt-2 text-ink empty:hidden">
+      <p role="status" className="mt-2 text-ink">
         {message}
       </p>
     </>
@@ -127,7 +134,13 @@ export function AiSettings() {
   const set = (patch: Partial<Settings>) => act((s) => updateSettings(s, patch));
 
   if (!aiAllowed(store.age)) {
-    return <p className="mt-2 text-ink">AI help is only for people aged 13 and over. Everything else works the same, and nothing leaves this device.</p>;
+    return (
+      <>
+        <p className="mt-2 text-ink">AI help is only for people aged 13 and over. Everything else works the same, and nothing leaves this device.</p>
+        {/* A model saved earlier (before the age changed) can still be removed. */}
+        {store.settings.deviceModel ? <DeviceModel on set={set} /> : null}
+      </>
+    );
   }
 
   return (

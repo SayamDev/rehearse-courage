@@ -18,8 +18,8 @@ const MAX_LENGTH: Record<ReplyKind, Record<AiAge, number>> = {
 export function cleanReply(text: string): string {
   return text
     .replace(/[*_#`]/g, "")
-    .replace(/\s*[—–‒―]\s*|\s+-+\s+/g, ", ")
-    .replace(/\?\s*[!！]+/g, "?")
+    .replace(/\s*[—–‒―]\s*|\s+[-‐]+\s+|(?<=\w)--+(?=\w)/g, ", ")
+    .replace(/\?\s*[!！]+|[!！]+\s*\?/g, "?")
     .replace(/[!！]+/g, ".")
     .replace(/\s+/g, " ")
     .trim()
@@ -49,7 +49,7 @@ const PATTERNS: { reason: string; re: RegExp; coachOnly?: true }[] = [
   {
     reason: "speech",
     coachOnly: true,
-    re: /\bstutter|\bstammer|\bfluen(t|cy)\b|\bfillers?\b|\bum+\b|\buh+\b|\bpaus(e|es|ed|ing)\b|\bmumbl|\btrip(ped)? over\b|\bslow(ly|er)?\b|\bclearly\b|\bsmoothly\b|\bsteady\b|\bconfident(ly)?\b|\bnerv(es|ous)\b|\banxi(ous|ety)\b|\b(loud|quiet)(ly|er)?\b|\b(seemed|sounded|looked|seem|sound|look) (a bit |so |really |very |quite )?(scared|shy|worried|unsure|tense)\b|\b(your|the way you) (voice|delivery|speaking|pace|words came out)\b/,
+    re: /\bstutter|\bstammer|\bfluen(t|cy)\b|\bfillers?\b|\bum+\b|\buh+\b|\bpaus(e|es|ed|ing)\b|\bmumbl|\btrip(ped)? over\b|\bslow(ly|er)?\b|\bclearly\b|\bsmoothly\b|\bsteady\b|\bconfident(ly)?\b|\bnerv(es|ous)\b|\banxi(ous|ety)\b|\b(loud|quiet)(ly|er)?\b|\b(seemed|sounded|looked|seem|sound|look) (a bit |so |really |very |quite )?(scared|shy|worried|unsure|tense)\b|\b(your|the way you) (voice|delivery|speaking|pace|words came out)\b|\b(spoke|speak|sounded|sound|said (it|that)|say (it|that)|talked|came across)\b( \w+){0,2} (well|great|perfect(ly)?|nice(ly)?|good|brilliant(ly)?|amazing(ly)?|fine|clear|natural(ly)?|strong(ly)?)\b|\bstumbl|\barticulate|\bdelivery\b|\bclear\b|\bwithout (a )?(hesitat|stopping|getting stuck)|\bhesitat/,
   },
   // No health claims or labels.
   {

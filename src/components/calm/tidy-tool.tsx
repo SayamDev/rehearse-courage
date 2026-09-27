@@ -18,7 +18,7 @@ function SayItBack() {
   return (
     <div className="mt-4">
       <SpeakButton state={speak.state} onStart={speak.start} onStop={speak.stop} label="Say the tidy version" />
-      <p role="status" className="mt-2 text-ink empty:hidden">
+      <p role="status" className="mt-2 text-ink">
         {speak.state === "done" ? "You said it out loud. That is the practice." : speak.state === "blocked" ? "The microphone is off. Saying it in your head counts too." : ""}
       </p>
     </div>
@@ -41,6 +41,14 @@ export function TidyTool({ onCrisis }: { onCrisis: () => void }) {
   const [busy, setBusy] = useState(false);
   const id = useId();
   const tidyRef = useRef<HTMLParagraphElement>(null);
+  // False once the page has gone, so a late answer does nothing.
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (tidy) tidyRef.current?.focus();
@@ -56,6 +64,7 @@ export function TidyTool({ onCrisis }: { onCrisis: () => void }) {
     setBusy(true);
     setStatus("Writing down what you said.");
     const heard = await transcribeAnswer(store, await waitForRecording(speak.latest), speak.latest().seconds, deps());
+    if (!alive.current) return;
     speak.reset();
     setBusy(false);
     if (heard.kind === "crisis") return onCrisis();
@@ -78,6 +87,7 @@ export function TidyTool({ onCrisis }: { onCrisis: () => void }) {
     setTidy(null);
     setStatus("Tidying.");
     const out = await tidyAnswer(store, messy, deps());
+    if (!alive.current) return;
     setBusy(false);
     if (out.kind === "crisis") return onCrisis();
     if (out.kind === "tidy") {
@@ -117,14 +127,23 @@ export function TidyTool({ onCrisis }: { onCrisis: () => void }) {
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {online ? (
-          <SpeakButton state={speak.state} onStart={speak.start} onStop={stopSpeaking} label="Say it messy" variant="secondary" />
+          <SpeakButton
+            state={speak.state}
+            // Not while the last recording is still being written down.
+            onStart={() => {
+              if (!busy) speak.start();
+            }}
+            onStop={stopSpeaking}
+            label="Say it messy"
+            variant="secondary"
+          />
         ) : null}
         <Button variant={tidy ? "secondary" : "primary"} icon={Sparkle} onClick={doTidy} aria-disabled={busy}>
           Tidy it
         </Button>
       </div>
-      <p id={`${id}-status`} role="status" className="mt-3 text-ink empty:hidden">
-        {status}
+      <p id={`${id}-status`} role="status" className="mt-3 text-ink">
+        {speak.state === "blocked" && !status ? "The microphone is off. You can type instead." : status}
       </p>
 
       {tidy ? (

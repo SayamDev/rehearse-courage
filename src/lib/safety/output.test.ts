@@ -10,6 +10,9 @@ describe("cleanReply", () => {
   test("turns spaced hyphens into commas and keeps questions as questions", () => {
     expect(cleanReply("Nice work - I like your idea.")).toBe("Nice work, I like your idea.");
     expect(cleanReply("Really?!")).toBe("Really?");
+    expect(cleanReply("Really!?")).toBe("Really?");
+    expect(cleanReply("Nice--really.")).toBe("Nice, really.");
+    expect(cleanReply("Nice \u2010 really.")).toBe("Nice, really.");
     expect(cleanReply("A well-known book.")).toBe("A well-known book.");
   });
 
@@ -38,6 +41,13 @@ describe("checkOutputLocal", () => {
     ["You did not trip over any words.", "speech"],
     ["You seemed a bit anxious there.", "speech"],
     ["You sounded really confident.", "speech"],
+    ["You sounded great.", "speech"],
+    ["You spoke really well.", "speech"],
+    ["Great job, you said it perfectly.", "speech"],
+    ["Wow, perfect delivery.", "speech"],
+    ["You got it out without stumbling.", "speech"],
+    ["You were so articulate.", "speech"],
+    ["Nice and clear.", "speech"],
     ["You've got this.", "banned"],
     ["Don't be nervous about it.", "banned"],
     ["Try not to stutter next time.", "speech"],

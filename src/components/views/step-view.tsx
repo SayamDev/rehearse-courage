@@ -126,6 +126,17 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   const typeRef = useRef<HTMLTextAreaElement>(null);
   const focusType = useRef(false);
   const replyRef = useRef<HTMLElement>(null);
+  const speakRef = useRef<HTMLButtonElement>(null);
+  // Set by Try again: where focus goes once the reply block has gone.
+  const againFocus = useRef<"speak" | "type" | null>(null);
+  // False once the page has gone, so a late answer does not save a step or redirect.
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   // Microphone off or missing: fall back to typing, calmly, with the field focused.
   const typing = mode === "type" || speak.state === "blocked";
@@ -142,7 +153,12 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
 
   // The button that asked for Cobi's reply is replaced by the reply: move focus there so nobody is left on nothing.
   useEffect(() => {
-    if (reply) replyRef.current?.focus();
+    if (reply) {
+      replyRef.current?.focus();
+    } else if (againFocus.current) {
+      (againFocus.current === "type" ? typeRef : speakRef).current?.focus();
+      againFocus.current = null;
+    }
   }, [reply]);
 
   // Level 5 optional timer: counts up, never down, only when the person turned timers on.
@@ -200,6 +216,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
     let answer = by === "type" ? text : "";
     if (by === "speak" && online) {
       const heard = await transcribeAnswer(store, await waitForRecording(speak.latest), speak.seconds, deps);
+      if (!alive.current) return;
       if (heard.kind === "crisis") {
         finish({ seconds: spokenSeconds(), typed: false, crisis: true });
         return;
@@ -218,6 +235,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       },
       deps,
     );
+    if (!alive.current) return;
     setThinking(false);
     if (out.kind === "crisis") {
       finish({ seconds: by === "speak" ? spokenSeconds() : null, typed: by === "type", crisis: true });
@@ -227,6 +245,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   };
 
   const againFromReply = () => {
+    againFocus.current = reply?.by === "type" ? "type" : "speak";
     setReply(null);
     speak.reset();
   };
@@ -356,7 +375,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
             ) : (
               <>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <SpeakButton state={speak.state} onStart={speak.start} onStop={speak.stop} />
+                  <SpeakButton ref={speakRef} state={speak.state} onStart={speak.start} onStop={speak.stop} />
                   <Button variant="secondary" icon={Keyboard} onClick={typeInstead}>
                     Type instead
                   </Button>
@@ -417,7 +436,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
         {/* Step 4: Cobi's reply, announced when it arrives. */}
         {level === 4 ? (
           <div className="mt-5">
-            <p role="status" className="text-ink empty:hidden">
+            <p role="status" className="min-h-0 text-ink">
               {thinking ? "Cobi is thinking." : ""}
             </p>
             {reply ? (

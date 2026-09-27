@@ -38,7 +38,7 @@ async function post(deps: ClientDeps, path: string, body: BodyInit, json: boolea
       method: "POST",
       body,
       headers: json ? { "Content-Type": "application/json" } : undefined,
-      signal: AbortSignal.timeout(deps.timeoutMs ?? 15_000),
+      signal: AbortSignal.timeout(deps.timeoutMs ?? 12_000),
     });
     if (!res.ok) return null;
     const data: unknown = await res.json();

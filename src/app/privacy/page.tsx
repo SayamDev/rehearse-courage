@@ -31,18 +31,18 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
     title: "What never leaves this device",
     body: [
       "Your steps, your badges, your companion and your settings. For anyone under 13, and anyone with online AI help off, your words and voice never leave it either.",
-      "Things you type or say are checked for signs that you might need support, and that check happens on this device, before anything is sent.",
+      "Things you type are checked for signs that you might need support. That check happens on this device, before anything is sent. Things you say are checked the same way as soon as they are written down as text.",
     ],
   },
   {
     id: "ai",
     title: "AI, for 13 and over",
     body: [
-      "If you are 13 or over and \"Online AI help\" is on in Me, a few things are sent so Cobi can reply to you and tidy can work: the words of that one answer or sentence, which practice step it was, and your age group (13 to 17, or adult). Never your name, your companion, or anything else about you.",
+      "If you are 13 or over and \"Online AI help\" is on in Me, a few things are sent so Cobi can reply to you and tidy can work: the words of that one answer or sentence, which practice step it was (and its words, if it is a step you wrote yourself), and your age group (13 to 17, or adult). Never your name, your companion, or anything else about you.",
       "They go to Groq first, and to Cloudflare if Groq is busy. Groq is set to keep nothing, and neither uses your words to train AI. Rehearse Courage does not keep or log them either. Both are free, so nobody pays for your data.",
       "Replies are checked before you see them, by a safety filter and, when it is available, a safety model at Cloudflare. If anything looks wrong, you see one of Cobi's own replies instead.",
       "To share the free service fairly, the site counts how many AI requests come from each internet connection each day. It uses a scrambled code that changes every day, cannot be turned back into your address, and is only kept in memory.",
-      "You can turn online help off in Me. You can also save a small AI model on this device instead. Once it is saved, nothing it does leaves the device.",
+      "You can turn online help off in Me. You can also save a small AI model on this device instead. It downloads from Hugging Face and GitHub, where the model is published, and nothing about you is sent with it. Once it is saved, nothing it does leaves the device.",
     ],
   },
   {

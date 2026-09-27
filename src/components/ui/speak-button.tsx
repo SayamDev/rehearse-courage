@@ -28,7 +28,9 @@ export function SpeakButton({
   label = "Hold to speak",
   variant = "primary",
   className = "",
+  ref,
 }: {
+  ref?: React.Ref<HTMLButtonElement>;
   state: SpeakState;
   /** Secondary where another button is the screen's one amber action. */
   variant?: "primary" | "secondary";
@@ -73,6 +75,7 @@ export function SpeakButton({
 
   return (
     <button
+      ref={ref}
       type="button"
       onPointerDown={down}
       onPointerUp={up}

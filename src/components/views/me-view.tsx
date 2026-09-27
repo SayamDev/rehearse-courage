@@ -4,6 +4,7 @@ import { useId, useRef, useState, type ChangeEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DownloadSimple, Trash, UploadSimple } from "@phosphor-icons/react";
+import { removeModel } from "@/lib/ai/device";
 import { backupFilename, exportBackup, importBackup } from "@/lib/backup";
 import { stageFor, type Stage } from "@/lib/companion";
 import { braveDaysThisWeek, missionsDone, totalPoints } from "@/lib/courage";
@@ -218,6 +219,8 @@ export function MeView() {
                   variant="secondary"
                   icon={Trash}
                   onClick={() => {
+                    // Also delete a saved on-device model (its library only loads if there is one).
+                    if (store.settings.deviceModel) void removeModel().catch(() => {});
                     clearEverything();
                     router.replace("/start");
                   }}

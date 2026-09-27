@@ -25,7 +25,7 @@ export const MODEL_F16 = "Qwen2.5-0.5B-Instruct-q4f16_1-MLC";
 export const MODEL_F32 = "Qwen2.5-0.5B-Instruct-q4f32_1-MLC";
 /** Rounded up, for the Download button. */
 export const DOWNLOAD_MB = 300;
-const GENERATE_TIMEOUT_MS = 25_000;
+const GENERATE_TIMEOUT_MS = 15_000;
 
 /** Half-precision models are smaller and faster, but not every graphics chip supports them. */
 export function pickModel(hasF16: boolean): string {
@@ -58,11 +58,14 @@ export async function supportedModel(): Promise<string | null> {
 }
 
 let engine: Promise<MLCEngine> | null = null;
+// The latest listener, so pressing Download again during a download still shows progress.
+let progressTo: ((fraction: number) => void) | undefined;
 
 function load(model: string, onProgress?: (fraction: number) => void): Promise<MLCEngine> {
+  if (onProgress) progressTo = onProgress;
   if (!engine) {
     engine = loadWebLlm()
-      .then((w) => w.CreateMLCEngine(model, { initProgressCallback: (r) => onProgress?.(r.progress) }))
+      .then((w) => w.CreateMLCEngine(model, { initProgressCallback: (r) => progressTo?.(r.progress) }))
       .catch((err) => {
         engine = null;
         throw err;

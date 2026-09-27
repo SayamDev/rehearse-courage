@@ -46,6 +46,14 @@ test("a teen hears Cobi answer what they typed, then finishes the step", async (
   expect(await page.evaluate(() => localStorage.getItem("courage:v1"))).not.toContain("answer is ten");
 });
 
+test("Try again after Cobi's reply puts focus back where the answer was typed", async ({ page }) => {
+  await seed(page);
+  await page.route("**/api/coach", (r) => r.fulfill({ json: { reply: "Ten. Nice thinking.", source: "groq" } }));
+  await typeAnswerAtStep4(page);
+  await page.getByRole("button", { name: "Try again" }).click();
+  await expect(page.getByLabel("Type what you would say")).toBeFocused();
+});
+
 test("when the AI cannot answer, Cobi's own reply appears instead", async ({ page }) => {
   await seed(page);
   await page.route("**/api/coach", (r) => r.fulfill({ json: { reply: null } }));

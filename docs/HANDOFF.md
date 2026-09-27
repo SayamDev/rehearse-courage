@@ -37,7 +37,7 @@ All eight tasks are built, tested and reviewed. How it works:
 - Providers (`src/lib/ai/provider.ts`): Groq `openai/gpt-oss-20b` and `whisper-large-v3-turbo`, then Workers AI (`@cf/meta/llama-3.1-8b-instruct`, `@cf/openai/whisper-large-v3-turbo`) through the `AI` binding. `null` means "use your own fallback".
 - Output check (`src/lib/safety/output.ts`): clean (no dashes, no `!`, no markdown), local filter (banned lines, any comment on how someone spoke, health labels, personal questions, links, harm, swearing, tidy drift), then Llama Guard 3 on Workers AI while its daily share lasts.
 - Browser (`src/lib/ai/client.ts`): nothing is ever sent for under 13, a skipped age, or with "Online AI help" off. Fallback order: online, on-device model (if saved), pre-written (`src/lib/content/coach-replies.ts`).
-- Step 4: "Hear Cobi's reply" after speaking or typing; spoken answers are transcribed (13+ online only) from an in-memory recording that is dropped straight after.
+- Step 4: "Hear Cobi's reply" after speaking or typing; spoken answers are transcribed (13+ online only) from an in-memory recording that is never saved and is dropped when the step ends or on Try again.
 - Kit, Sentence frames: "Say it messy, then tidy" for 13+ when online help or the device model is on.
 - Me, AI help: "Online AI help" switch (default on, 13+ only) and "AI on this device" (WebLLM, Qwen2.5 0.5B, about 300 MB, download only on a tap, warning on mobile data, remove button). The WebLLM code is a separate chunk that production only loads after the tap.
 - Rate limits (`src/lib/ai/limits.ts`): per visitor per day (coach 30, tidy 30, transcribe 60) keyed by an HMAC of the IP with a random in-memory secret that changes daily; site caps under the free plans. All env-overridable.
