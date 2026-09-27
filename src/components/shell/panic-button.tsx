@@ -14,7 +14,7 @@ export function PanicButton() {
   return (
     <Link
       href={`${pathname}?calm=1`}
-      className="fixed bottom-[5.75rem] right-3 z-40 flex h-11 items-center gap-2 rounded-full bg-chrome px-4 text-sm font-semibold text-on-chrome transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-on-chrome/10 active:bg-on-chrome/15 sm:right-6"
+      className="fixed bottom-[var(--panic-offset)] right-3 z-40 flex h-11 items-center gap-2 rounded-full bg-chrome px-4 text-sm font-semibold text-on-chrome transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-on-chrome/10 active:bg-on-chrome/15 sm:right-6"
     >
       <ShieldCheck size={20} weight="regular" aria-hidden />
       Panic now

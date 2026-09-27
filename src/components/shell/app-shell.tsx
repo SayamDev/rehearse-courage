@@ -15,7 +15,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <>
       <SettingsEffects />
       <SkipLink />
-      <main id="main" className="min-h-dvh pb-40">
+      <main id="main" className="min-h-dvh pb-[var(--nav-space)]">
         {children}
         <p className="mt-12 px-4 text-sm text-muted">© 2026 Sayam Ajmal. All rights reserved.</p>
       </main>

@@ -21,6 +21,10 @@
   --dur-feedback: 180ms;
   --dur-ui: 320ms;
   --dur-scene: 750ms;
+  /* Bottom-nav reserved space: keeps page content and the footer clear of the fixed nav. */
+  --nav-space: 10rem;
+  /* Panic now's fixed bottom offset: clears the nav with a gap so it never overlaps it. */
+  --panic-offset: 5.75rem;
   color-scheme: light;
 }
 
