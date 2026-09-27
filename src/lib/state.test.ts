@@ -62,6 +62,11 @@ describe("state", () => {
     expect(capped[0].text).toHaveLength(140);
   });
 
+  test("normalize drops a custom step with an unparseable createdAt", () => {
+    const validCustom = { id: "c1", room: "class", text: "Ask the librarian", createdAt: "2026-09-28T10:00:00.000Z" };
+    expect(normalize({ customSteps: [{ ...validCustom, createdAt: "not-a-date" }] }).customSteps).toEqual([]);
+  });
+
   test("normalize drops invalid events but keeps valid ones", () => {
     const validEvent = { kind: "kit", at: "2026-09-28T10:00:00.000Z" };
     const cases = [

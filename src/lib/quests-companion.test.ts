@@ -24,7 +24,10 @@ describe("quests", () => {
 
   test("pool is large enough and dash free", () => {
     expect(QUEST_POOL.length).toBeGreaterThanOrEqual(6);
-    for (const q of QUEST_POOL) expect(q.text).not.toMatch(/[–—]/);
+    for (const q of QUEST_POOL) {
+      expect(q.text).not.toMatch(/[–—]/);
+      expect(q.text).not.toContain("!");
+    }
   });
 
   test("progress counts only today and the right kind", () => {

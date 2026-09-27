@@ -7,11 +7,11 @@ export type Quest = { id: string; text: string; kind: "speak" | "type" | "rescue
 export const QUEST_POOL: Quest[] = [
   { id: "speak-1", text: "Say one thing out loud", kind: "speak", target: 1 },
   { id: "speak-2", text: "Do two speaking steps", kind: "speak", target: 2 },
-  { id: "type-1", text: "Type an answer before you say it", kind: "type", target: 1 },
+  { id: "type-1", text: "Type one answer", kind: "type", target: 1 },
   { id: "rescue-3", text: "Practise 3 rescue phrases", kind: "rescue", target: 3 },
-  { id: "rescue-1", text: "Learn one new rescue phrase", kind: "rescue", target: 1 },
+  { id: "rescue-1", text: "Practise one rescue phrase", kind: "rescue", target: 1 },
   { id: "kit-1", text: "Try one calm-down tool", kind: "kit", target: 1 },
-  { id: "kit-2", text: "Breathe along twice today", kind: "kit", target: 2 },
+  { id: "kit-2", text: "Use a calm-down tool twice", kind: "kit", target: 2 },
 ];
 
 function hash(s: string): number {

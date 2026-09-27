@@ -1,6 +1,6 @@
 import { newBadges } from "./achievements";
 import { daysBetween } from "./dates";
-import { makeCustomStep } from "./ladder";
+import { MAX_CUSTOM, makeCustomStep } from "./ladder";
 import { SPECIES } from "./companion";
 import {
   EVENT_KINDS,
@@ -91,12 +91,12 @@ function isValidCustomStep(v: unknown): v is CustomStep {
     (ROOM_IDS as string[]).includes(v.room as string) &&
     typeof v.text === "string" &&
     v.text.trim().length > 0 &&
-    typeof v.createdAt === "string"
+    isParseableDate(v.createdAt)
   );
 }
 
 function normalizeCustomStep(v: CustomStep): CustomStep {
-  return { ...v, text: v.text.trim().slice(0, 140) };
+  return { ...v, text: v.text.trim().slice(0, MAX_CUSTOM) };
 }
 
 function isValidEvent(v: unknown): v is AppEvent {

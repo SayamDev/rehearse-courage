@@ -32,6 +32,7 @@ describe("content", () => {
       expect(t.trim().length).toBeGreaterThan(0);
       expect(t).not.toMatch(/[–—]/);
       expect(t.toLowerCase()).not.toContain("oops");
+      expect(t).not.toContain("!");
     }
   });
 

@@ -20,7 +20,10 @@ describe("achievements", () => {
   test("twelve badges with unique ids and no dashes in copy", () => {
     expect(BADGES).toHaveLength(12);
     expect(new Set(BADGES.map((b) => b.id)).size).toBe(12);
-    for (const b of BADGES) expect(`${b.title}${b.description}`).not.toMatch(/[–—]/);
+    for (const b of BADGES) {
+      expect(`${b.title}${b.description}`).not.toMatch(/[–—]/);
+      expect(`${b.title}${b.description}`).not.toContain("!");
+    }
   });
 
   test("nothing earned at the start", () => {

@@ -1,5 +1,5 @@
 import type { Situation } from "./content/situations";
-import type { CustomStep, HardThing, Level, RoomId, StepRecord } from "./types";
+import { ROOM_IDS, type CustomStep, type HardThing, type Level, type RoomId, type StepRecord } from "./types";
 
 export const LEVELS: { level: Level; name: string; speaking: boolean }[] = [
   { level: 1, name: "Think it", speaking: false },
@@ -9,8 +9,6 @@ export const LEVELS: { level: Level; name: string; speaking: boolean }[] = [
   { level: 5, name: "Say it with a little pressure", speaking: true },
   { level: 6, name: "Try it for real", speaking: false },
 ];
-
-const ROOM_ORDER: RoomId[] = ["class", "friends", "presenting"];
 
 /** Which rooms each "what feels hard" choice points to first. */
 const HARD_TO_ROOM: Partial<Record<HardThing, RoomId>> = {
@@ -36,7 +34,7 @@ export function suggestNext(
   hard: HardThing[],
 ): { situationId: string; level: Level } | null {
   const preferred = hard.map((h) => HARD_TO_ROOM[h]).filter((r): r is RoomId => Boolean(r));
-  const order = [...new Set([...preferred, ...ROOM_ORDER])];
+  const order = [...new Set([...preferred, ...ROOM_IDS])];
   for (const room of order) {
     const open = situations
       .filter((s) => s.room === room)
@@ -56,7 +54,7 @@ export function mapLight(records: StepRecord[], situations: Situation[]): number
   return lit / situations.length;
 }
 
-const MAX_CUSTOM = 140;
+export const MAX_CUSTOM = 140;
 
 export function makeCustomStep(room: RoomId, text: string, now: Date): CustomStep {
   const clean = text.trim().slice(0, MAX_CUSTOM);
