@@ -41,6 +41,10 @@ export function BottomNav() {
   const pathname = usePathname();
   const active = activeNav(pathname);
 
+  // First-visit setup (/start) has nowhere for these five tabs to lead yet:
+  // hide the nav there rather than link to empty screens.
+  if (pathname === "/start") return null;
+
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-3 z-30 px-3 sm:px-6">
       <div className="mx-auto flex h-16 max-w-[1100px] items-stretch justify-between rounded-full bg-chrome px-1 text-on-chrome">

@@ -26,6 +26,11 @@
   --nav-space: 10rem;
   /* Panic now's fixed bottom offset: clears the nav with a gap so it never overlaps it. */
   --panic-offset: 5.75rem;
+  /* First-visit (/start) has no bottom nav, so its own reserved space and Panic
+     offset are smaller: just enough to clear Panic now itself, floating near
+     the corner like any other page's fixed control. */
+  --nav-space-start: 5rem;
+  --panic-offset-start: 1.5rem;
   color-scheme: light;
 }
 

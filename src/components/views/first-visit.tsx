@@ -14,6 +14,12 @@ import { PaperCard } from "@/components/ui/paper-card";
 import { Button } from "@/components/ui/button";
 
 const headingClass = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink outline-none";
+// Inline, not just the outline-none class: the heading is focused
+// programmatically (tabIndex=-1) purely to move the screen reader's
+// position, not as a visible focus target, and inline style beats the
+// global :focus-visible rule regardless of cascade order. Real controls
+// (buttons, links, the input) keep their normal focus-visible ring.
+const noVisibleFocusRing = { outline: "none" } as const;
 
 const COMPANION_ICONS: Partial<Record<Species, Icon>> = { hedgehog: PawPrint, fox: Leaf };
 
@@ -72,9 +78,17 @@ export function FirstVisit() {
   }
 
   return (
-    <div className="relative mx-auto max-w-[720px] px-4 pb-16 pt-8 sm:pt-14">
-      <div className="relative h-[34vh] min-h-[200px] overflow-hidden rounded-card sm:h-[320px]">
-        <SceneArt room="class" crop="wide" priority />
+    <div className="relative mx-auto max-w-[720px] px-4 pb-16 pt-6 sm:pt-14">
+      {/* Shorter than other screens' hero art on phones: /start has no bottom
+          nav to absorb Panic now, so the tallest step (companion picker)
+          needs to fit above Panic's fixed corner without scrolling past it;
+          see the overlap check in the fix-1 screenshots/report. */}
+      <div className="relative h-[20vh] min-h-[140px] overflow-hidden rounded-card sm:h-[320px]">
+        {/* object-top: this frame is wider than the art's own aspect ratio, so
+            object-cover's default center crop cuts the school and flag off
+            the top at wide widths. Anchoring to the top keeps them in frame
+            at every width; only the waterfall/lower island is ever trimmed. */}
+        <SceneArt room="class" crop="wide" priority className="object-top" />
         <div
           aria-hidden
           className="absolute inset-0"
@@ -146,7 +160,7 @@ function StepAge({
 }) {
   return (
     <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
         How old are you?
       </h1>
       <p className="mt-2 text-muted">This keeps the app right for you. Skip if you would rather not say.</p>
@@ -181,7 +195,7 @@ function StepHardThings({
 }) {
   return (
     <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
         What feels hard right now?
       </h1>
       <p className="mt-2 text-muted">Choose as many as fit. Skip if none feel right.</p>
@@ -223,7 +237,7 @@ function StepCompanion({
 }) {
   return (
     <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
         Pick a companion
       </h1>
       <p className="mt-2 text-muted">They will keep you company while you practise. You can change this any time.</p>
@@ -275,7 +289,7 @@ function StepName({
         onFinish();
       }}
     >
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
         Give them a name
       </h1>
       <p className="mt-2 text-muted">Skip to keep the name {placeholder}.</p>
