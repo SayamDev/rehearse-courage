@@ -31,6 +31,20 @@ describe("courage points", () => {
     expect(totalPoints(records)).toBe(15 + 15 + 10);
   });
 
+  test("orders records by real time even with different offsets", () => {
+    const later = rec(2, "2026-09-28T20:00:00-05:00");
+    const earlier = rec(1, "2026-09-28T23:00:00+05:00");
+    expect(totalPoints([later, earlier])).toBe(15 + 15);
+  });
+
+  test("each situation tracks its own highest level", () => {
+    const records = [
+      rec(3, "2026-09-28T10:00:00Z", { situationId: "class-answer" }),
+      rec(1, "2026-09-28T11:00:00Z", { situationId: "friends-join" }),
+    ];
+    expect(totalPoints(records)).toBe(15 + 15);
+  });
+
   test("missions are level 6 records", () => {
     expect(missionsDone([rec(6, "2026-09-28T10:00:00"), rec(5, "2026-09-28T10:00:00")])).toBe(1);
   });

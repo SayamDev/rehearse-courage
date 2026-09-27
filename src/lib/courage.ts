@@ -13,7 +13,7 @@ export function pointsFor(record: StepRecord, previousHighest: number): number {
 }
 
 export function totalPoints(records: StepRecord[]): number {
-  const sorted = [...records].sort((a, b) => a.at.localeCompare(b.at));
+  const sorted = [...records].sort((a, b) => Date.parse(a.at) - Date.parse(b.at));
   const highest = new Map<string, number>();
   let total = 0;
   for (const r of sorted) {
