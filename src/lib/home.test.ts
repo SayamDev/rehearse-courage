@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { homeModel, NIGHT_TINT_MAX, skyTint } from "./home";
 import { DEFAULT_STATE, type CourageState } from "./state";
 import { SITUATIONS } from "./content/situations";
+import { braveDaysThisWeek, totalPoints } from "./courage";
 import type { StepRecord } from "./types";
 
 const NOW = new Date("2026-09-27T12:00:00.000Z");
@@ -47,17 +48,26 @@ describe("homeModel", () => {
     expect(model.levelName).toBe("Say it out loud, alone");
   });
 
-  test("all situations at level 6 reports done", () => {
+  test("all situations at level 6 reports done, with stats and a clear sky", () => {
     const records = SITUATIONS.map((s) => record(s.id, 6));
     const model = homeModel(state({ records }), NOW);
     expect(model.done).toBe(true);
+    expect(model.braveDays).toBe(braveDaysThisWeek(records, NOW));
+    expect(model.points).toBe(totalPoints(records));
+    expect(model.skyTint).toBe(0);
   });
 
   test("stats always reflect braveDaysThisWeek and totalPoints", () => {
     const records = [record("class-answer", 1)];
     const model = homeModel(state({ records }), NOW);
     expect(model.braveDays).toBe(1);
-    expect(model.points).toBeGreaterThan(0);
+    expect(model.points).toBe(totalPoints(records));
+  });
+
+  test("title uses the grown-up words for teens and adults", () => {
+    const model = homeModel(state({ age: "teen" }), NOW);
+    if (model.done) throw new Error("unreachable");
+    expect(model.title).toBe("Answer a question in class");
   });
 });
 

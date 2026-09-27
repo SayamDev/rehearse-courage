@@ -19,7 +19,7 @@ export type HomeModel =
       points: number;
       skyTint: number;
     }
-  | { done: true; braveDays: number; points: number };
+  | { done: true; braveDays: number; points: number; skyTint: number };
 
 /** Sky warmth overlay opacity: fully night at mapLight 0, clear by mapLight 1. */
 export function skyTint(records: CourageState["records"]): number {
@@ -37,7 +37,7 @@ export function homeModel(state: CourageState, now: Date): HomeModel {
   const next = suggestNext(state.records, SITUATIONS, state.hardThings);
 
   if (!next) {
-    return { done: true, braveDays, points };
+    return { done: true, braveDays, points, skyTint: skyTint(state.records) };
   }
 
   const situation = situationById(next.situationId);

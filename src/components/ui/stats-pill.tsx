@@ -29,20 +29,27 @@ export function StatsPill({ braveDays, points }: { braveDays: number; points: nu
   const braveDaysText = splitCount(braveDaysLabel(braveDays), braveDays);
   const pointsText = splitCount(pointsLabel(points), points);
 
+  // Two lines per half, as on the home comp ("3 brave days" / "this week",
+  // "145" / "courage points"), so the pill never wraps mid-phrase on a phone.
+  const braveMain = braveDaysText.suffix.replace(/ this week$/, "");
+
   return (
     <div className="inline-flex items-stretch divide-x divide-on-chrome/15 overflow-hidden rounded-full bg-chrome text-on-chrome">
-      <span className="flex items-center gap-2 px-4 py-2.5">
-        <CalendarCheck size={22} weight="regular" aria-hidden className="text-amber" />
-        <span className="text-sm leading-tight">
-          <span className="tabular font-semibold">{braveDaysText.count}</span>
-          <span className="text-on-chrome/85">{braveDaysText.suffix}</span>
+      <span className="flex items-center gap-2.5 py-2.5 pl-5 pr-4">
+        <CalendarCheck size={24} weight="regular" aria-hidden className="shrink-0 text-amber" />
+        <span className="flex flex-col whitespace-nowrap leading-tight">
+          <span className="font-semibold">
+            <span className="tabular">{braveDaysText.count}</span>
+            {braveMain}
+          </span>
+          <span className="text-on-chrome/85">this week</span>
         </span>
       </span>
-      <span className="flex items-center gap-2 px-4 py-2.5">
-        <Star size={22} weight="regular" aria-hidden className="text-amber" />
-        <span className="text-sm leading-tight">
+      <span className="flex items-center gap-2.5 py-2.5 pl-4 pr-5">
+        <Star size={24} weight="regular" aria-hidden className="shrink-0 text-amber" />
+        <span className="flex flex-col whitespace-nowrap leading-tight">
           <span className="tabular font-semibold">{pointsText.count}</span>
-          <span className="text-on-chrome/85">{pointsText.suffix}</span>
+          <span className="text-on-chrome/85">{pointsText.suffix.trim()}</span>
         </span>
       </span>
     </div>
