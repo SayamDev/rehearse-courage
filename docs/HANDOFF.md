@@ -48,7 +48,7 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 | 13 Me, privacy, about, 404 | Done, reviewed |
 | 14 E2E, axe, visual check against comps | Done: 14 journeys and 84 axe runs (21 routes, light and dark, 390 and 1280) all pass |
 
-**Next:** open the Plan 3 PR from `plan-3-screens` to `main`, then swap in the missing art (below) when 12ui is available.
+**Next:** review and merge the Plan 3 PR (`plan-3-screens` to `main`), then swap in the missing art (below) when 12ui is available.
 
 ### Decisions made during Plan 3 (not all in the plan text)
 
@@ -66,7 +66,7 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 - Step 4 coach lines and step 5 pressure lines are pre-written in `src/lib/content/coach.ts` (Plan 4 swaps in live replies for 13 and over).
 - `/help?crisis=1&from=...` is the crisis variant; `safeReturn` in `src/lib/help.ts` guards the "Carry on" link.
 - Kit and Badges headers use `panic.webp` as a stand-in (`ArtHeader`) until header-kit / header-badges exist. Speech tools tile uses an icon until it has art.
-- Text size is still a single "Larger text" switch (115%); DESIGN.md mentions 100/115/130. Decide whether to add a third step.
+- Text size has three steps (Normal, Large, Larger = 100/115/130%) as in DESIGN.md; old saves with `largeText: true` become Large.
 - E2E: `PW_CHROMIUM_PATH=/path/to/chromium npm run test:e2e` (omit the variable on a machine where Playwright's own browsers are installed).
 
 ### Art still needed (Task 1)

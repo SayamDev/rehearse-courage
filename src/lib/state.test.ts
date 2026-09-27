@@ -172,3 +172,13 @@ describe("state", () => {
     expect(() => importBackup("not json")).toThrow("not-a-backup");
   });
 });
+
+describe("text size setting", () => {
+  test("defaults to normal, keeps a valid size, and upgrades the old largeText switch", () => {
+    expect(normalize({}).settings.textSize).toBe("normal");
+    expect(normalize({ settings: { textSize: "larger" } }).settings.textSize).toBe("larger");
+    expect(normalize({ settings: { textSize: "huge" } }).settings.textSize).toBe("normal");
+    expect(normalize({ settings: { largeText: true } }).settings.textSize).toBe("large");
+    expect(normalize({ settings: { largeText: true, textSize: "normal" } }).settings.textSize).toBe("normal");
+  });
+});

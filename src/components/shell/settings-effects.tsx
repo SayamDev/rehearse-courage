@@ -21,12 +21,12 @@ export function SettingsEffects() {
     if (settings.reduceMotion) root.setAttribute("data-motion", "reduce");
     else root.removeAttribute("data-motion");
 
-    if (settings.largeText) root.setAttribute("data-text", "large");
+    if (settings.textSize !== "normal") root.setAttribute("data-text", settings.textSize);
     else root.removeAttribute("data-text");
 
     if (settings.theme === "system") root.removeAttribute("data-theme");
     else root.setAttribute("data-theme", settings.theme);
-  }, [settings.reduceMotion, settings.largeText, settings.theme]);
+  }, [settings.reduceMotion, settings.textSize, settings.theme]);
 
   return null;
 }

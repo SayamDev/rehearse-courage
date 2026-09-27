@@ -14,7 +14,7 @@ export const RETURNING = {
   cameBack: false,
   settings: {
     reduceMotion: false,
-    largeText: false,
+    textSize: "normal",
     sounds: true,
     confetti: true,
     timers: false,

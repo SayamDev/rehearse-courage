@@ -25,7 +25,8 @@ const CARD_TITLE = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)]";
 function Island({ room, line }: { room: RoomId; line: string | null }) {
   const RoomIcon = ROOM_ICON[room];
   return (
-    <li>
+    // min-w-0 so a long label at the largest text size wraps instead of widening the page.
+    <li className="min-w-0">
       <Link
         href={`/room/${room}`}
         className="group flex items-center gap-4 rounded-card p-1 md:flex-col md:gap-0 md:p-0"
@@ -44,7 +45,7 @@ function Island({ room, line }: { room: RoomId; line: string | null }) {
           <span className="min-w-0">
             <span className="block font-display text-xl font-bold leading-tight">{ROOM_LABEL[room]}</span>
             {/* Reserve the line's height before hydration so nothing jumps. */}
-            <span className="tabular block text-base text-on-chrome/85">{line ?? " "}</span>
+            <span className="tabular block break-words text-base text-on-chrome/85">{line ?? " "}</span>
           </span>
         </span>
       </Link>

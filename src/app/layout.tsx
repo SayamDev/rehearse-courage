@@ -32,7 +32,7 @@ export const viewport: Viewport = {
 // flashes wrong on load. Kept intentionally tiny and never throws; SettingsEffects
 // is the live updater once React hydrates. See node_modules/next/dist/docs/
 // 01-app/02-guides/preventing-flash-before-hydration.md.
-const SETTINGS_SCRIPT = `(function(){try{var r=JSON.parse(localStorage.getItem("courage:v1"));var s=r&&r.settings;if(!s)return;var d=document.documentElement;if(s.theme==="light"||s.theme==="dark")d.setAttribute("data-theme",s.theme);if(s.reduceMotion)d.setAttribute("data-motion","reduce");if(s.largeText)d.setAttribute("data-text","large")}catch(e){}})()`;
+const SETTINGS_SCRIPT = `(function(){try{var r=JSON.parse(localStorage.getItem("courage:v1"));var s=r&&r.settings;if(!s)return;var d=document.documentElement;if(s.theme==="light"||s.theme==="dark")d.setAttribute("data-theme",s.theme);if(s.reduceMotion)d.setAttribute("data-motion","reduce");if(s.textSize==="large"||s.textSize==="larger")d.setAttribute("data-text",s.textSize);else if(s.largeText)d.setAttribute("data-text","large")}catch(e){}})()`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

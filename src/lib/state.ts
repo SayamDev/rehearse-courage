@@ -18,9 +18,12 @@ import {
 
 export type Theme = "system" | "light" | "dark";
 
+/** Root text size: 100%, 115%, 130% (DESIGN.md). */
+export type TextSize = "normal" | "large" | "larger";
+
 export type Settings = {
   reduceMotion: boolean;
-  largeText: boolean;
+  textSize: TextSize;
   sounds: boolean;
   confetti: boolean;
   /** Off by default: no clocks unless the user asks. */
@@ -59,7 +62,7 @@ export const DEFAULT_STATE: CourageState = {
   cameBack: false,
   settings: {
     reduceMotion: false,
-    largeText: false,
+    textSize: "normal",
     sounds: true,
     confetti: true,
     timers: false,
@@ -123,9 +126,8 @@ function isValidCompanion(v: unknown): v is { species: Species; name: string } {
   return isObject(v) && SPECIES.some((s) => s.id === v.species) && typeof v.name === "string";
 }
 
-const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme">[] = [
+const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = [
   "reduceMotion",
-  "largeText",
   "sounds",
   "confetti",
   "timers",
@@ -133,6 +135,7 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme">[] = [
 ];
 
 const THEMES: Theme[] = ["system", "light", "dark"];
+const TEXT_SIZES: TextSize[] = ["normal", "large", "larger"];
 
 function normalizeSettings(v: unknown): Settings {
   const raw = isObject(v) ? v : {};
@@ -141,6 +144,9 @@ function normalizeSettings(v: unknown): Settings {
     if (typeof raw[key] === "boolean") settings[key] = raw[key];
   }
   if (THEMES.includes(raw.theme as Theme)) settings.theme = raw.theme as Theme;
+  // Older saves had a single largeText switch (115%).
+  if (TEXT_SIZES.includes(raw.textSize as TextSize)) settings.textSize = raw.textSize as TextSize;
+  else if (raw.largeText === true) settings.textSize = "large";
   return settings;
 }
 

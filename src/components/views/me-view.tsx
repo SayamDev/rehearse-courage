@@ -8,7 +8,7 @@ import { backupFilename, exportBackup, importBackup } from "@/lib/backup";
 import { stageFor, type Stage } from "@/lib/companion";
 import { braveDaysThisWeek, missionsDone, totalPoints } from "@/lib/courage";
 import { AGE_OPTIONS, hardThingOptions, toggleHardThing } from "@/lib/onboarding";
-import { setAge, setHardThings, updateSettings, type Settings, type Theme } from "@/lib/state";
+import { setAge, setHardThings, updateSettings, type Settings, type TextSize, type Theme } from "@/lib/state";
 import { act, clearEverything, useCourage } from "@/lib/store";
 import { Companion } from "@/components/scene/companion";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,12 @@ const STAGE_WORD: Record<Stage, string> = {
   waving: "Waving",
   speaking: "Standing tall",
 };
+
+const TEXT_SIZES: { value: TextSize; label: string }[] = [
+  { value: "normal", label: "Normal" },
+  { value: "large", label: "Large" },
+  { value: "larger", label: "Larger" },
+];
 
 const THEMES: { value: Theme; label: string }[] = [
   { value: "system", label: "Match my device" },
@@ -116,7 +122,6 @@ export function MeView() {
 
       <Section title="Settings">
         <div className="mt-3 divide-y divide-line">
-          <Switch checked={store.settings.largeText} onChange={(v) => set({ largeText: v })} label="Larger text" />
           <Switch checked={store.settings.reduceMotion} onChange={(v) => set({ reduceMotion: v })} label="Reduce motion" />
           <Switch checked={store.settings.sounds} onChange={(v) => set({ sounds: v })} label="Sounds" />
           <Switch checked={store.settings.confetti} onChange={(v) => set({ confetti: v })} label="Paper sparks when you finish a step" />
@@ -127,6 +132,16 @@ export function MeView() {
             label="Keep my recordings on this device"
           />
         </div>
+        <fieldset className="mt-4">
+          <legend className="font-semibold text-ink">Text size</legend>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {TEXT_SIZES.map((t) => (
+              <button key={t.value} type="button" aria-pressed={store.settings.textSize === t.value} onClick={() => set({ textSize: t.value })} className={chip(store.settings.textSize === t.value)}>
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
         <fieldset className="mt-4">
           <legend className="font-semibold text-ink">Theme</legend>
           <div className="mt-2 flex flex-wrap gap-2">
