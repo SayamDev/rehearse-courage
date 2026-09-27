@@ -4,7 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Eye, ShieldCheck, UsersThree, X } from "@phosphor-icons/react";
+import { ArrowRight, Eye, Lifebuoy, UsersThree, X } from "@phosphor-icons/react";
 import { logEvent } from "@/lib/state";
 import { act } from "@/lib/store";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
@@ -126,7 +126,7 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
       <div className="relative mx-auto flex min-h-full max-w-[900px] flex-col px-4 pb-10 pt-6 md:pt-10">
         <header className="flex items-start justify-between gap-4 text-on-chrome">
           <div className="flex items-start gap-3">
-            <ShieldCheck size={36} weight="regular" aria-hidden className="mt-1 shrink-0" />
+            <Lifebuoy size={36} weight="regular" aria-hidden className="mt-1 shrink-0" />
             <div>
               <h1 id="panic-title" ref={headingRef} tabIndex={-1} className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] outline-none">
                 Panic now
@@ -144,7 +144,7 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
             <Grounding onDone={leaveGrounding} />
           ) : (
             <>
-              <BreathingLantern reduce={reduce} />
+              <BreathingLantern reduce={reduce} tone="calm" />
               <p className="mt-2 text-center text-ink">You are safe. This feeling will pass.</p>
             </>
           )}

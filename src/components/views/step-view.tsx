@@ -30,6 +30,27 @@ const FIELD =
   "mt-2 block w-full rounded-2xl border border-line bg-surface px-4 py-3 text-ink placeholder:text-muted focus-visible:border-ink";
 
 type Step = { id: string; room: RoomId; scene: string; ideas: string[]; mission: string; title: string };
+/** What each practice step asks for, so every step reads as its own task, not the same question again. */
+const TASK: Partial<Record<Level, string>> = {
+  2: "Now put it into words.",
+  3: "Now say it out loud, just to yourself.",
+  4: "Now say it to Cobi.",
+  5: "Now say it with everyone looking.",
+};
+
+const COBI_PLAYS: Record<RoomId, string> = {
+  class: "Cobi plays your teacher and will answer you.",
+  friends: "Cobi plays one of your friends and will answer you.",
+  presenting: "Cobi plays someone in the audience and will answer you.",
+};
+
+function taskHint(level: Level, room: RoomId): string {
+  if (level === 2) return "Type it below, or whisper it to yourself, then press Done.";
+  if (level === 3) return "Nobody is listening. The app only counts the seconds.";
+  if (level === 4) return COBI_PLAYS[room];
+  return "A little pressure, like the real moment. The words can be the same as before.";
+}
+
 type CobiReply = { text: string; source: "online" | "device" | "prewritten"; by: "speak" | "type" };
 
 /** Resolves a pre-written situation or one of the person's own steps into what the page shows. */
@@ -275,17 +296,36 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       </div>
 
       <PaperCard className="relative mx-auto -mt-8 max-w-[640px]">
-        <h2 className="text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{step.scene}</h2>
+        {TASK[level] ? (
+          <>
+            {/* Steps 2 to 5: the moment is a reminder; the new task is the heading. */}
+            <p className="text-muted">The moment</p>
+            <p className="mt-1 text-ink">{step.scene}</p>
+            <h2 className="mt-4 text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{TASK[level]}</h2>
+            <p className="mt-1 text-ink">{taskHint(level, step.room)}</p>
+          </>
+        ) : (
+          <h2 className="text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{step.scene}</h2>
+        )}
 
         {level === 6 ? (
           <>
             <p className="mt-4 text-muted">Your mission</p>
             <p className="mt-1 text-lg font-semibold text-ink">{step.mission}</p>
           </>
-        ) : step.ideas.length > 0 ? (
+        ) : step.ideas.length > 0 && level === 1 ? (
           <div className="mt-5">
             <IdeaList ideas={step.ideas} value={idea} onChange={setIdea} />
           </div>
+        ) : step.ideas.length > 0 ? (
+          <details className="group mt-4 rounded-2xl bg-surface-2 px-4">
+            <summary className="flex min-h-11 cursor-pointer items-center font-semibold text-ink">Need a start? Show ideas</summary>
+            <ul className="grid list-disc gap-1 pb-3 pl-6 text-ink marker:text-muted">
+              {step.ideas.map((i) => (
+                <li key={i}>{i}</li>
+              ))}
+            </ul>
+          </details>
         ) : null}
 
         {level === 4 ? (
@@ -338,7 +378,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
           <>
             <TextField
               label="Type it here"
-              hint="Or whisper it to yourself, then press Done."
+              hint="Only you can see this, and it is not saved."
               value={text}
               onChange={setText}
             />
