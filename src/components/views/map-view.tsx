@@ -99,7 +99,7 @@ export function MapView() {
                 </p>
                 <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{words(situation.title, store.age)}</h2>
                 <p className="mt-2 text-ink">{LEVELS[next.level - 1].name}</p>
-                <ButtonLink href={`/step/${next.situationId}?level=${next.level}`} className="mt-6" icon={ArrowRight}>
+                <ButtonLink href={`/step/${next.situationId}?level=${next.level}`} className="mt-6" icon={ArrowRight} iconEnd>
                   Continue
                 </ButtonLink>
               </>
@@ -107,7 +107,7 @@ export function MapView() {
               <>
                 <h2 className={`${CARD_TITLE} text-ink`}>You have walked every path.</h2>
                 <p className="mt-2 text-ink">You can add a step of your own on any island.</p>
-                <ButtonLink href="/room/class#add" className="mt-6" icon={ArrowRight}>
+                <ButtonLink href="/room/class#add" className="mt-6" icon={ArrowRight} iconEnd>
                   Add your own step
                 </ButtonLink>
               </>

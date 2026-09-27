@@ -108,11 +108,11 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
             Back to the map
           </ButtonLink>
           {result.level === 6 ? (
-            <ButtonLink href={`/room/${room}`} variant="secondary" icon={ArrowRight}>
+            <ButtonLink href={`/room/${room}`} variant="secondary" icon={ArrowRight} iconEnd>
               Back to the island
             </ButtonLink>
           ) : (
-            <ButtonLink href={`/step/${result.situationId}?level=${result.nextLevel}`} variant="secondary" icon={ArrowRight}>
+            <ButtonLink href={`/step/${result.situationId}?level=${result.nextLevel}`} variant="secondary" icon={ArrowRight} iconEnd>
               One more step
             </ButtonLink>
           )}

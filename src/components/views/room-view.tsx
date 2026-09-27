@@ -126,7 +126,7 @@ export function RoomView({ room }: { room: RoomId }) {
               <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{current.title}</h2>
               <p className="mt-2 text-ink">{LEVELS[level - 1].name}</p>
             </div>
-            <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6" icon={ArrowRight}>
+            <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6" icon={ArrowRight} iconEnd>
               {level === current.next ? "Continue" : `Practise step ${level}`}
             </ButtonLink>
             <p className="mt-4 text-muted">Choose a stone to practise a different step.</p>

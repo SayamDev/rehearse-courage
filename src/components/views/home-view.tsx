@@ -150,7 +150,7 @@ export function HomeView() {
         {model.done ? (
           <>
             <h2 className="text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink">You have walked every path.</h2>
-            <ButtonLink href="/room/class#add" className="mt-6" icon={ArrowRight}>
+            <ButtonLink href="/room/class#add" className="mt-6" icon={ArrowRight} iconEnd>
               Add your own step
             </ButtonLink>
           </>
@@ -163,7 +163,7 @@ export function HomeView() {
               <br />
               <span className="text-ink">{model.levelName}</span>
             </p>
-            <ButtonLink href={`/step/${model.situationId}?level=${model.level}`} className="mt-5" icon={ArrowRight}>
+            <ButtonLink href={`/step/${model.situationId}?level=${model.level}`} className="mt-5" icon={ArrowRight} iconEnd>
               Start
             </ButtonLink>
           </>

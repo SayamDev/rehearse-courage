@@ -28,17 +28,21 @@ type ButtonOwnProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: Icon;
+  /** Put the icon after the label (forward arrows, as on the comps). */
+  iconEnd?: boolean;
   children: ReactNode;
 };
 
 export type ButtonProps = ButtonOwnProps &
   Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> & { ref?: Ref<HTMLButtonElement> };
 
-export function Button({ variant = "primary", size = "lg", icon: IconCmp, children, className = "", ...props }: ButtonProps) {
+export function Button({ variant = "primary", size = "lg", icon: IconCmp, iconEnd = false, children, className = "", ...props }: ButtonProps) {
+  const icon = IconCmp ? <IconCmp size={size === "lg" ? 22 : 18} weight="regular" aria-hidden /> : null;
   return (
     <button type="button" className={buttonClass(variant, size, className)} {...props}>
-      {IconCmp ? <IconCmp size={size === "lg" ? 22 : 18} weight="regular" aria-hidden /> : null}
+      {iconEnd ? null : icon}
       {children}
+      {iconEnd ? icon : null}
     </button>
   );
 }
@@ -47,17 +51,21 @@ type ButtonLinkOwnProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   icon?: Icon;
+  /** Put the icon after the label (forward arrows, as on the comps). */
+  iconEnd?: boolean;
   children: ReactNode;
 } & LinkProps;
 
 export type ButtonLinkProps = ButtonLinkOwnProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href" | "children">;
 
-export function ButtonLink({ variant = "primary", size = "lg", icon: IconCmp, children, className = "", ...props }: ButtonLinkProps) {
+export function ButtonLink({ variant = "primary", size = "lg", icon: IconCmp, iconEnd = false, children, className = "", ...props }: ButtonLinkProps) {
+  const icon = IconCmp ? <IconCmp size={size === "lg" ? 22 : 18} weight="regular" aria-hidden /> : null;
   return (
     <Link className={buttonClass(variant, size, className)} {...props}>
-      {IconCmp ? <IconCmp size={size === "lg" ? 22 : 18} weight="regular" aria-hidden /> : null}
+      {iconEnd ? null : icon}
       {children}
+      {iconEnd ? icon : null}
     </Link>
   );
 }

@@ -148,7 +148,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       <div className="mx-auto max-w-[640px] px-4 pt-10">
         <h1 className={`${TITLE} text-ink`}>This step isn&apos;t on this device.</h1>
         <p className="mt-2 text-ink">Your own steps are saved only on the device where you added them.</p>
-        <ButtonLink href="/map" className="mt-6" icon={ArrowRight}>
+        <ButtonLink href="/map" className="mt-6" icon={ArrowRight} iconEnd>
           Go to the map
         </ButtonLink>
       </div>
