@@ -147,10 +147,16 @@ a {
   color: var(--ink);
 }
 
-:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
-  border-radius: 6px;
+/* In Tailwind v4's cascade layers, "base" sits below "utilities" regardless
+   of source order within this file, so a component's outline-none utility
+   (e.g. a programmatically-focused, non-interactive heading) reliably wins
+   over this rule without needing an inline style or an important modifier. */
+@layer base {
+  :focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
 }
 
 * {

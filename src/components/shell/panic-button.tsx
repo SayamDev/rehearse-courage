@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShieldCheck } from "@phosphor-icons/react";
+import { hidesNav } from "./no-nav-routes";
 
 /**
  * Opens the Panic now view (built in a later task) by adding `?calm=1` to
@@ -16,9 +17,10 @@ const OFFSET_CLASS_START = "fixed bottom-[var(--panic-offset-start)] right-3 z-4
 
 export function PanicButton() {
   const pathname = usePathname();
-  // /start has no bottom nav to clear (see BottomNav), so Panic now sits
-  // closer to the corner instead of the taller offset that clears the nav.
-  const className = pathname === "/start" ? OFFSET_CLASS_START : OFFSET_CLASS;
+  // Routes in no-nav-routes.ts have no bottom nav to clear (see BottomNav),
+  // so Panic now sits closer to the corner instead of the taller offset
+  // that clears the nav.
+  const className = hidesNav(pathname) ? OFFSET_CLASS_START : OFFSET_CLASS;
 
   return (
     <Link href={`${pathname}?calm=1`} className={className}>

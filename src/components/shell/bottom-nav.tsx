@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FirstAidKit, House, MapTrifold, Medal, User, type Icon } from "@phosphor-icons/react";
+import { hidesNav } from "./no-nav-routes";
 
 export type NavHref = "/" | "/map" | "/kit" | "/badges" | "/me";
 export type NavLabel = "Home" | "Map" | "Kit" | "Badges" | "Me";
@@ -41,9 +42,10 @@ export function BottomNav() {
   const pathname = usePathname();
   const active = activeNav(pathname);
 
-  // First-visit setup (/start) has nowhere for these five tabs to lead yet:
-  // hide the nav there rather than link to empty screens.
-  if (pathname === "/start") return null;
+  // Routes in no-nav-routes.ts (currently just /start) have nowhere for
+  // these five tabs to lead yet: hide the nav there rather than link to
+  // empty screens.
+  if (hidesNav(pathname)) return null;
 
   return (
     <nav aria-label="Main" className="fixed inset-x-0 bottom-3 z-30 px-3 sm:px-6">

@@ -13,13 +13,13 @@ import { Companion } from "@/components/scene/companion";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Button } from "@/components/ui/button";
 
+// The heading is focused programmatically (tabIndex=-1) purely to move the
+// screen reader's position, not as a visible focus target. outline-none
+// suppresses that ring; it reliably beats globals.css's :focus-visible rule
+// because that rule lives in Tailwind's "base" cascade layer, below
+// "utilities" (see globals.css). Real controls (buttons, links, the input)
+// are untouched and keep their normal focus-visible ring.
 const headingClass = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink outline-none";
-// Inline, not just the outline-none class: the heading is focused
-// programmatically (tabIndex=-1) purely to move the screen reader's
-// position, not as a visible focus target, and inline style beats the
-// global :focus-visible rule regardless of cascade order. Real controls
-// (buttons, links, the input) keep their normal focus-visible ring.
-const noVisibleFocusRing = { outline: "none" } as const;
 
 const COMPANION_ICONS: Partial<Record<Species, Icon>> = { hedgehog: PawPrint, fox: Leaf };
 
@@ -160,7 +160,7 @@ function StepAge({
 }) {
   return (
     <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
         How old are you?
       </h1>
       <p className="mt-2 text-muted">This keeps the app right for you. Skip if you would rather not say.</p>
@@ -195,7 +195,7 @@ function StepHardThings({
 }) {
   return (
     <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
         What feels hard right now?
       </h1>
       <p className="mt-2 text-muted">Choose as many as fit. Skip if none feel right.</p>
@@ -237,7 +237,7 @@ function StepCompanion({
 }) {
   return (
     <div>
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
         Pick a companion
       </h1>
       <p className="mt-2 text-muted">They will keep you company while you practise. You can change this any time.</p>
@@ -289,7 +289,7 @@ function StepName({
         onFinish();
       }}
     >
-      <h1 ref={headingRef} tabIndex={-1} className={headingClass} style={noVisibleFocusRing}>
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
         Give them a name
       </h1>
       <p className="mt-2 text-muted">Skip to keep the name {placeholder}.</p>
