@@ -26,15 +26,17 @@ export type BudgetKind = "groqChat" | "groqTranscribe" | "groqAudioSeconds" | "w
  * Whole site, per day. Groq's free plan allows about 1,000 chat and 2,000
  * transcription requests (8 hours of audio) a day. Workers AI's free
  * allocation is about 10,000 neurons a day, shared by chat, speech and the
- * safety guard, so its caps are small.
+ * safety guard. Most of it goes to the guard, so as many replies as
+ * possible get both checks; the backup chat and speech caps stay small.
+ * Once the guard's share is used, replies still pass the local filter.
  */
 export const SITE_CAPS: Record<BudgetKind, number> = {
   groqChat: num(process.env.SITE_GROQ_CHAT, 900),
   groqTranscribe: num(process.env.SITE_GROQ_TRANSCRIBE, 1900),
   groqAudioSeconds: num(process.env.SITE_GROQ_AUDIO_SECONDS, 27_000),
-  workersChat: num(process.env.SITE_WORKERS_CHAT, 40),
-  workersGuard: num(process.env.SITE_WORKERS_GUARD, 300),
-  workersWhisper: num(process.env.SITE_WORKERS_WHISPER, 40),
+  workersChat: num(process.env.SITE_WORKERS_CHAT, 25),
+  workersGuard: num(process.env.SITE_WORKERS_GUARD, 600),
+  workersWhisper: num(process.env.SITE_WORKERS_WHISPER, 25),
 };
 
 export function today(now = new Date()): string {

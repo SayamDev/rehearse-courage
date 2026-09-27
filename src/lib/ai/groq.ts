@@ -81,7 +81,7 @@ export async function groqJson<T>(
         response_format: { type: "json_schema", json_schema: { name, strict: true, schema: strictSchema(schema) } },
       }),
     },
-    opts.timeoutMs ?? 10_000,
+    opts.timeoutMs ?? 6_000,
   );
   const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
   const content = data.choices?.[0]?.message?.content;

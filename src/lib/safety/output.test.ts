@@ -7,6 +7,12 @@ describe("cleanReply", () => {
     expect(cleanReply("Nice – really!!")).toBe("Nice, really.");
   });
 
+  test("turns spaced hyphens into commas and keeps questions as questions", () => {
+    expect(cleanReply("Nice work - I like your idea.")).toBe("Nice work, I like your idea.");
+    expect(cleanReply("Really?!")).toBe("Really?");
+    expect(cleanReply("A well-known book.")).toBe("A well-known book.");
+  });
+
   test("strips markdown, wrapping quotes and extra spaces", () => {
     expect(cleanReply('  "**That** is   a _good_ point."  ')).toBe("That is a good point.");
   });
@@ -22,13 +28,23 @@ describe("checkOutputLocal", () => {
   test.each([
     ["", "empty"],
     ["Calm down, it is fine.", "banned"],
+    ["You got this.", "banned"],
+    ["You've totally got this.", "banned"],
+    ["Stay calm, it went well.", "banned"],
+    ["Take a deep breath and go again.", "banned"],
+    ["Don't worry, that was good.", "banned"],
+    ["You spoke so clearly and smoothly.", "speech"],
+    ["Your voice was steady.", "speech"],
+    ["You did not trip over any words.", "speech"],
+    ["You seemed a bit anxious there.", "speech"],
+    ["You sounded really confident.", "speech"],
     ["You've got this.", "banned"],
     ["Don't be nervous about it.", "banned"],
     ["Try not to stutter next time.", "speech"],
     ["You said um a lot.", "speech"],
     ["That was very fluent.", "speech"],
     ["Try to speak more clearly.", "speech"],
-    ["It sounds like you have anxiety.", "health"],
+    ["It sounds like you have ADHD.", "health"],
     ["A therapist could help with that.", "health"],
     ["What is your name?", "personal"],
     ["Which school do you go to?", "personal"],
@@ -54,6 +70,12 @@ describe("checkOutputLocal", () => {
     expect(long.length).toBeLessThan(320);
     expect(checkOutputLocal(long, "coach", "teen")).toEqual({ ok: false, reason: "long" });
     expect(checkOutputLocal(long, "coach", "adult").ok).toBe(true);
+  });
+
+  test("a tidy may keep the person's own words about feelings, but never links or harm", () => {
+    const input = "um I get nervous and I try to stay calm when I speak slowly";
+    expect(ok("I get nervous, and I try to stay calm when I speak slowly.", "tidy", input)).toBe(true);
+    expect(ok("I get nervous. See www.help.com", "tidy", input)).toBe(false);
   });
 
   test("a tidy must stay close to the person's own words", () => {

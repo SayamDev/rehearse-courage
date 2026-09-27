@@ -3,7 +3,7 @@ import { coachLine } from "@/lib/content/coach";
 import { situationById } from "@/lib/content/situations";
 import { checkCrisis } from "@/lib/safety/crisis";
 import type { RoomId } from "@/lib/types";
-import { clientKey, json, sameOrigin } from "./guard";
+import { bodyWithin, clientKey, json, sameOrigin } from "./guard";
 import { coachReply, tidySentence, transcribeAudio, type ProviderDeps } from "./provider";
 import { AiAgeSchema, CoachBody, TidyBody } from "./schemas";
 
@@ -17,7 +17,11 @@ import { AiAgeSchema, CoachBody, TidyBody } from "./schemas";
 export const MAX_AUDIO_BYTES = 4 * 1024 * 1024;
 export const MAX_AUDIO_SECONDS = 120;
 
+/** JSON bodies are small (about 600 characters of answer); anything bigger is refused unread. */
+export const MAX_JSON_BYTES = 8 * 1024;
+
 const NOT_AVAILABLE = { error: "not-available" };
+const TOO_LARGE = { error: "too-large" };
 
 async function readJson(request: Request): Promise<unknown> {
   return request.json().catch(() => null);
@@ -30,6 +34,7 @@ function ageAllowed(raw: unknown): boolean {
 
 export async function handleCoach(request: Request, deps: ProviderDeps): Promise<Response> {
   if (!sameOrigin(request)) return json(NOT_AVAILABLE, 403);
+  if (!bodyWithin(request, MAX_JSON_BYTES)) return json(TOO_LARGE, 413);
   const raw = await readJson(request);
   if (!ageAllowed(raw)) return json(NOT_AVAILABLE, 403);
   const parsed = CoachBody.safeParse(raw);
@@ -52,6 +57,7 @@ export async function handleCoach(request: Request, deps: ProviderDeps): Promise
 
 export async function handleTidy(request: Request, deps: ProviderDeps): Promise<Response> {
   if (!sameOrigin(request)) return json(NOT_AVAILABLE, 403);
+  if (!bodyWithin(request, MAX_JSON_BYTES)) return json(TOO_LARGE, 413);
   const raw = await readJson(request);
   if (!ageAllowed(raw)) return json(NOT_AVAILABLE, 403);
   const parsed = TidyBody.safeParse(raw);
@@ -72,13 +78,18 @@ export function audioFilename(type: string): string {
   return "answer.webm";
 }
 
+/** Opus audio is roughly 4 KB a second, so the audio budget counts at least this, whatever the browser says. */
+const BYTES_PER_SECOND = 4000;
+
 export async function handleTranscribe(request: Request, deps: ProviderDeps): Promise<Response> {
   if (!sameOrigin(request)) return json(NOT_AVAILABLE, 403);
+  if (!bodyWithin(request, MAX_AUDIO_BYTES + 64 * 1024)) return json(TOO_LARGE, 413);
   const form = await request.formData().catch(() => null);
   if (!form || !AiAgeSchema.safeParse(form.get("age")).success) return json(NOT_AVAILABLE, 403);
   const audio = form.get("audio");
   if (!(audio instanceof Blob) || audio.size === 0 || audio.size > MAX_AUDIO_BYTES) return json({ error: "bad-request" }, 400);
-  const seconds = Math.min(MAX_AUDIO_SECONDS, Math.max(0, Number(form.get("seconds")) || 0));
+  const claimed = Math.max(0, Number(form.get("seconds")) || 0);
+  const seconds = Math.min(MAX_AUDIO_SECONDS, Math.max(claimed, audio.size / BYTES_PER_SECOND));
 
   if (!deps.limits.takeToken("transcribe", await clientKey(request))) return json({ text: null, reason: "limit" });
 

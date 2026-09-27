@@ -24,6 +24,6 @@ export const TidyBody = z.object({
 });
 export type TidyBody = z.infer<typeof TidyBody>;
 
-/** What the model must answer with (JSON mode). */
-export const CoachOutput = z.object({ reply: z.string().max(1000) });
-export const TidyOutput = z.object({ tidy: z.string().max(1000) });
+/** What the model must answer with (JSON mode). Length is checked by the output filter, not the schema, so strict mode stays simple. */
+export const CoachOutput = z.object({ reply: z.string() });
+export const TidyOutput = z.object({ tidy: z.string() });

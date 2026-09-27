@@ -18,34 +18,49 @@ const MAX_LENGTH: Record<ReplyKind, Record<AiAge, number>> = {
 export function cleanReply(text: string): string {
   return text
     .replace(/[*_#`]/g, "")
-    .replace(/\s*[—–]\s*/g, ", ")
-    .replace(/!+/g, ".")
+    .replace(/\s*[—–‒―]\s*|\s+-+\s+/g, ", ")
+    .replace(/\?\s*[!！]+/g, "?")
+    .replace(/[!！]+/g, ".")
     .replace(/\s+/g, " ")
     .trim()
     .replace(/^["“'‘]+|["”'’]+$/g, "")
+    .replace(/^,\s*/, "")
     .replace(/\.{2,}$/, ".")
-    .replace(/,\s*\./g, ".")
+    .replace(/,\s*([.?])/g, "$1")
     .trim();
 }
 
-const PATTERNS: { reason: string; re: RegExp }[] = [
+/**
+ * `coachOnly` patterns apply to Cobi's replies. A tidy is the person's own
+ * sentence (the drift check keeps it that way), so it may mention being
+ * calm or nervous; it still may not carry links, contact details, harm or
+ * swearing.
+ */
+const PATTERNS: { reason: string; re: RegExp; coachOnly?: true }[] = [
   { reason: "email", re: /\S+@\S+\.\S+/ },
   { reason: "link", re: /https?:\/\/|www\.|\b[a-z0-9-]+\.(com|org|net|io|co|uk|app|dev)\b/ },
   { reason: "phone", re: /\+?\d[\d\s().-]{6,}\d/ },
   {
     reason: "banned",
-    re: /\bcalm down\b|\byou'?ve got this\b|\brelax\b|\bdon'?t be (so )?(nervous|shy|scared|anxious)\b|\bjust breathe\b|\bno need to (be )?(nervous|worry)\b/,
+    coachOnly: true,
+    re: /\bcalm\b|\byou'?(ve)? (\w+ )?got this\b|\brelax\b|\bdon'?t (be|get) (so |too )?(nervous|shy|scared|anxious|worried)\b|\bdon'?t worry\b|\bno need to (be )?(nervous|worry)\b|\b(deep )?breaths?\b|\bbreathe\b|\bslow down\b/,
   },
-  // Never comment on how someone spoke.
-  { reason: "speech", re: /\bstutter|\bstammer|\bfluen(t|cy)\b|\bfillers?\b|\bum+\b|\buh+\b|\bpauses?d?\b|\bspeak (more )?(clearly|slowly|faster)\b|\bmumbl/ },
+  // Never comment on how someone spoke or how they seemed, not even as praise.
+  {
+    reason: "speech",
+    coachOnly: true,
+    re: /\bstutter|\bstammer|\bfluen(t|cy)\b|\bfillers?\b|\bum+\b|\buh+\b|\bpaus(e|es|ed|ing)\b|\bmumbl|\btrip(ped)? over\b|\bslow(ly|er)?\b|\bclearly\b|\bsmoothly\b|\bsteady\b|\bconfident(ly)?\b|\bnerv(es|ous)\b|\banxi(ous|ety)\b|\b(loud|quiet)(ly|er)?\b|\b(seemed|sounded|looked|seem|sound|look) (a bit |so |really |very |quite )?(scared|shy|worried|unsure|tense)\b|\b(your|the way you) (voice|delivery|speaking|pace|words came out)\b/,
+  },
   // No health claims or labels.
   {
     reason: "health",
-    re: /\bdiagnos|\bdisorder\b|\bmedicat|\btherap(y|ist)\b|\bsymptom|\byou (have|may have|might have) (anxiety|adhd|autism|depression|social anxiety)\b/,
+    coachOnly: true,
+    re: /\bdiagnos|\bdisorder\b|\bmedicat|\btherap(y|ist)\b|\bsymptom|\byou (have|may have|might have) (adhd|autism|depression)\b/,
   },
   // Never ask for anything that identifies someone.
   {
     reason: "personal",
+    coachOnly: true,
     re: /\b(what'?s|what is|tell me) your (full |real |last )?name\b|\bwhere do you live\b|\bhow old are you\b|\bwhich school\b|\byour (home )?address\b|\bphone number\b|\bsend me\b|\bphotos?\b|\bsnapchat|\binstagram|\bwhatsapp|\bdiscord\b/,
   },
   { reason: "profanity", re: /\b(fuck\w*|shit\w*|bitch\w*|bastards?|dicks?|cunts?|piss(ed)?|crap|damn|wank\w*|twats?|sluts?|whores?)\b/ },
@@ -67,7 +82,10 @@ export function checkOutputLocal(text: string, kind: ReplyKind, age: AiAge, inpu
   if (!t.trim()) return { ok: false, reason: "empty" };
   if (text.length > MAX_LENGTH[kind][age]) return { ok: false, reason: "long" };
   if (checkCrisis(text).crisis || HARM.test(t)) return { ok: false, reason: "crisis" };
-  for (const p of PATTERNS) if (p.re.test(t)) return { ok: false, reason: p.reason };
+  for (const p of PATTERNS) {
+    if (p.coachOnly && kind !== "coach") continue;
+    if (p.re.test(t)) return { ok: false, reason: p.reason };
+  }
   if (kind === "tidy") {
     if (text.length > input.length * 2 + 40) return { ok: false, reason: "drift" };
     const own = new Set(wordsOf(input));

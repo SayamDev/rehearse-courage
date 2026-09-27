@@ -24,6 +24,13 @@ export default function AboutPage() {
           It rewards trying, never how smoothly you speak. It never counts pauses, fillers or stutters, and it never
           takes anything away.
         </p>
+        <p>
+          For people aged 13 and over, Cobi&apos;s replies and sentence tidy can use free AI that does not keep your words
+          or learn from them. For anyone younger, every reply is written in advance and nothing leaves the device.{" "}
+          <Link href="/privacy#ai" className="font-semibold underline">
+            How AI is used
+          </Link>
+        </p>
         <p>Rehearse Courage is practice, not therapy. It does not diagnose or treat any condition.</p>
         <p>
           It is a sister project to{" "}

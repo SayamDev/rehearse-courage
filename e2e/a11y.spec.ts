@@ -9,6 +9,7 @@ const ROUTES = [
   "/room/class",
   "/step/class-answer?level=1",
   "/step/class-answer?level=3",
+  "/step/class-answer?level=4",
   "/step/class-answer?level=6",
   "/kit",
   "/kit/breathing",

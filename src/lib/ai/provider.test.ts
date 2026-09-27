@@ -72,6 +72,17 @@ describe("provider order", () => {
     expect(await coachReply(COACH, deps({ groq: { key: "k", fetch: groqFetch("Nice answer.") }, ai }))).toBeNull();
   });
 
+  test("when the guard's daily share is used up, replies still get the local filter", async () => {
+    const limits = createLimits(VISITOR_LIMITS, { ...SITE_CAPS, workersGuard: 0 });
+    const ai = binding();
+    expect(await coachReply(COACH, { groq: { key: "k", fetch: groqFetch("Nice answer.") }, ai, limits })).toEqual({
+      text: "Nice answer.",
+      source: "groq",
+    });
+    expect(await coachReply(COACH, { groq: { key: "k", fetch: groqFetch("You got this.") }, ai, limits })).toBeNull();
+    expect(ai.run).not.toHaveBeenCalled();
+  });
+
   test("site budgets are respected", async () => {
     const limits = createLimits(VISITOR_LIMITS, { ...SITE_CAPS, groqChat: 0, workersChat: 0 });
     const fetch = groqFetch("Nice.");
@@ -148,12 +159,22 @@ describe("request guards", () => {
     expect(sameOrigin(req({}))).toBe(false);
   });
 
-  test("the rate-limit key is a daily hash, never the address", async () => {
-    const a = await clientKey(req({ "cf-connecting-ip": "203.0.113.9" }), new Date("2026-09-27T10:00:00Z"));
+  test("the rate-limit key is a keyed daily hash, never the address", async () => {
+    const day1 = new Date("2026-09-27T10:00:00Z");
+    const a = await clientKey(req({ "cf-connecting-ip": "203.0.113.9" }), day1);
+    expect(await clientKey(req({ "cf-connecting-ip": "203.0.113.9" }), day1)).toBe(a);
+    expect(await clientKey(req({ "cf-connecting-ip": "203.0.113.10" }), day1)).not.toBe(a);
     const b = await clientKey(req({ "cf-connecting-ip": "203.0.113.9" }), new Date("2026-09-28T10:00:00Z"));
     expect(a).toMatch(/^[0-9a-f]{16}$/);
-    expect(a).not.toContain("203");
     expect(a).not.toBe(b);
+    // A plain hash of ip and date would be guessable; this one uses a secret that only lives in memory.
+    const plain = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode("203.0.113.9|2026-09-27")));
+    expect(a).not.toBe(Array.from(plain.slice(0, 8), (x) => x.toString(16).padStart(2, "0")).join(""));
+  });
+
+  test("a forwarded-for header cannot choose the key", async () => {
+    const day = new Date("2026-09-27T10:00:00Z");
+    expect(await clientKey(req({ "x-forwarded-for": "1.1.1.1" }), day)).toBe(await clientKey(req({ "x-forwarded-for": "2.2.2.2" }), day));
   });
 });
 

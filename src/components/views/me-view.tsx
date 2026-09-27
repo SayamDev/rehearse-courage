@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { StatsPill } from "@/components/ui/stats-pill";
 import { Switch } from "@/components/ui/switch";
+import { AiSettings } from "./ai-settings";
 
 const STAGE_WORD: Record<Stage, string> = {
   hiding: "Curled up with their lantern",
@@ -56,8 +57,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 /**
  * Me ("/me"): the companion and progress, settings, what the app knows
- * about you (editable), and your data: back up, restore, delete. Nothing
- * here leaves the device except a backup file the person saves themselves.
+ * about you (editable), AI help (13 and over), and your data: back up,
+ * restore, delete. Nothing here leaves the device except a backup file the
+ * person saves themselves.
  */
 export function MeView() {
   const store = useCourage();
@@ -179,6 +181,10 @@ export function MeView() {
             })}
           </div>
         </fieldset>
+      </Section>
+
+      <Section title="AI help">
+        <AiSettings />
       </Section>
 
       <Section title="Your data">

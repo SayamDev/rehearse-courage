@@ -3,14 +3,16 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ArrowRight, Check, Keyboard, Microphone, X } from "@phosphor-icons/react";
+import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ChatCircle, Check, Keyboard, Microphone, X } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
+import { browserAiDeps } from "@/lib/ai/browser";
+import { canUseOnline, coachAnswer, transcribeAnswer } from "@/lib/ai/client";
 import { COACH_NAME, coachLine, PRESSURE_LINES } from "@/lib/content/coach";
 import { situationById } from "@/lib/content/situations";
 import { LEVELS } from "@/lib/ladder";
 import { ROOM_LABEL } from "@/lib/rooms";
 import { checkCrisis } from "@/lib/safety/crisis";
-import { useSpeak } from "@/lib/speak";
+import { useSpeak, waitForRecording } from "@/lib/speak";
 import { recordStep } from "@/lib/state";
 import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
@@ -28,6 +30,7 @@ const FIELD =
   "mt-2 block w-full rounded-2xl border border-line bg-surface px-4 py-3 text-ink placeholder:text-muted focus-visible:border-ink";
 
 type Step = { id: string; room: RoomId; scene: string; ideas: string[]; mission: string; title: string };
+type CobiReply = { text: string; source: "online" | "device" | "prewritten"; by: "speak" | "type" };
 
 /** Resolves a pre-written situation or one of the person's own steps into what the page shows. */
 function useStep(id: string): Step | null | undefined {
@@ -106,7 +109,10 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   const store = useCourage();
   const router = useRouter();
   const step = useStep(id);
-  const speak = useSpeak({ keep: store.settings.keepRecordings });
+  const level: Level = resolveLevel(levelParam, store.records, id);
+  const online = canUseOnline(store);
+  // At step 4, 13 and over with online help on: keep the audio in memory for one transcription.
+  const speak = useSpeak({ keep: store.settings.keepRecordings, capture: level === 4 && online });
 
   const [idea, setIdea] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -115,10 +121,11 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   const [mode, setMode] = useState<"speak" | "type">("speak");
   const [result, setResult] = useState<StepResult | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [reply, setReply] = useState<CobiReply | null>(null);
+  const [thinking, setThinking] = useState(false);
   const typeRef = useRef<HTMLTextAreaElement>(null);
   const focusType = useRef(false);
-
-  const level: Level = resolveLevel(levelParam, store.records, id);
+  const replyRef = useRef<HTMLElement>(null);
 
   // Microphone off or missing: fall back to typing, calmly, with the field focused.
   const typing = mode === "type" || speak.state === "blocked";
@@ -132,6 +139,11 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       typeRef.current?.focus();
     }
   }, [mode]);
+
+  // The button that asked for Cobi's reply is replaced by the reply: move focus there so nobody is left on nothing.
+  useEffect(() => {
+    if (reply) replyRef.current?.focus();
+  }, [reply]);
 
   // Level 5 optional timer: counts up, never down, only when the person turned timers on.
   const showTimer = level === 5 && store.settings.timers && result === null;
@@ -159,18 +171,64 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
 
   if (result) return <StepDone result={result} room={step.room} title={step.title} />;
 
-  const finish = ({ seconds, typed }: { seconds: number | null; typed: boolean }) => {
+  const finish = ({ seconds, typed, crisis = false }: { seconds: number | null; typed: boolean; crisis?: boolean }) => {
     const record: StepRecord = { situationId: step.id, level, at: new Date().toISOString(), seconds, typed, roughDay };
     const before = store.records;
     const earned = act((s) => recordStep(s, record));
     speak.reset();
-    const flagged = [text, note].some((t) => t.trim() && checkCrisis(t).crisis);
+    const flagged = crisis || [text, note].some((t) => t.trim() && checkCrisis(t).crisis);
     if (flagged) {
       router.push(`/help?crisis=1&from=${encodeURIComponent(`/step/${step.id}`)}`);
       return;
     }
     setResult(stepResult(before, record, earned));
     window.scrollTo({ top: 0 });
+  };
+
+  const spokenSeconds = () => (speak.seconds > 0 ? speak.seconds : null);
+
+  /**
+   * Step 4: Cobi answers what they said. Typed words, or (13 and over with
+   * online help) the transcript of what they said, go to the coach; under
+   * 13 and every fallback get a pre-written reply on the device. The words
+   * are never saved.
+   */
+  const askCobi = async (by: "speak" | "type") => {
+    if (thinking) return;
+    setThinking(true);
+    const deps = browserAiDeps(store.settings.deviceModel);
+    let answer = by === "type" ? text : "";
+    if (by === "speak" && online) {
+      const heard = await transcribeAnswer(store, await waitForRecording(speak.latest), speak.seconds, deps);
+      if (heard.kind === "crisis") {
+        finish({ seconds: spokenSeconds(), typed: false, crisis: true });
+        return;
+      }
+      if (heard.kind === "text") answer = heard.text;
+    }
+    const out = await coachAnswer(
+      store,
+      {
+        situationId: step.id,
+        room: step.room,
+        scene: step.scene,
+        prompt: words(coachLine(step.id), store.age),
+        answer,
+        seed: `${step.id}-${store.records.length}-${answer.length}`,
+      },
+      deps,
+    );
+    setThinking(false);
+    if (out.kind === "crisis") {
+      finish({ seconds: by === "speak" ? spokenSeconds() : null, typed: by === "type", crisis: true });
+      return;
+    }
+    setReply({ text: out.text, source: out.source, by });
+  };
+
+  const againFromReply = () => {
+    setReply(null);
+    speak.reset();
   };
 
   const typeInstead = () => {
@@ -215,6 +273,14 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
             <figcaption className="text-muted">{COACH_NAME}</figcaption>
             <blockquote className="mt-1 text-ink">{words(coachLine(step.id), store.age)}</blockquote>
           </figure>
+        ) : null}
+        {level === 4 && online ? (
+          <p className="mt-2 text-muted">
+            Cobi&apos;s reply comes from an online AI. What you say is not saved.{" "}
+            <Link href="/privacy#ai" className="underline">
+              How this works
+            </Link>
+          </p>
         ) : null}
 
         {level === 5 ? (
@@ -263,7 +329,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
         ) : null}
 
         {/* Levels 3 to 5: speak, or type instead. */}
-        {speaking && !typing ? (
+        {speaking && !typing && !reply ? (
           <div className="mt-6">
             {speak.state === "done" ? (
               <>
@@ -273,10 +339,16 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
                     : "All done. You can finish here or try again."}
                 </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <Button icon={Check} onClick={() => finish({ seconds: speak.seconds > 0 ? speak.seconds : null, typed: false })}>
-                    Finish
-                  </Button>
-                  <Button variant="secondary" icon={Microphone} onClick={speak.reset}>
+                  {level === 4 ? (
+                    <Button icon={ChatCircle} onClick={() => askCobi("speak")} aria-disabled={thinking}>
+                      Hear Cobi&apos;s reply
+                    </Button>
+                  ) : (
+                    <Button icon={Check} onClick={() => finish({ seconds: spokenSeconds(), typed: false })}>
+                      Finish
+                    </Button>
+                  )}
+                  <Button variant="secondary" icon={Microphone} onClick={speak.reset} disabled={thinking}>
                     Try again
                   </Button>
                 </div>
@@ -303,7 +375,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
           </div>
         ) : null}
 
-        {speaking && typing ? (
+        {speaking && typing && !reply ? (
           <>
             {speak.state === "blocked" ? (
               <p id="mic-off" className="mt-5 text-ink" role="status">
@@ -318,12 +390,19 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
               describedBy={speak.state === "blocked" ? "mic-off" : undefined}
             />
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Button icon={Check} onClick={() => finish({ seconds: null, typed: true })}>
-                Done
-              </Button>
+              {level === 4 ? (
+                <Button icon={ChatCircle} onClick={() => askCobi("type")} aria-disabled={thinking}>
+                  Hear Cobi&apos;s reply
+                </Button>
+              ) : (
+                <Button icon={Check} onClick={() => finish({ seconds: null, typed: true })}>
+                  Done
+                </Button>
+              )}
               <Button
                 variant="secondary"
                 icon={Microphone}
+                disabled={thinking}
                 onClick={() => {
                   speak.reset();
                   setMode("speak");
@@ -333,6 +412,37 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
               </Button>
             </div>
           </>
+        ) : null}
+
+        {/* Step 4: Cobi's reply, announced when it arrives. */}
+        {level === 4 ? (
+          <div className="mt-5">
+            <p role="status" className="text-ink empty:hidden">
+              {thinking ? "Cobi is thinking." : ""}
+            </p>
+            {reply ? (
+              <>
+                <figure ref={replyRef} tabIndex={-1} className="rounded-2xl bg-surface-2 px-4 py-3 outline-none">
+                  <figcaption className="text-muted">{COACH_NAME}</figcaption>
+                  <blockquote className="mt-1 text-ink">{reply.text}</blockquote>
+                </figure>
+                {reply.source === "device" ? <p className="mt-2 text-muted">This reply came from the AI on this device.</p> : null}
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <Button
+                    icon={Check}
+                    onClick={() =>
+                      finish({ seconds: reply.by === "speak" ? spokenSeconds() : null, typed: reply.by === "type" })
+                    }
+                  >
+                    Finish
+                  </Button>
+                  <Button variant="secondary" icon={ArrowCounterClockwise} onClick={againFromReply}>
+                    Try again
+                  </Button>
+                </div>
+              </>
+            ) : null}
+          </div>
         ) : null}
 
         {/* Level 6: try it for real. */}

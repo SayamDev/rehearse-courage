@@ -26,9 +26,12 @@ export function SpeakButton({
   onStart,
   onStop,
   label = "Hold to speak",
+  variant = "primary",
   className = "",
 }: {
   state: SpeakState;
+  /** Secondary where another button is the screen's one amber action. */
+  variant?: "primary" | "secondary";
   /** The resting label, e.g. "Say it" in the rescue deck. */
   label?: string;
   onStart: () => void;
@@ -76,7 +79,7 @@ export function SpeakButton({
       onPointerCancel={up}
       onClick={click}
       onContextMenu={(e) => e.preventDefault()}
-      className={`${buttonClass("primary", "lg")} touch-none select-none ${live ? "stone-pulse" : ""} ${className}`}
+      className={`${buttonClass(variant, "lg")} touch-none select-none ${live ? "stone-pulse" : ""} ${className}`}
     >
       <IconCmp size={22} weight="regular" aria-hidden />
       {state === "asking" || state === "listening" ? LABEL[state] : label}
