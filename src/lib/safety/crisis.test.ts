@@ -94,14 +94,29 @@ describe("crisis check", () => {
     // misspellings
     "sucicide",
     "suiciide",
+    "suicde",
+    "suisidal",
     // cutting, re-verified after narrowing
     "I've been cutting again",
     "i keep cutting myself",
     "I started cutting last year",
     "i've been cutting and nobody knows",
+    // cutting with trailing words
+    "I've been cutting again lately",
+    "i've been cutting again since tuesday",
+    "I started cutting when I was 12",
+    "I've been cutting for a year",
     // end it, re-verified after narrowing
     "ending it tonight",
     "i want to end it now",
+    // past-tense abuse after a pronoun
+    "he hit me",
+    "she hit me yesterday",
+    "they always hit me",
+    "someone hurt me",
+    "he punched me at school",
+    "she slapped me",
+    "he hit me in the face",
   ])("flags: %s", (text) => {
     expect(checkCrisis(text).crisis).toBe(true);
   });
@@ -136,6 +151,21 @@ describe("crisis check", () => {
     "I wanted to end it quickly",
     "they said it hits me",
     "she says it really hurts me when I stumble",
+    // cutting false alarms
+    "I'm cutting class",
+    "I keep cutting my speech short",
+    "I've been cutting it close",
+    "I keep cutting in when others talk",
+    // past-tense abuse false alarms
+    "they beat me in the debate",
+    "someone hit me up after class",
+    "he hit me with a question I didn't know",
+    // subjectless keeps-hitting nerves talk
+    "the nerves keep hitting me",
+    "it keeps hitting me",
+    "the panic keeps hitting me",
+    "this feeling keeps hitting me",
+    "the thought keeps hitting me",
   ])("does not flag everyday nerves: %s", (text) => {
     expect(checkCrisis(text).crisis).toBe(false);
   });
