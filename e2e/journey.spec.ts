@@ -12,6 +12,11 @@ test("first visit, first step, step done, back to the map", async ({ page }) => 
   await page.getByRole("button", { name: "Let's go" }).click();
 
   await expect(page).toHaveURL(/\/$/);
+  // The welcome guide opens once, on the first Home visit.
+  const welcome = page.getByRole("dialog", { name: "Firefly is ready when you are" });
+  await expect(welcome).toBeVisible();
+  await welcome.getByRole("button", { name: "Let's start" }).click();
+  await expect(welcome).toBeHidden();
   await expect(page.getByText("Today's one step")).toBeVisible();
   await page.getByRole("link", { name: "Start" }).click();
 

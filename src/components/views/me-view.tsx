@@ -5,11 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { DownloadSimple, Trash, UploadSimple } from "@phosphor-icons/react";
 import { removeModel } from "@/lib/ai/device";
-import { backupFilename, exportBackup, importBackup } from "@/lib/backup";
+import { importBackup } from "@/lib/backup";
 import { stageFor, type Stage } from "@/lib/companion";
 import { braveDaysThisWeek, missionsDone, totalPoints } from "@/lib/courage";
 import { AGE_OPTIONS, hardThingOptions, toggleHardThing } from "@/lib/onboarding";
 import { setAge, setHardThings, updateSettings, type Settings, type TextSize, type Theme } from "@/lib/state";
+import { saveBackupFile } from "@/lib/save-backup";
 import { act, clearEverything, useCourage } from "@/lib/store";
 import { Companion } from "@/components/scene/companion";
 import { Button } from "@/components/ui/button";
@@ -79,13 +80,7 @@ export function MeView() {
   const download = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { hydrated: _h, ...state } = store;
-    const url = URL.createObjectURL(new Blob([exportBackup(state)], { type: "application/json" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = backupFilename(new Date());
-    a.click();
-    // Later, so Safari and older Firefox have started the download first.
-    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+    saveBackupFile(state);
     setMessage("Backup saved. Keep the file somewhere safe.");
   };
 
