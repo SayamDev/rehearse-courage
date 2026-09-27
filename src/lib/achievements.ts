@@ -11,7 +11,7 @@ const roomOf = (id: string) => situationById(id)?.room;
 
 const RULES: Badge[] = [
   { id: "first-words", title: "First words", description: "You spoke out loud for the first time.", earned: (i) => i.records.some((r) => r.level >= 3 && !r.typed) },
-  { id: "typed-first", title: "Typed it first", description: "You typed before speaking. That counts.", earned: (i) => i.records.some((r) => r.typed) },
+  { id: "typed-first", title: "Typed it first", description: "You typed your answer. That counts.", earned: (i) => i.records.some((r) => r.typed) },
   { id: "hand-up", title: "Hand up", description: "You reached step 5 in class.", earned: (i) => i.records.some((r) => r.level >= 5 && roomOf(r.situationId) === "class") },
   { id: "said-anyway", title: "Said it anyway", description: "You spoke on a rough day.", earned: (i) => i.records.some((r) => r.roughDay && r.level >= 3 && !r.typed) },
   { id: "back-again", title: "Back again", description: "You came back after a break. Welcome back.", earned: (i) => i.cameBack },
