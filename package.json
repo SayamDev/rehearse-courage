@@ -1,0 +1,43 @@
+{
+  "name": "rehearse-courage",
+  "version": "0.1.0",
+  "private": true,
+  "author": "Sayam Ajmal",
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "next dev --port 3330",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest run",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test:e2e": "playwright test",
+    "cf:build": "sh scripts/cf.sh build-only",
+    "cf:preview": "sh scripts/cf.sh preview",
+    "cf:deploy": "sh scripts/cf.sh deploy"
+  },
+  "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.6",
+    "@phosphor-icons/react": "^2.1.10",
+    "lottie-web": "^5.13.0",
+    "motion": "^13.4.4",
+    "next": "16.3.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.63.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^26.6.2",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.6",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^5.0.2",
+    "wrangler": "^4.142.0"
+  }
+}
