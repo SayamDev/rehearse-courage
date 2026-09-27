@@ -42,7 +42,9 @@ export function Companion({ species, stage, size = 96 }: { species: Species; sta
       <div
         aria-hidden
         className="absolute inset-0 rounded-full"
-        style={{ boxShadow: `0 0 ${Math.round(size * 0.6)}px ${Math.round(size * 0.2)}px rgb(255 171 11 / ${glow})` }}
+        style={{
+          boxShadow: `0 0 ${Math.round(size * 0.6)}px ${Math.round(size * 0.2)}px color-mix(in srgb, var(--amber) ${Math.round(glow * 100)}%, transparent)`,
+        }}
       />
       <div
         role="img"

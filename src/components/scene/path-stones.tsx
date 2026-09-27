@@ -10,10 +10,12 @@ import { SceneArt } from "./scene-art";
 const STATE_WORD: Record<StoneState, string> = { lit: "done", current: "current", dim: "not yet" };
 
 // Dim stones get a solid paper fill (not just a thin outline) so they stay
-// legible over busy art; lit and current stay amber, current adds the pulse.
+// legible over busy art; lit and current stay amber, current adds the pulse
+// plus a static ink outline ring so it still reads as "current" (not just
+// "lit") when data-motion="reduce" flattens the pulse to its end frame.
 const STONE_CLASS: Record<StoneState, string> = {
   lit: "bg-amber text-on-amber shadow-glow",
-  current: "bg-amber text-on-amber shadow-glow stone-pulse",
+  current: "bg-amber text-on-amber shadow-glow stone-pulse outline outline-3 outline-offset-2 outline-on-amber",
   // Ink (not stone-dim) numerals on dim stones: stone-dim on the surface
   // fill reads under 4.5:1, ink clears it comfortably in both themes.
   dim: "border-2 border-stone-dim bg-surface text-ink shadow-card",
@@ -47,21 +49,26 @@ function stoneLabel(level: number, state: StoneState) {
  * whichever crop frame is showing.
  *
  * Pass `onPick` to make the stones and destination real buttons (used on
- * the room screen to choose a step). Without it, the whole path is a single
- * decorative group with a text summary for assistive tech (used on Home,
- * where the destination is Start, not the stones).
+ * the room screen to choose a step) — they are wrapped in explicit list
+ * semantics (role="list"/"listitem", since `list-none` otherwise drops the
+ * implicit list role in some screen readers) so assistive tech announces
+ * "item 3 of 6". Without `onPick`, the whole path is a single decorative
+ * group with a text summary instead (used on Home, where the destination is
+ * Start, not the stones).
  */
 export function PathStones({
   room,
   situationId,
   onPick,
   crop = "island",
+  priority = false,
   previewRecords,
 }: {
   room: RoomId;
   situationId: string;
   onPick?: (level: Level) => void;
   crop?: CropKind;
+  priority?: boolean;
   /** Testing only: overrides the courage store's records so a fixed state (e.g. a mid-progress example) can be rendered without touching real progress. Used by the dev scene lab. */
   previewRecords?: StepRecord[];
 }) {
@@ -74,75 +81,84 @@ export function PathStones({
 
   const summary = states.map((s, i) => `step ${i + 1} ${STATE_WORD[s]}`).join(", ");
 
+  const stoneAt = (i: number) => {
+    const level = i + 1;
+    const state = states[i];
+    const pt = toCropFrame(scene.stones[i], box);
+    return { level, state, style: { left: `${pt.x}%`, top: `${pt.y}%` } };
+  };
+
+  const dest = toCropFrame({ x: scene.destination.x, y: scene.destination.y }, box);
+  const destStyle = {
+    left: `${dest.x}%`,
+    top: `${dest.y}%`,
+    width: `${(scene.destination.w / box.w) * 100}%`,
+    height: `${(scene.destination.h / box.h) * 100}%`,
+  };
+  const destState = states[5];
+  const destLabel = `Step 6, Try it for real, ${scene.destination.label}, ${STATE_WORD[destState]}`;
+
   return (
     <div
       className="relative w-full overflow-hidden rounded-card"
       style={{ aspectRatio: cropAspect(scene, box), containerType: "inline-size" }}
       {...(interactive ? {} : { role: "img", "aria-label": `Path: ${summary}.` })}
     >
-      <SceneArt room={room} crop={crop} />
-      <div aria-hidden={interactive ? undefined : true}>
-        {scene.stones.map((raw, i) => {
-          const level = i + 1;
-          const state = states[i];
-          const pt = toCropFrame(raw, box);
-          const posStyle = { left: `${pt.x}%`, top: `${pt.y}%` };
+      <SceneArt room={room} crop={crop} priority={priority} />
 
-          if (interactive) {
-            // The button itself is the 44px minimum hit area (invisible
-            // background); the visible coin inside it is the one that
-            // shrinks with the frame, via an invisible padding ring.
+      {interactive ? (
+        <ul role="list" className="m-0 list-none p-0">
+          {scene.stones.map((_, i) => {
+            const { level, state, style } = stoneAt(i);
             return (
-              <button
-                key={level}
-                type="button"
-                onClick={() => onPick?.(level as Level)}
-                aria-label={stoneLabel(level, state)}
-                style={posStyle}
-                className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-transparent focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
-              >
-                <span
-                  style={STONE_VISUAL}
-                  className={`flex items-center justify-center rounded-full font-display text-base font-bold transition-colors duration-[var(--dur-ui)] hover:brightness-95 active:brightness-90 ${STONE_CLASS[state]}`}
+              <li key={level} role="listitem">
+                {/* The button itself is the 44px minimum hit area (invisible
+                    background); the visible coin inside it is the one that
+                    shrinks with the frame. */}
+                <button
+                  type="button"
+                  onClick={() => onPick?.(level as Level)}
+                  aria-label={stoneLabel(level, state)}
+                  style={style}
+                  className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-transparent focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
                 >
-                  {level}
-                </span>
-              </button>
+                  <span
+                    style={STONE_VISUAL}
+                    className={`flex items-center justify-center rounded-full font-display text-base font-bold transition-colors duration-[var(--dur-ui)] hover:brightness-95 active:brightness-90 ${STONE_CLASS[state]}`}
+                  >
+                    {level}
+                  </span>
+                </button>
+              </li>
             );
-          }
-
-          return (
-            <div
-              key={level}
-              style={{ ...posStyle, ...STONE_VISUAL }}
-              className={`absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-display text-base font-bold ${STONE_CLASS[state]}`}
-            >
-              {level}
-            </div>
-          );
-        })}
-
-        {(() => {
-          const dest = toCropFrame({ x: scene.destination.x, y: scene.destination.y }, box);
-          const destW = (scene.destination.w / box.w) * 100;
-          const destH = (scene.destination.h / box.h) * 100;
-          const destStyle = { left: `${dest.x}%`, top: `${dest.y}%`, width: `${destW}%`, height: `${destH}%` };
-
-          if (interactive) {
+          })}
+          <li role="listitem">
+            <button
+              type="button"
+              onClick={() => onPick?.(6 as Level)}
+              aria-label={destLabel}
+              style={destStyle}
+              className={`absolute transition-[box-shadow,outline-color] duration-[var(--dur-ui)] ${DEST_CLASS[destState]}`}
+            />
+          </li>
+        </ul>
+      ) : (
+        <div aria-hidden>
+          {scene.stones.map((_, i) => {
+            const { level, state, style } = stoneAt(i);
             return (
-              <button
-                type="button"
-                onClick={() => onPick?.(6 as Level)}
-                aria-label={`Step 6, Try it for real, ${scene.destination.label}, ${STATE_WORD[states[5]]}`}
-                style={destStyle}
-                className={`absolute transition-[box-shadow,outline-color] duration-[var(--dur-ui)] ${DEST_CLASS[states[5]]}`}
-              />
+              <div
+                key={level}
+                style={{ ...style, ...STONE_VISUAL }}
+                className={`absolute flex -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full font-display text-base font-bold ${STONE_CLASS[state]}`}
+              >
+                {level}
+              </div>
             );
-          }
-
-          return <div style={destStyle} className={`absolute ${DEST_CLASS[states[5]]}`} />;
-        })()}
-      </div>
+          })}
+          <div style={destStyle} className={`absolute ${DEST_CLASS[destState]}`} />
+        </div>
+      )}
     </div>
   );
 }

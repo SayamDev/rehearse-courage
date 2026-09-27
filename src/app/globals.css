@@ -16,7 +16,8 @@
   --focus: #1f6fd1;
   --calm: #3e7c6b;
   --card-shadow: 0 10px 24px -14px rgb(17 60 75 / 0.35);
-  --glow: 0 0 0 6px rgb(255 171 11 / 0.18), 0 6px 18px -6px rgb(255 171 11 / 0.55);
+  --glow:
+    0 0 0 6px color-mix(in srgb, var(--amber) 18%, transparent), 0 6px 18px -6px color-mix(in srgb, var(--amber) 55%, transparent);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-feedback: 180ms;
   --dur-ui: 320ms;
@@ -177,10 +178,10 @@ a {
    motion collapses this to the end frame via the rules above. */
 @keyframes stone-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgb(255 171 11 / 0.45);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 45%, transparent);
   }
   100% {
-    box-shadow: 0 0 0 12px rgb(255 171 11 / 0);
+    box-shadow: 0 0 0 12px transparent;
   }
 }
 
