@@ -75,7 +75,8 @@ export function MeView() {
     a.href = url;
     a.download = backupFilename(new Date());
     a.click();
-    URL.revokeObjectURL(url);
+    // Later, so Safari and older Firefox have started the download first.
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
     setMessage("Backup saved. Keep the file somewhere safe.");
   };
 
@@ -83,6 +84,9 @@ export function MeView() {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    // Clear first so the same message is announced again on a repeat.
+    setMessage("");
+    await new Promise((r) => requestAnimationFrame(r));
     try {
       const next = importBackup(await file.text());
       act(() => next);
@@ -194,7 +198,7 @@ export function MeView() {
                   icon={Trash}
                   onClick={() => {
                     clearEverything();
-                    router.push("/");
+                    router.replace("/start");
                   }}
                 >
                   Yes, delete everything

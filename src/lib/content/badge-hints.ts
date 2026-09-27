@@ -14,5 +14,5 @@ export const BADGE_HINTS: Record<string, string> = {
   "room-explorer": "Try a step on all three islands.",
   "my-own-step": "Add a step of your own on any island.",
   "then-and-now": "Listen back to how far you have come (coming soon).",
-  dawn: "Say a step out loud in every situation on the map.",
+  dawn: "Reach step 3 in every situation on the map.",
 };

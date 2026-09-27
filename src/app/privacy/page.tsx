@@ -16,7 +16,7 @@ const SECTIONS: { title: string; body: string[] }[] = [
   {
     title: "What is saved, and where",
     body: [
-      "Your companion and its name, your age group if you chose one, what feels hard, the steps you have done, your badges and your settings.",
+      "Your companion and its name, your age group if you chose one, what feels hard, the steps you have done, any steps you wrote yourself, which tools you used and when, the day you last visited, your badges and your settings.",
       "All of it is kept in this browser's storage on this device. If you clear your browser data, it is gone, unless you saved a backup.",
     ],
   },

@@ -7,6 +7,7 @@ import { dayKey } from "@/lib/dates";
 import { dailyQuests, questProgress } from "@/lib/quests";
 import { useCourage } from "@/lib/store";
 import { ArtHeader } from "@/components/scene/art-header";
+import { PaperCard } from "@/components/ui/paper-card";
 import { Sticker } from "@/components/ui/sticker";
 
 /**
@@ -17,9 +18,11 @@ import { Sticker } from "@/components/ui/sticker";
  */
 export function BadgesView() {
   const store = useCourage();
-  const now = new Date();
-  const day = dayKey(now);
-  const quests = dailyQuests(day);
+  // Today's quests depend on the person's local date, so they are only
+  // worked out after hydration: the page is prebuilt, and the build date
+  // must never leak into (or mismatch) what the browser shows.
+  const day = store.hydrated ? dayKey(new Date()) : null;
+  const quests = day ? dailyQuests(day) : [];
   const earned = new Set(store.hydrated ? store.earned : []);
 
   return (
@@ -27,14 +30,15 @@ export function BadgesView() {
       <ArtHeader title="Badges" line="Small steps. Real courage." />
 
       <div className="relative mx-auto -mt-4 max-w-[1100px] px-4">
-        <section aria-labelledby="quests-heading" className="rounded-card bg-surface p-5 shadow-card sm:p-6">
+        <PaperCard className="!p-5 sm:!p-6">
+        <section aria-labelledby="quests-heading">
           <h2 id="quests-heading" className="text-2xl text-ink">
             Today&apos;s quests
           </h2>
           <p className="text-muted">Small ideas for today, if you want them. Skipping them changes nothing.</p>
-          <ul role="list" className="mt-4 grid list-none gap-2 p-0 md:grid-cols-3 md:gap-4">
+          <ul role="list" className="mt-4 grid min-h-[13.5rem] list-none gap-2 p-0 md:min-h-[4.5rem] md:grid-cols-3 md:gap-4">
             {quests.map((q) => {
-              const done = store.hydrated ? questProgress(q, store.records, store.events, day) : 0;
+              const done = day ? questProgress(q, store.records, store.events, day) : 0;
               const complete = done >= q.target;
               return (
                 <li key={q.id} className="flex items-center gap-3 rounded-2xl bg-surface-2 px-4 py-3">
@@ -54,6 +58,7 @@ export function BadgesView() {
             })}
           </ul>
         </section>
+        </PaperCard>
 
         <section aria-labelledby="badges-heading" className="mt-10">
           <h2 id="badges-heading" className="text-2xl text-ink">
@@ -66,10 +71,12 @@ export function BadgesView() {
             {BADGES.map((b) => {
               const has = earned.has(b.id);
               return (
-                <li key={b.id} className="flex flex-col items-center rounded-card bg-surface p-4 text-center shadow-card sm:p-5">
-                  <Sticker badgeId={b.id} earned={has} size={88} />
-                  <h3 className="mt-3 text-lg text-ink">{b.title}</h3>
-                  <p className="mt-1 text-muted">{has ? b.description : BADGE_HINTS[b.id]}</p>
+                <li key={b.id}>
+                  <PaperCard className="flex h-full flex-col items-center !p-4 text-center sm:!p-5">
+                    <Sticker badgeId={b.id} earned={has} size={88} />
+                    <h3 className="mt-3 text-lg text-ink">{b.title}</h3>
+                    <p className="mt-1 text-muted">{has ? b.description : BADGE_HINTS[b.id]}</p>
+                  </PaperCard>
                 </li>
               );
             })}

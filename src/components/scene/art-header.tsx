@@ -21,7 +21,7 @@ export function ArtHeader({ title, line, art = "/art/panic.webp" }: { title: str
           }}
         />
       </div>
-      <header className="relative mx-auto max-w-[1100px] px-4 pb-10 pt-8 text-on-chrome md:pb-16 md:pt-12">
+      <header className="relative mx-auto min-h-[28dvh] max-w-[1100px] px-4 pb-10 pt-8 text-on-chrome md:min-h-0 md:pb-16 md:pt-12">
         <h1 className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]">{title}</h1>
         <p className="mt-1 max-w-[36ch]">{line}</p>
       </header>

@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { House } from "@phosphor-icons/react/dist/ssr";
 import { SceneArt } from "@/components/scene/scene-art";
 import { ButtonLink } from "@/components/ui/button";
+
+export const metadata: Metadata = {
+  title: "Page not found - Rehearse Courage",
+};
 
 /** 404: a small scene, one kind line, and the way home. */
 export default function NotFound() {
