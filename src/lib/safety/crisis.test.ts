@@ -69,6 +69,39 @@ describe("crisis check", () => {
     "he hurts me",
     "I'm being abused",
     "I'm scared to go home",
+    // regression: abuse with trailing context
+    "my dad hits me in the face",
+    "my dad hits me at night",
+    "my mum hits me in the stomach",
+    "my brother hits me at school",
+    "my stepdad hurts me at home",
+    "he always hurts me",
+    // repeated abuse
+    "she keeps hitting me",
+    "he keeps hurting me",
+    // want to be dead / should just die
+    "i want to be dead",
+    "i should just die",
+    "i might as well die",
+    // don't want to wake up
+    "i dont want to wake up",
+    "i dont want to wake up tomorrow",
+    "I want to not wake up",
+    // hate myself / bullied / disappear
+    "i hate myself",
+    "I'm being bullied",
+    "i want to disappear",
+    // misspellings
+    "sucicide",
+    "suiciide",
+    // cutting, re-verified after narrowing
+    "I've been cutting again",
+    "i keep cutting myself",
+    "I started cutting last year",
+    "i've been cutting and nobody knows",
+    // end it, re-verified after narrowing
+    "ending it tonight",
+    "i want to end it now",
   ])("flags: %s", (text) => {
     expect(checkCrisis(text).crisis).toBe(true);
   });
@@ -86,6 +119,7 @@ describe("crisis check", () => {
     "I cant go on stage",
     "he beat me at chess",
     "my brother beat me at fifa",
+    "my brother beat me at football",
     "I cut my hair",
     "she hurt my feelings",
     "I was going to die laughing",
@@ -93,6 +127,15 @@ describe("crisis check", () => {
     "reality hits me",
     "it suddenly hits me that everyone is watching",
     "the teacher touches me on the shoulder",
+    "my teacher touched me on the shoulder to say well done",
+    "I don't want to wake up early for the speech",
+    "I keep cutting people off when I talk",
+    "I started cutting my notes down",
+    "been cutting corners",
+    "let's end it here",
+    "I wanted to end it quickly",
+    "they said it hits me",
+    "she says it really hurts me when I stumble",
   ])("does not flag everyday nerves: %s", (text) => {
     expect(checkCrisis(text).crisis).toBe(false);
   });
