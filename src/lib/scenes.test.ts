@@ -1,6 +1,16 @@
 import { describe, expect, test } from "vitest";
-import { SCENES, stoneStates } from "./scenes";
+import { sceneCrop, SCENES, stoneStates, toCropFrame, type CropBox } from "./scenes";
 import { ROOM_IDS, type Level, type StepRecord } from "./types";
+
+/** Every crop box (island and wide) is inside the full art and non-empty. */
+function expectValidBox(box: CropBox) {
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.w).toBeGreaterThan(0);
+  expect(box.h).toBeGreaterThan(0);
+  expect(box.x + box.w).toBeLessThanOrEqual(100);
+  expect(box.y + box.h).toBeLessThanOrEqual(100);
+}
 
 const rec = (situationId: string, level: Level): StepRecord => ({
   situationId,
@@ -68,6 +78,44 @@ describe("SCENES", () => {
       expect(scene.width).toBeGreaterThan(0);
       expect(scene.height).toBeGreaterThan(0);
       expect(scene.destination.label.length).toBeGreaterThan(0);
+    }
+  });
+
+  test("island and wide crop boxes are valid and stay inside the full art", () => {
+    for (const room of ROOM_IDS) {
+      expectValidBox(SCENES[room].islandFocus);
+      expectValidBox(SCENES[room].wideFocus);
+    }
+  });
+
+  test("every stone and the destination fall inside the island crop (nothing gets cropped off)", () => {
+    for (const room of ROOM_IDS) {
+      const scene = SCENES[room];
+      const box = scene.islandFocus;
+      for (const stone of scene.stones) {
+        const pt = toCropFrame(stone, box);
+        expect(pt.x).toBeGreaterThanOrEqual(0);
+        expect(pt.x).toBeLessThanOrEqual(100);
+        expect(pt.y).toBeGreaterThanOrEqual(0);
+        expect(pt.y).toBeLessThanOrEqual(100);
+      }
+      const destPt = toCropFrame({ x: scene.destination.x, y: scene.destination.y }, box);
+      expect(destPt.x).toBeGreaterThanOrEqual(0);
+      expect(destPt.y).toBeGreaterThanOrEqual(0);
+    }
+  });
+
+  test("in the island crop, no two of the 6 points (5 stones plus destination) sit closer than 12% of the frame apart, so 44px stones never collide", () => {
+    for (const room of ROOM_IDS) {
+      const scene = SCENES[room];
+      const box = sceneCrop(scene, "island");
+      const points = [...scene.stones, { x: scene.destination.x, y: scene.destination.y }].map((p) => toCropFrame(p, box));
+      for (let i = 0; i < points.length; i++) {
+        for (let j = i + 1; j < points.length; j++) {
+          const dist = Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y);
+          expect(dist).toBeGreaterThan(12);
+        }
+      }
     }
   });
 });

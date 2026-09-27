@@ -6,17 +6,19 @@ import type { Stage } from "@/lib/companion";
 import { Companion } from "@/components/scene/companion";
 import { PathStones } from "@/components/scene/path-stones";
 import { SCENES } from "@/lib/scenes";
-import { ROOM_IDS, type RoomId } from "@/lib/types";
+import { ROOM_IDS, type RoomId, type StepRecord } from "@/lib/types";
 
 type Point = { x: number; y: number };
 
-const SAMPLE_SITUATION: Record<RoomId, string> = {
-  class: "class-answer",
-  friends: "friends-join",
-  presenting: "present-intro",
-};
-
 const STAGES: Stage[] = ["hiding", "peeking", "waving", "speaking"];
+
+// A fixed, fabricated ladder used only by the PathStones preview below, so
+// lit, current and dim all show at once without touching real progress
+// (highest 2 done, step 3 current, 4 to 6 not yet).
+const MID_PROGRESS: StepRecord[] = [
+  { situationId: "preview", level: 1, at: "2026-01-01T00:00:00.000Z", seconds: 4, typed: false, roughDay: false },
+  { situationId: "preview", level: 2, at: "2026-01-02T00:00:00.000Z", seconds: 6, typed: false, roughDay: false },
+];
 
 /** Click-to-log coordinate lab: click the art to record an x/y percent pair, shown here and in the console, ready to paste into scenes.ts. */
 export function ScenesLab() {
@@ -103,9 +105,17 @@ export function ScenesLab() {
 
       <section className="flex flex-col gap-4 border-t border-line pt-6">
         <h2 className="font-display text-xl font-bold text-ink">PathStones preview (real component)</h2>
-        <p className="text-muted">Same scene, rendered through PathStones with an untouched ladder (step 1 current).</p>
-        <div className="max-w-xl">
-          <PathStones room={room} situationId={SAMPLE_SITUATION[room]} onPick={() => {}} />
+        <p className="text-muted">
+          A mid-progress example (steps 1 and 2 done, step 3 current, 4 to 6 not yet) so lit, current and dim all
+          show, at a card width and again at a phone width, to check spacing.
+        </p>
+        <div className="flex flex-wrap items-start gap-6">
+          <div className="w-full max-w-xl">
+            <PathStones room={room} situationId="preview" onPick={() => {}} previewRecords={MID_PROGRESS} />
+          </div>
+          <div className="w-[340px]">
+            <PathStones room={room} situationId="preview" onPick={() => {}} previewRecords={MID_PROGRESS} />
+          </div>
         </div>
       </section>
 
