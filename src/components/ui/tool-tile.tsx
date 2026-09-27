@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight, type Icon } from "@phosphor-icons/react";
 
 /**
  * One body-kit tool: round illustration, title, one line of copy, an arrow
@@ -14,9 +14,12 @@ export function ToolTile({
   line,
   helps,
   eager = false,
+  icon: IconCmp,
 }: {
   href: string;
-  art: string;
+  /** Round illustration, or null to show `icon` on a quiet fill until art exists. */
+  art: string | null;
+  icon?: Icon;
   title: string;
   line: string;
   helps: string;
@@ -29,7 +32,13 @@ export function ToolTile({
       className="group flex items-center gap-4 rounded-card border border-line bg-surface p-4 transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-surface-2 active:bg-surface-2 focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
     >
       <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-surface-2">
-        <Image src={art} alt="" fill sizes="64px" loading={eager ? "eager" : "lazy"} className="object-cover" />
+        {art ? (
+          <Image src={art} alt="" fill sizes="64px" loading={eager ? "eager" : "lazy"} className="object-cover" />
+        ) : IconCmp ? (
+          <span className="flex h-full w-full items-center justify-center text-ink">
+            <IconCmp size={30} weight="regular" aria-hidden />
+          </span>
+        ) : null}
       </span>
       <span className="min-w-0 flex-1">
         <span className="flex items-center justify-between gap-2">

@@ -25,9 +25,12 @@ export function SpeakButton({
   state,
   onStart,
   onStop,
+  label = "Hold to speak",
   className = "",
 }: {
   state: SpeakState;
+  /** The resting label, e.g. "Say it" in the rescue deck. */
+  label?: string;
   onStart: () => void;
   onStop: () => void;
   className?: string;
@@ -76,7 +79,7 @@ export function SpeakButton({
       className={`${buttonClass("primary", "lg")} touch-none select-none ${live ? "stone-pulse" : ""} ${className}`}
     >
       <IconCmp size={22} weight="regular" aria-hidden />
-      {LABEL[state]}
+      {state === "asking" || state === "listening" ? LABEL[state] : label}
     </button>
   );
 }
