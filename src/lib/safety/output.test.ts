@@ -70,6 +70,13 @@ describe("checkOutputLocal", () => {
     expect(checkOutputLocal(text, "coach", "adult")).toEqual({ ok: false, reason });
   });
 
+  test.each(["Let me make that clear for everyone.", "The sky is clear today, so let's go outside.", "I'd say that is fine, go ahead.", "Well said, that is a strong point."])(
+    "keeps an ordinary reply: %j",
+    (t) => {
+      expect(ok(t)).toBe(true);
+    },
+  );
+
   test("does not flag ordinary words that contain a short banned word", () => {
     expect(ok("I love reading Dickens too. That sounds relaxing.")).toBe(true);
   });

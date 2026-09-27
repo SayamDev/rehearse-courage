@@ -156,7 +156,8 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
     if (reply) {
       replyRef.current?.focus();
     } else if (againFocus.current) {
-      (againFocus.current === "type" ? typeRef : speakRef).current?.focus();
+      // The speak button is not there when the microphone is off; the text field is.
+      (againFocus.current === "type" ? typeRef.current : (speakRef.current ?? typeRef.current))?.focus();
       againFocus.current = null;
     }
   }, [reply]);

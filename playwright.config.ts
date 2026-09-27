@@ -22,7 +22,7 @@ export default defineConfig({
     { name: "laptop", use: { ...devices["Desktop Chrome"], viewport: { width: 1280, height: 900 } } },
   ],
   webServer: {
-    command: "npx next dev --port 3330",
+    command: "npm run dev",
     url: "http://localhost:3330",
     reuseExistingServer: true,
     timeout: 120_000,

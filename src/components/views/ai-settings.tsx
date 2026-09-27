@@ -27,6 +27,13 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
   const downloadRef = useRef<HTMLButtonElement>(null);
   const progressRef = useRef<HTMLParagraphElement>(null);
   const moveFocus = useRef<"remove" | "download" | null>(null);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    return () => {
+      alive.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     let live = true;
@@ -58,6 +65,8 @@ function DeviceModel({ on, set }: { on: boolean; set: (patch: Partial<Settings>)
     setPhase("downloading");
     try {
       await downloadModel((p) => setProgress(p));
+      // Left the page (or deleted everything) meanwhile: do not write into a fresh store.
+      if (!alive.current) return;
       set({ deviceModel: true });
       moveFocus.current = "remove";
       setMessage("Saved on this device. Cobi and tidy can now work without the internet.");
