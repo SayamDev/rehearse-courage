@@ -6,7 +6,7 @@ import type { CourageState } from "./state";
 import type { Level } from "./types";
 
 /** Night tint opacity when nothing has been said out loud yet (mapLight 0). Fades to 0 as mapLight reaches 1. */
-export const NIGHT_TINT_MAX = 0.35;
+export const NIGHT_TINT_MAX = 0.6;
 
 export type HomeModel =
   | {
