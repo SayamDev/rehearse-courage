@@ -46,3 +46,8 @@ next-env.d.ts
 
 # controller scratch
 /.superpowers/
+/design/12ui-pages/
+
+# Playwright
+/test-results/
+/playwright-report/

@@ -16,15 +16,21 @@ import {
   type StepRecord,
 } from "./types";
 
+export type Theme = "system" | "light" | "dark";
+
+/** Root text size: 100%, 115%, 130% (DESIGN.md). */
+export type TextSize = "normal" | "large" | "larger";
+
 export type Settings = {
   reduceMotion: boolean;
-  largeText: boolean;
+  textSize: TextSize;
   sounds: boolean;
   confetti: boolean;
   /** Off by default: no clocks unless the user asks. */
   timers: boolean;
   /** Off by default: recordings are only kept when the user opts in (Then vs Now). */
   keepRecordings: boolean;
+  theme: Theme;
 };
 
 export type CourageState = {
@@ -54,7 +60,15 @@ export const DEFAULT_STATE: CourageState = {
   earned: [],
   lastSeen: null,
   cameBack: false,
-  settings: { reduceMotion: false, largeText: false, sounds: true, confetti: true, timers: false, keepRecordings: false },
+  settings: {
+    reduceMotion: false,
+    textSize: "normal",
+    sounds: true,
+    confetti: true,
+    timers: false,
+    keepRecordings: false,
+    theme: "system",
+  },
 };
 
 const AGES: AgeBand[] = ["under13", "teen", "adult"];
@@ -112,14 +126,16 @@ function isValidCompanion(v: unknown): v is { species: Species; name: string } {
   return isObject(v) && SPECIES.some((s) => s.id === v.species) && typeof v.name === "string";
 }
 
-const KNOWN_BOOLEAN_SETTINGS: (keyof Settings)[] = [
+const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = [
   "reduceMotion",
-  "largeText",
   "sounds",
   "confetti",
   "timers",
   "keepRecordings",
 ];
+
+const THEMES: Theme[] = ["system", "light", "dark"];
+const TEXT_SIZES: TextSize[] = ["normal", "large", "larger"];
 
 function normalizeSettings(v: unknown): Settings {
   const raw = isObject(v) ? v : {};
@@ -127,6 +143,10 @@ function normalizeSettings(v: unknown): Settings {
   for (const key of KNOWN_BOOLEAN_SETTINGS) {
     if (typeof raw[key] === "boolean") settings[key] = raw[key];
   }
+  if (THEMES.includes(raw.theme as Theme)) settings.theme = raw.theme as Theme;
+  // Older saves had a single largeText switch (115%).
+  if (TEXT_SIZES.includes(raw.textSize as TextSize)) settings.textSize = raw.textSize as TextSize;
+  else if (raw.largeText === true) settings.textSize = "large";
   return settings;
 }
 

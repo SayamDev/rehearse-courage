@@ -18,3 +18,9 @@ export function importBackup(text: string): CourageState {
   if (!p || p.app !== APP || !p.state) throw new Error("not-a-backup");
   return normalize(p.state);
 }
+
+/** "rehearse-courage-backup-2026-09-27.json", using the local date. */
+export function backupFilename(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `rehearse-courage-backup-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`;
+}
