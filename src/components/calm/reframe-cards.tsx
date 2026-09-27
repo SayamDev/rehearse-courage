@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
 import { REFRAME_CARDS } from "@/lib/content/body";
@@ -11,20 +11,16 @@ import { Button } from "@/components/ui/button";
 export function ReframeCards({ kind, age }: { kind: "blushing" | "sweating"; age: AgeBand | null }) {
   const cards = REFRAME_CARDS[kind];
   const [i, setI] = useState(0);
-  const cardRef = useRef<HTMLDivElement>(null);
   const card = cards[i];
-
-  const go = (next: number) => {
-    setI(next);
-    cardRef.current?.focus();
-  };
+  // The card is a polite live region, so focus stays on the button pressed.
+  const go = (next: number) => setI((next + cards.length) % cards.length);
 
   return (
     <section aria-labelledby="reframe-heading">
       <h2 id="reframe-heading" className="text-2xl text-ink">
         Cards to try
       </h2>
-      <div ref={cardRef} tabIndex={-1} aria-live="polite" className="mt-3 rounded-card bg-surface-2 p-5 outline-none">
+      <div aria-live="polite" className="mt-3 rounded-card bg-surface-2 p-5">
         <p className="tabular text-muted">
           Card {i + 1} of {cards.length}
         </p>
@@ -35,10 +31,10 @@ export function ReframeCards({ kind, age }: { kind: "blushing" | "sweating"; age
         </p>
       </div>
       <div className="mt-4 flex flex-wrap gap-3">
-        <Button variant="secondary" size="md" icon={ArrowLeft} onClick={() => go(i - 1)} disabled={i === 0}>
+        <Button variant="secondary" size="md" icon={ArrowLeft} onClick={() => go(i - 1)}>
           Back
         </Button>
-        <Button variant="secondary" size="md" icon={ArrowRight} onClick={() => go((i + 1) % cards.length)}>
+        <Button variant="secondary" size="md" icon={ArrowRight} onClick={() => go(i + 1)}>
           {i === cards.length - 1 ? "Start again" : "Next card"}
         </Button>
       </div>

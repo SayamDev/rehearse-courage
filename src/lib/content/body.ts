@@ -30,7 +30,7 @@ export const KIT_TOOLS: { id: KitToolId; title: string; line: Words; helps: Word
   {
     id: "sweating",
     title: "Sweating",
-    line: w("Cool down and let your body settle.", "Cool your body and ease the tension."),
+    line: w("Cool your body and let it settle.", "Cool your body and ease the tension."),
     helps: w("Helps when you feel hot or sticky", "Helps when you feel too hot or tense"),
     art: "/art/kit/sweating.webp",
   },
@@ -52,7 +52,7 @@ export const KIT_TOOLS: { id: KitToolId; title: string; line: Words; helps: Word
     id: "speech",
     title: "Speech tools",
     line: w("Ways some people like to talk when words get stuck.", "Optional techniques for when words get stuck."),
-    helps: w("Helps if you stutter or lose words", "Helps if you stutter or your words catch"),
+    helps: w("For anyone whose words sometimes get stuck"),
     art: null,
   },
 ];
@@ -70,7 +70,7 @@ export const BODY_EXPLAINERS: Record<"blushing" | "sweating", Words[]> = {
     ),
     w(
       "It is your body trying to help, even if it does not feel like it. It always fades.",
-      "It is a normal stress response, not a sign that anything is wrong. It always fades.",
+      "It is a common reaction to being on the spot. It always fades.",
     ),
   ],
   sweating: [

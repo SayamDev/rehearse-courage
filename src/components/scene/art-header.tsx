@@ -11,8 +11,10 @@ export function ArtHeader({ title, line, art = "/art/panic.webp" }: { title: str
     <div className="relative overflow-hidden">
       <div aria-hidden className="absolute inset-0">
         <Image src={art} alt="" fill priority sizes="100vw" className="object-cover object-[50%_30%]" />
+        {/* Phones: the text spans the banner, so the scrim stays deep all the way across. */}
+        <div className="absolute inset-0 md:hidden" style={{ background: "color-mix(in srgb, var(--chrome) 78%, transparent)" }} />
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 hidden md:block"
           style={{
             background:
               "linear-gradient(to right, color-mix(in srgb, var(--chrome) 88%, transparent), color-mix(in srgb, var(--chrome) 60%, transparent) 55%, color-mix(in srgb, var(--chrome) 15%, transparent))",

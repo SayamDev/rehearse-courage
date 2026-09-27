@@ -13,7 +13,9 @@ import { SpeakButton } from "@/components/ui/speak-button";
 
 /**
  * Rescue phrases, one at a time. "Say it" practises it out loud on the
- * device (nothing is recorded or sent); typing it counts too. Either way
+ * device (nothing is recorded or sent); typing it counts too. Courage
+ * first: having a go counts, however quiet it was, so a spoken attempt is
+ * counted once the microphone was listening, whatever the seconds. Either way
  * a rescue event is logged once per phrase, which feeds the Rescue ready
  * badge and daily quests. "Next" moves on.
  */

@@ -41,7 +41,7 @@ describe("body kit content", () => {
 
   test("no medical claims or fluency judgement", () => {
     for (const t of allText()) {
-      expect(t.toLowerCase()).not.toMatch(/\b(cure|treat|treatment|therapy|diagnos|fix your|fluent|fluency)\b/);
+      expect(t.toLowerCase()).not.toMatch(/\b(cure\w*|treat\w*|therap\w*|diagnos\w*|fix your|fluen\w*)/);
     }
   });
 });
