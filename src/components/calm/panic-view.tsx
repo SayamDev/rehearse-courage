@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -29,7 +29,15 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
   const returnTo = useRef<Element | null>(null);
   const logged = useRef(false);
 
-  // Remember what had focus, move focus in, log the visit, stop the page behind from scrolling.
+  const groundingTile = useRef<HTMLButtonElement>(null);
+  const onCloseRef = useRef(onClose);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
+
+  // Remember what had focus, move focus in, log the visit, stop the page
+  // behind from scrolling, and make everything behind inert so screen
+  // readers (including swipe navigation) stay inside the dialog.
   useEffect(() => {
     returnTo.current = document.activeElement;
     headingRef.current?.focus();
@@ -40,31 +48,57 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
     }
     const overflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // Siblings of the dialog and of each of its ancestors up to <body>, so
+    // this holds however the dialog ends up nested.
+    const behind: HTMLElement[] = [];
+    for (let node: HTMLElement | null = dialogRef.current; node && node !== document.body; node = node.parentElement) {
+      for (const sib of Array.from(node.parentElement?.children ?? [])) {
+        if (sib !== node && sib instanceof HTMLElement && !sib.inert && sib.tagName !== "SCRIPT") behind.push(sib);
+      }
+    }
+    behind.forEach((el) => (el.inert = true));
     return () => {
       document.body.style.overflow = overflow;
+      behind.forEach((el) => (el.inert = false));
       if (returnTo.current instanceof HTMLElement) returnTo.current.focus();
     };
   }, []);
 
-  // Keep Tab inside the dialog; Escape closes.
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Escape") {
-      e.stopPropagation();
-      onClose();
-      return;
-    }
-    if (e.key !== "Tab" || !dialogRef.current) return;
-    const items = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
-    if (items.length === 0) return;
-    const first = items[0];
-    const last = items[items.length - 1];
-    if (e.shiftKey && (document.activeElement === first || document.activeElement === headingRef.current)) {
-      e.preventDefault();
-      last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
-      e.preventDefault();
-      first.focus();
-    }
+  // Escape closes and Tab stays inside, wherever focus is (even after a
+  // click on plain text has moved it to the body).
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onCloseRef.current();
+        return;
+      }
+      if (e.key !== "Tab" || !dialogRef.current) return;
+      const items = Array.from(dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE));
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      const inside = active instanceof Node && dialogRef.current.contains(active);
+      if (!inside) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      } else if (e.shiftKey && (active === first || active === headingRef.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  const leaveGrounding = () => {
+    setGrounding(false);
+    // The grounding screen is gone; put focus back on the tile that opened it.
+    requestAnimationFrame(() => groundingTile.current?.focus());
   };
 
   const reduce = useReducedMotion();
@@ -75,7 +109,6 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="panic-title"
-      onKeyDown={onKeyDown}
       className="fixed inset-0 z-50 overflow-y-auto bg-canvas"
     >
       <div aria-hidden className="absolute inset-x-0 top-0 h-[70dvh] min-h-[420px]">
@@ -84,7 +117,8 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 70%, transparent), color-mix(in srgb, var(--chrome) 25%, transparent) 30%, transparent 55%, var(--canvas) 100%)",
+              // Deep behind the header text (AA over the clouds in both themes), clearing towards the middle.
+              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 88%, transparent), color-mix(in srgb, var(--chrome) 70%, transparent) 16%, color-mix(in srgb, var(--chrome) 20%, transparent) 34%, transparent 55%, var(--canvas) 100%)",
           }}
         />
       </div>
@@ -107,7 +141,7 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
 
         <div className="mx-auto mt-[18dvh] w-full max-w-[560px] rounded-card bg-surface p-6 shadow-card sm:p-8">
           {grounding ? (
-            <Grounding onDone={() => setGrounding(false)} />
+            <Grounding onDone={leaveGrounding} />
           ) : (
             <>
               <BreathingLantern reduce={reduce} />
@@ -119,6 +153,7 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
         {!grounding ? (
           <div className="mx-auto mt-5 grid w-full max-w-[760px] gap-3 md:grid-cols-2">
             <button
+              ref={groundingTile}
               type="button"
               onClick={() => setGrounding(true)}
               className="flex min-h-11 items-center gap-4 rounded-card bg-surface p-4 text-left shadow-card transition-colors duration-[var(--dur-ui)] hover:bg-surface-2 active:bg-line/60"

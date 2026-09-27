@@ -29,6 +29,7 @@ export function SupportLines({ lines }: { lines: SupportLine[] }) {
                   {...(href.startsWith("https") ? { target: "_blank", rel: "noreferrer" } : {})}
                 >
                   {line.contact}
+                  {href.startsWith("https") ? <span className="sr-only"> (opens in a new tab)</span> : null}
                 </a>
               ) : (
                 <span className="tabular block py-2 text-lg font-semibold text-ink">{line.contact}</span>

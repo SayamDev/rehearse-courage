@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { contactHref, safeReturn } from "./help";
+import { contactHref, emergencyNumbers, safeReturn } from "./help";
 
 describe("safeReturn", () => {
   test("allows same-site paths", () => {
@@ -8,7 +8,17 @@ describe("safeReturn", () => {
   });
 
   test("rejects anything that could leave the site", () => {
-    for (const bad of [undefined, "", "https://evil.test", "//evil.test", "/\\evil.test", "javascript:alert(1)"]) {
+    for (const bad of [
+      undefined,
+      "",
+      "https://evil.test",
+      "//evil.test",
+      "/\\evil.test",
+      "javascript:alert(1)",
+      "/\t/evil.test",
+      "/\n/evil.test",
+      "/ /evil.test",
+    ]) {
       expect(safeReturn(bad)).toBeNull();
     }
   });
@@ -24,8 +34,21 @@ describe("contactHref", () => {
     expect(contactHref("findahelpline.com")).toBe("https://findahelpline.com");
   });
 
-  test("instructions stay as text", () => {
-    expect(contactHref("Text SHOUT to 85258")).toBeNull();
-    expect(contactHref("Call or text 988")).toBeNull();
+  test("call-or-text numbers are callable and text lines open a message", () => {
+    expect(contactHref("Call or text 988")).toBe("tel:988");
+    expect(contactHref("Call or text 1737")).toBe("tel:1737");
+    expect(contactHref("Text SHOUT to 85258")).toBe("sms:85258?&body=SHOUT");
+  });
+
+  test("anything else stays as text", () => {
+    expect(contactHref("Ask a trusted adult")).toBeNull();
+  });
+});
+
+describe("emergencyNumbers", () => {
+  test("splits numbers, leaves the text fallback alone", () => {
+    expect(emergencyNumbers("999")).toEqual(["999"]);
+    expect(emergencyNumbers("112 or 999")).toEqual(["112", "999"]);
+    expect(emergencyNumbers("your local emergency number")).toEqual([]);
   });
 });

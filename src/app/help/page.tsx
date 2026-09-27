@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { ArrowLeft, ArrowRight } from "@phosphor-icons/react/dist/ssr";
-import { safeReturn } from "@/lib/help";
+import { emergencyNumbers, safeReturn } from "@/lib/help";
 import { supportLines } from "@/lib/safety/crisis";
 import { SupportLines } from "@/components/calm/support-lines";
 
@@ -49,7 +49,20 @@ export default async function HelpPage({
         <SupportLines lines={lines} />
       </div>
 
-      <p className="mt-6 rounded-card bg-surface-2 p-4 font-semibold text-ink">If you are in danger now, call {emergency}.</p>
+      <p className="mt-6 rounded-card bg-surface-2 p-4 font-semibold text-ink">
+        If you are in danger now, call{" "}
+        {emergencyNumbers(emergency).length > 0
+          ? emergencyNumbers(emergency).map((n, i) => (
+              <span key={n}>
+                {i > 0 ? " or " : null}
+                <a href={`tel:${n}`} className="tabular underline">
+                  {n}
+                </a>
+              </span>
+            ))
+          : emergency}
+        .
+      </p>
       <p className="mt-4 text-muted">Rehearse Courage is practice, not therapy.</p>
 
       {back ? (
