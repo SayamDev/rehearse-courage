@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { createSpeakController, FRAME_MS, rms, VOICE_THRESHOLD, voicedSeconds, type SpeakDeps } from "./speak";
+import { createSpeakController, FRAME_MS, rms, VOICE_THRESHOLD, voicedSeconds, waitForRecording, type SpeakDeps } from "./speak";
 
 describe("voicedSeconds", () => {
   test("silence is zero", () => {
@@ -176,5 +176,14 @@ describe("createSpeakController recordings", () => {
     c.stop();
     expect(recorded).toBe(1);
     expect(c.get().recording).not.toBeNull();
+  });
+});
+
+describe("waitForRecording", () => {
+  test("returns the recording once it arrives, or null after the wait", async () => {
+    const blob = new Blob(["x"]);
+    let calls = 0;
+    expect(await waitForRecording(() => ({ recording: ++calls > 2 ? blob : null }), 5, 1)).toBe(blob);
+    expect(await waitForRecording(() => ({ recording: null }), 3, 1)).toBeNull();
   });
 });

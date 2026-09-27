@@ -31,6 +31,10 @@ export type Settings = {
   /** Off by default: recordings are only kept when the user opts in (Then vs Now). */
   keepRecordings: boolean;
   theme: Theme;
+  /** On by default, but only ever used at 13 and over: Cobi's live replies, tidy and speech to text online. */
+  onlineHelp: boolean;
+  /** Off by default: the person downloaded the small AI model to this device and chose to use it. */
+  deviceModel: boolean;
 };
 
 export type CourageState = {
@@ -68,6 +72,8 @@ export const DEFAULT_STATE: CourageState = {
     timers: false,
     keepRecordings: false,
     theme: "system",
+    onlineHelp: true,
+    deviceModel: false,
   },
 };
 
@@ -132,6 +138,8 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = 
   "confetti",
   "timers",
   "keepRecordings",
+  "onlineHelp",
+  "deviceModel",
 ];
 
 const THEMES: Theme[] = ["system", "light", "dark"];

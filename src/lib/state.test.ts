@@ -30,6 +30,18 @@ describe("state", () => {
     expect(DEFAULT_STATE.settings.keepRecordings).toBe(false);
   });
 
+  test("online help defaults on (it only applies at 13 and over); the device model defaults off", () => {
+    expect(DEFAULT_STATE.settings.onlineHelp).toBe(true);
+    expect(DEFAULT_STATE.settings.deviceModel).toBe(false);
+    const old = normalize({ age: "adult", settings: { sounds: false } });
+    expect(old.settings.onlineHelp).toBe(true);
+    expect(old.settings.deviceModel).toBe(false);
+    const off = normalize({ settings: { onlineHelp: false, deviceModel: true } });
+    expect(off.settings.onlineHelp).toBe(false);
+    expect(off.settings.deviceModel).toBe(true);
+    expect(normalize({ settings: { onlineHelp: "yes" } }).settings.onlineHelp).toBe(true);
+  });
+
   test("normalize fills gaps and survives junk", () => {
     expect(normalize(null)).toEqual(DEFAULT_STATE);
     expect(normalize("nonsense")).toEqual(DEFAULT_STATE);

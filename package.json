@@ -5,7 +5,9 @@
   "author": "Sayam Ajmal",
   "license": "UNLICENSED",
   "scripts": {
+    "predev": "node scripts/vendor-webllm.mjs",
     "dev": "next dev --port 3330",
+    "prebuild": "node scripts/vendor-webllm.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -17,6 +19,7 @@
     "cf:deploy": "sh scripts/cf.sh deploy"
   },
   "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.85",
     "@opennextjs/cloudflare": "^1.20.6",
     "@phosphor-icons/react": "^2.1.10",
     "lottie-web": "^5.13.0",

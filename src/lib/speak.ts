@@ -198,18 +198,29 @@ function browserDeps(): SpeakDeps {
   };
 }
 
+/** The recording arrives just after the microphone stops (MediaRecorder finishes async); wait up to two seconds for it. */
+export async function waitForRecording(latest: () => { recording: Blob | null }, tries = 20, ms = 100): Promise<Blob | null> {
+  for (let i = 0; i < tries; i++) {
+    const r = latest().recording;
+    if (r) return r;
+    await new Promise((resolve) => setTimeout(resolve, ms));
+  }
+  return null;
+}
+
 const IDLE: SpeakSnapshot = { state: "idle", seconds: 0, recording: null };
 
 /**
  * Speaking on the device for a component. `keep` (the keepRecordings
  * setting, Then vs Now in Plan 5) also collects the audio in memory as
- * `recording`. The microphone is always released when the component
- * goes away.
+ * `recording`; so does `capture`, used for one transcription at 13 and
+ * over. Either way it only lives in memory until reset or the component
+ * goes away, and the microphone is always released then too.
  */
-export function useSpeak({ keep = false }: { keep?: boolean } = {}) {
+export function useSpeak({ keep = false, capture = false }: { keep?: boolean; capture?: boolean } = {}) {
   const [ctrl] = useState(() => createSpeakController(browserDeps()));
-  useEffect(() => ctrl.setKeep(keep), [ctrl, keep]);
+  useEffect(() => ctrl.setKeep(keep || capture), [ctrl, keep, capture]);
   const snap = useSyncExternalStore(ctrl.subscribe, ctrl.get, () => IDLE);
   useEffect(() => () => ctrl.dispose(), [ctrl]);
-  return { ...snap, start: ctrl.start, stop: ctrl.stop, reset: ctrl.reset };
+  return { ...snap, start: ctrl.start, stop: ctrl.stop, reset: ctrl.reset, latest: ctrl.get };
 }

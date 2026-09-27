@@ -1,6 +1,6 @@
 # Handoff: Rehearse Courage
 
-Last updated: 2026-09-27 (late evening, UK time, cloud session). Read this first in a new session, then `PRODUCT.md`, `DESIGN.md`, and the current plan.
+Last updated: 2026-09-27 (night, UK time, cloud session). Read this first in a new session, then `PRODUCT.md`, `DESIGN.md`, and the current plan.
 
 ## What this is
 
@@ -18,16 +18,38 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 | `DESIGN.md` | Paper Lantern Map design system: colours (tokens), type, shapes, stones, components, motion, anti-patterns |
 | `docs/superpowers/specs/2026-09-27-rehearse-courage-design.md` | Full product spec (features, AI rules, safety, privacy, build order) |
 | `docs/superpowers/plans/2026-09-27-plan-1-foundation-and-core-logic.md` | Plan 1 (done, merged) |
-| `docs/superpowers/plans/2026-09-27-plan-3-screens.md` | **Plan 3 (in progress)**: 14 tasks with files, behaviour, copy, tests |
+| `docs/superpowers/plans/2026-09-27-plan-3-screens.md` | Plan 3 (done, merged as PR #2): 14 tasks with files, behaviour, copy, tests |
+| `docs/superpowers/plans/2026-09-27-plan-4-ai-and-safety.md` | **Plan 4 (built on `plan-4-ai-safety`)**: AI coach, tidy, speech to text, safety pipeline |
 | `docs/superpowers/plans/deferred-from-plan-1.md` | Review findings deferred to later plans |
 | `design/comps/*.jpg` | Approved screen designs (visual authority): home, map, step, step-done, panic, kit, badges |
 | `design/art-manifest.md` | Every art file in `public/art/`, its source, and what is still missing |
 
 ## Branches
 
-- `main`: Plan 1 merged (PR #1).
-- `plan-2-design`: design phase (PRODUCT.md, DESIGN.md, tokens, fonts, comps). Not merged to main; `plan-3-screens` is built on top of it.
-- `plan-3-screens`: all Plan 3 work. **Continue here.** When Plan 3 is done, open one PR from `plan-3-screens` to `main` (it includes the design phase).
+- `main`: Plans 1 to 3 merged (PR #1, PR #2).
+- `plan-4-ai-safety`: all Plan 4 work. Open one PR to `main` when reviewed.
+
+## Plan 4 status (AI and safety)
+
+All eight tasks are built, tested and reviewed. How it works:
+
+- `/api/coach`, `/api/tidy`, `/api/transcribe` (thin routes over `src/lib/ai/handlers.ts`). Order of checks: same origin, body size (413), age band (only `teen`/`adult`, else 403), crisis check, per-visitor daily share, then providers.
+- Providers (`src/lib/ai/provider.ts`): Groq `openai/gpt-oss-20b` and `whisper-large-v3-turbo`, then Workers AI (`@cf/meta/llama-3.1-8b-instruct`, `@cf/openai/whisper-large-v3-turbo`) through the `AI` binding. `null` means "use your own fallback".
+- Output check (`src/lib/safety/output.ts`): clean (no dashes, no `!`, no markdown), local filter (banned lines, any comment on how someone spoke, health labels, personal questions, links, harm, swearing, tidy drift), then Llama Guard 3 on Workers AI while its daily share lasts.
+- Browser (`src/lib/ai/client.ts`): nothing is ever sent for under 13, a skipped age, or with "Online AI help" off. Fallback order: online, on-device model (if saved), pre-written (`src/lib/content/coach-replies.ts`).
+- Step 4: "Hear Cobi's reply" after speaking or typing; spoken answers are transcribed (13+ online only) from an in-memory recording that is never saved and is dropped when the step ends or on Try again.
+- Kit, Sentence frames: "Say it messy, then tidy" for 13+ when online help or the device model is on.
+- Me, AI help: "Online AI help" switch (default on, 13+ only) and "AI on this device" (WebLLM, Qwen2.5 0.5B, about 300 MB, download only on a tap, warning on mobile data, remove button). The WebLLM code is a separate chunk that production only loads after the tap.
+- Rate limits (`src/lib/ai/limits.ts`): per visitor per day (coach 30, tidy 30, transcribe 60) keyed by an HMAC of the IP with a random in-memory secret that changes daily; site caps under the free plans. All env-overridable.
+- Privacy page has an "AI, for 13 and over" section (`/privacy#ai`); About links to it.
+- Tests: unit tests for every module above; `e2e/ai.spec.ts` (mocked AI, under-13 and offline paths send nothing, crisis, tidy, Me, real route refusals); axe on step 4.
+
+**Maker actions before AI works live** (without them the app still works, with Cobi's pre-written replies):
+1. Create a free Groq API key (no card), and in the Groq console turn on Zero Data Retention.
+2. `npx wrangler secret put GROQ_API_KEY` (never put the key in a file in the repo).
+3. `npm run cf:deploy`. The Workers AI binding in `wrangler.jsonc` needs no setup on the free plan.
+
+Not done in Plan 4 (by design): server voices (Groq Orpheus, Aura-2) and on-device Whisper belong to Plan 5 with the voice work; the browser's own speech recogniser is not used.
 
 ## Plan 3 status
 
@@ -48,7 +70,7 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 | 13 Me, privacy, about, 404 | Done, reviewed |
 | 14 E2E, axe, visual check against comps | Done: 14 journeys and 84 axe runs (21 routes, light and dark, 390 and 1280) all pass |
 
-**Next:** review and merge the Plan 3 PR (`plan-3-screens` to `main`), then swap in the missing art (below) when 12ui is available.
+**Next:** review and merge the Plan 4 PR, do the maker actions above, then swap in the missing art (below) when 12ui is available.
 
 ### Decisions made during Plan 3 (not all in the plan text)
 
@@ -80,12 +102,12 @@ Generated with the `12ui` CLI (free daily allowance ran out on 2026-09-27; it re
 - Before each commit: `rm -rf .open-next` (Cloudflare build output breaks lint), then `npm test && npm run typecheck && npm run lint && npm run build`.
 - Screenshots: `npx playwright screenshot --full-page --viewport-size=390,844 --color-scheme=dark http://localhost:3330/<route> out.png` (and 1280x900 light). Full-page captures show the fixed nav mid-page; that is a capture artifact.
 - Dev server: `npx next dev --port 3330`.
-- Push `plan-3-screens` after each finished task.
+- Push the working branch after each finished task.
 
 ## Rules that must not be broken
 
 - Free forever: no paid services, no card on any account (Groq, Cloudflare), no analytics, trackers or ads. No accounts.
-- Under 13 (and a skipped age question) never uses generative AI or server speech to text. Nothing in Plan 3 sends data off the device.
+- Under 13 (and a skipped age question) never uses generative AI or server speech to text; the client never sends and the server refuses. For 13+, only the words of one answer (or one recording), the step and the age band are sent, never identifiers, and nothing is logged.
 - Never score fluency, fillers, pauses or stutters. Never punish: no broken streaks, no losing, badges never removed.
 - Copy: plain, kind, short. No em or en dashes, no "Oops", no exclamation marks in success messages, never "calm down" or "You've got this".
 - Tokens only (no raw hex in components), one amber (primary) button per screen, Phosphor Regular icons, no emoji, no padlocks or "locked".
@@ -94,7 +116,7 @@ Generated with the `12ui` CLI (free daily allowance ran out on 2026-09-27; it re
 
 ## After Plan 3
 
-- Plan 4: AI and safety pipeline (Groq `openai/gpt-oss-20b` with zero data retention, then Cloudflare Workers AI incl. Llama Guard output check, then opt-in WebLLM, then pre-written replies; `/api/coach`, `/api/tidy`, `/api/transcribe`; rate limits). Gemini/Mistral/OpenRouter free tiers are ruled out (training or logging).
+- Plan 4: built (see above). Gemini/Mistral/OpenRouter free tiers stay ruled out (training or logging).
 - Plan 5: mini-games, Then vs Now, extra on-device voices (kid voice set), on-device Whisper.
 - Plan 6: companion Lottie set (firefly, hedgehog, paper fox), real-user testing (teacher, teen, someone who stutters, someone with ADHD; STAMMA review of stuttering copy), launch.
 - Before launch: re-check every helpline number in `src/lib/safety/crisis.ts` against official sites.
@@ -102,5 +124,6 @@ Generated with the `12ui` CLI (free daily allowance ran out on 2026-09-27; it re
 ## Maker-only actions
 
 - Deploys: `npm run cf:deploy` (needs `npx wrangler login` on the machine).
+- AI: Groq key via `npx wrangler secret put GROQ_API_KEY`, and Zero Data Retention on in the Groq console.
 - Topping up 12ui is the maker's decision; do not do it.
 - Impeccable skill update is blocked upstream (pbakaus/impeccable#857); installed version 4.3.1 is current.

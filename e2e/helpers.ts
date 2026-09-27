@@ -20,6 +20,8 @@ export const RETURNING = {
     timers: false,
     keepRecordings: false,
     theme: "system",
+    onlineHelp: true,
+    deviceModel: false,
   },
 };
 

@@ -1,6 +1,7 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	// Free Cloudflare Workers plan. No R2, KV or paid bindings, so nothing here can bill.
+	// Workers AI on the free plan stops at the daily free allocation instead of charging.
 	"main": ".open-next/worker.js",
 	"name": "rehearse-courage",
 	"compatibility_date": "2026-09-01",
@@ -16,5 +17,7 @@
 			"service": "rehearse-courage"
 		}
 	],
+	// Backup AI (after Groq) and the Llama Guard safety check, for people aged 13 and over.
+	"ai": { "binding": "AI" },
 	"observability": { "enabled": false }
 }

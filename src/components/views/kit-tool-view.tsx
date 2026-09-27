@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
+import { canUseDevice, canUseOnline } from "@/lib/ai/client";
 import { ACCEPTANCE_LINES, BODY_EXPLAINERS, kitTool, SPEECH_TOOLS, type KitToolId } from "@/lib/content/body";
 import { FRAMES } from "@/lib/content/phrases";
 import { checkCrisis } from "@/lib/safety/crisis";
@@ -15,17 +16,28 @@ import { BreathingLantern } from "@/components/calm/breathing-lantern";
 import { Grounding } from "@/components/calm/grounding";
 import { ReframeCards } from "@/components/calm/reframe-cards";
 import { RescueDeck } from "@/components/calm/rescue-deck";
+import { TidyTool } from "@/components/calm/tidy-tool";
 import { IdeaList } from "@/components/ui/idea-list";
 import { PaperCard } from "@/components/ui/paper-card";
 
 /** Sentence frames: pick a shape, then fill the gaps in the box (in your head, out loud, or typed). Nothing is saved. */
-function Frames({ age, onCrisis }: { age: ReturnType<typeof useCourage>["age"]; onCrisis: () => void }) {
+function Frames({
+  age,
+  onCrisis,
+  heading = false,
+}: {
+  age: ReturnType<typeof useCourage>["age"];
+  onCrisis: () => void;
+  /** Shown with its own heading when the tidy tool sits above it. */
+  heading?: boolean;
+}) {
   const frames = FRAMES.map((f) => words(f.text, age));
   const [frame, setFrame] = useState<string | null>(null);
   const [draft, setDraft] = useState("");
   const id = useId();
   return (
     <>
+      {heading ? <h2 className="mb-1 text-2xl text-ink">Or use a frame</h2> : null}
       <p className="text-ink">Pick a shape, then fill in the gaps. You can say it in your head, out loud, or type it.</p>
       <div className="mt-4">
         <IdeaList
@@ -89,7 +101,10 @@ function SpeechTools({ age }: { age: ReturnType<typeof useCourage>["age"] }) {
  * once, which feeds the Calm captain badge and daily quests.
  */
 export function KitToolView({ tool }: { tool: KitToolId }) {
-  const { age, hydrated } = useCourage();
+  const store = useCourage();
+  const { age, hydrated } = store;
+  // Tidy is for 13 and over, and only when online help or the on-device model is on.
+  const tidy = hydrated && (canUseOnline(store) || canUseDevice(store));
   const router = useRouter();
   const reduce = useReducedMotion();
   const meta = kitTool(tool)!;
@@ -159,7 +174,14 @@ export function KitToolView({ tool }: { tool: KitToolId }) {
 
         {tool === "rescue" ? <RescueDeck onCrisis={() => router.push(`/help?crisis=1&from=${encodeURIComponent("/kit/rescue")}`)} /> : null}
         {tool === "frames" ? (
-          <Frames age={age} onCrisis={() => router.push(`/help?crisis=1&from=${encodeURIComponent("/kit/frames")}`)} />
+          <>
+            {tidy ? (
+              <div className="mb-8 border-b border-line pb-8">
+                <TidyTool onCrisis={() => router.push(`/help?crisis=1&from=${encodeURIComponent("/kit/frames")}`)} />
+              </div>
+            ) : null}
+            <Frames age={age} heading={tidy} onCrisis={() => router.push(`/help?crisis=1&from=${encodeURIComponent("/kit/frames")}`)} />
+          </>
         ) : null}
         {tool === "speech" ? <SpeechTools age={age} /> : null}
       </PaperCard>
