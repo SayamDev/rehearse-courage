@@ -1,7 +1,7 @@
 import { dayKey } from "./dates";
 import type { AppEvent, StepRecord } from "./types";
 
-export type Quest = { id: string; text: string; kind: "speak" | "type" | "rescue" | "kit"; target: number };
+export type Quest = { id: string; text: string; kind: "speak" | "type" | "rescue" | "kit" | "game"; target: number };
 
 /** Small, optional daily ideas. Missing them changes nothing. */
 export const QUEST_POOL: Quest[] = [
@@ -12,6 +12,7 @@ export const QUEST_POOL: Quest[] = [
   { id: "rescue-1", text: "Practise one rescue phrase", kind: "rescue", target: 1 },
   { id: "kit-1", text: "Try one body kit tool", kind: "kit", target: 1 },
   { id: "kit-2", text: "Use a body kit tool twice", kind: "kit", target: 2 },
+  { id: "game-1", text: "Play one warm-up game", kind: "game", target: 1 },
 ];
 
 function hash(s: string): number {
@@ -34,6 +35,6 @@ export function questProgress(q: Quest, records: StepRecord[], events: AppEvent[
   let done = 0;
   if (q.kind === "speak") done = records.filter((r) => today(r.at) && r.level >= 3 && !r.typed).length;
   if (q.kind === "type") done = records.filter((r) => today(r.at) && r.typed).length;
-  if (q.kind === "rescue" || q.kind === "kit") done = events.filter((e) => today(e.at) && e.kind === q.kind).length;
+  if (q.kind === "rescue" || q.kind === "kit" || q.kind === "game") done = events.filter((e) => today(e.at) && e.kind === q.kind).length;
   return Math.min(done, q.target);
 }

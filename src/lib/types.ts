@@ -47,8 +47,8 @@ export type StepRecord = {
 
 export type CustomStep = { id: string; room: RoomId; text: string; createdAt: string };
 
-export type EventKind = "kit" | "rescue" | "thenNow" | "panic";
+export type EventKind = "kit" | "rescue" | "thenNow" | "panic" | "game";
 
-export const EVENT_KINDS: EventKind[] = ["kit", "rescue", "thenNow", "panic"];
+export const EVENT_KINDS: EventKind[] = ["kit", "rescue", "thenNow", "panic", "game"];
 
 export type AppEvent = { kind: EventKind; at: string };
