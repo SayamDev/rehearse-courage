@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowCounterClockwise } from "@phosphor-icons/react";
-import { BREATHS, deflate, FULL_ENOUGH, inflate } from "@/lib/games";
+import { BALLOON_CUES, BREATHS, deflate, FULL_ENOUGH, inflate } from "@/lib/games";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Button } from "@/components/ui/button";
+import { useReadAloud } from "@/components/voice/spoken-line";
 
 /**
  * Breath balloon: hold the button while you breathe in and the balloon
@@ -59,7 +60,17 @@ export function BreathBalloon() {
   };
 
   const scale = 0.35 + fill * 0.65;
-  const cue = done ? "Five slow breaths. Nicely done." : holding ? (fill >= 1 ? "Full. Now let go and breathe out slowly." : "Breathe in...") : fill > 0.02 ? "And slowly out..." : "Hold the button and breathe in.";
+  const cueKey: keyof typeof BALLOON_CUES = done ? "done" : holding ? (fill >= 1 ? "full" : "in") : fill > 0.02 ? "out" : "start";
+  const cue = BALLOON_CUES[cueKey];
+  const read = useReadAloud();
+  // Say each new cue once (not the resting one), as the breath changes.
+  const lastCue = useRef(cueKey);
+  useEffect(() => {
+    if (cueKey === lastCue.current) return;
+    lastCue.current = cueKey;
+    if (cueKey !== "start") read(BALLOON_CUES[cueKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cueKey]);
 
   return (
     <div className="flex flex-col items-center text-center">

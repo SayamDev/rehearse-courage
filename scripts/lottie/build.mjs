@@ -461,6 +461,60 @@ function courage(theme) {
   return doc("That took courage", 640, 260, op, [check, disc, burst, top.layer, big.layer, under]);
 }
 
+/** A whole situation done (step 6): sun rays turn behind a planted flag, then "You did it / for real." stamps in. */
+function forReal(theme) {
+  ind = 0;
+  const op = 150;
+  const { ink } = THEMES[theme];
+  const cx = 150;
+  const cy = 190;
+  const rays = layer(
+    "rays",
+    Array.from({ length: 12 }, (_, k) =>
+      group(`ray ${k}`, [{ ty: "rc", d: 1, p: fixed([0, -118]), s: fixed([16, 70]), r: fixed(8) }, fill(k % 2 ? C.sun : C.teal)], { r: k * 30 }),
+    ),
+    {
+      op,
+      ks: {
+        p: [cx, cy, 0],
+        s: anim([[4, [0, 0, 100], EASE.pop], [26, [108, 108, 100], EASE.settle], [38, [100, 100, 100]]]),
+        r: anim([[4, 0, EASE.travel], [op, 40]]),
+        o: anim([[4, 0], [14, 100]]),
+      },
+    },
+  );
+  const disc = layer("disc", [group("disc", [el([0, 0], [150, 150]), fill(C.sun), stroke(C.white, 12)])], {
+    op,
+    ks: { p: [cx, cy, 0], s: anim([[0, [0, 0, 100], EASE.pop], [16, [112, 112, 100], EASE.settle], [28, [100, 100, 100]]]) },
+  });
+  const flag = layer(
+    "flag",
+    [
+      group("cloth", [path([[4, -86], [62, -68], [4, -50]], true), fill(C.coral), stroke(C.white, 6)]),
+      group("pole", [path([[0, 10], [0, -90]]), stroke(C.ink, 8)]),
+    ],
+    { op, ks: { p: [cx - 12, cy + 40, 0], s: anim([[18, [100, 0, 100], EASE.pop], [34, [100, 112, 100], EASE.settle], [44, [100, 100, 100]]]) } },
+  );
+  const inks = [C.sun, C.sky, C.coral, C.grape, C.lime, C.teal, C.coral, C.sky, C.sun, C.grape];
+  const burst = layer(
+    "burst",
+    inks.map((c, i) => {
+      const ang = (i / inks.length) * Math.PI * 2;
+      const r = 130 + (i % 3) * 18;
+      return group(`dot ${i}`, [el([0, 0], [i % 2 ? 14 : 20, i % 2 ? 14 : 20]), fill(c), stroke(C.white, 4)], {
+        p: anim([[20, [0, 0], EASE.settle], [60, [Math.cos(ang) * r, Math.sin(ang) * r]]]),
+        s: anim([[20, [30, 30], EASE.settle], [40, [100, 100], EASE.exit], [80, [0, 0]]]),
+      });
+    }),
+    { op, ks: { p: [cx, cy, 0] } },
+  );
+  const tx = 320;
+  const l1 = typeLayer("you did it", "You did it", { x: tx, y: 170, size: 64, color: ink, start: 30, stagger: 3, dur: 20, motion: "pop", op });
+  const l2 = typeLayer("for real", "for real.", { x: tx, y: 250, size: 64, color: hex("#13262b"), start: 56, stagger: 3, dur: 20, motion: "pop", op });
+  const bar = sweep("sweep", { x: tx - 10, y: 250 - l2.capHeight / 2 + 2, w: l2.width + 20, h: l2.capHeight + 30, color: C.sun, start: 50, op });
+  return doc("You did it for real", 720, 360, op, [l1.layer, l2.layer, bar, flag, disc, burst, rays]);
+}
+
 /** Map: the six steps of every situation as rising stair blocks, labelled, with a lantern that hops to the top. */
 function ladder(theme) {
   ind = 0;
@@ -586,11 +640,12 @@ for (const theme of ["light", "dark"]) {
   const suffix = theme === "dark" ? "-dark" : "";
   writeFileSync(join(out[0], `welcome${suffix}.json`), JSON.stringify(welcome(theme)));
   writeFileSync(join(out[0], `courage${suffix}.json`), JSON.stringify(courage(theme)));
+  writeFileSync(join(out[0], `for-real${suffix}.json`), JSON.stringify(forReal(theme)));
   writeFileSync(join(out[0], `ladder${suffix}.json`), JSON.stringify(ladder(theme)));
   writeFileSync(join(out[0], `ladder-tall${suffix}.json`), JSON.stringify(ladderTall(theme)));
 }
 if (player) {
-  for (const [scene, make] of [["scene-1", firefly], ["scene-2", stepDone], ["scene-3", kit], ["scene-4", badges], ["scene-5", () => welcome("light")], ["scene-6", () => courage("light")], ["scene-7", () => ladder("light")], ["scene-8", () => ladderTall("light")]]) {
+  for (const [scene, make] of [["scene-1", firefly], ["scene-2", stepDone], ["scene-3", kit], ["scene-4", badges], ["scene-5", () => welcome("light")], ["scene-6", () => courage("light")], ["scene-7", () => ladder("light")], ["scene-8", () => ladderTall("light")], ["scene-9", () => forReal("light")]]) {
     const dir = join(player, "public/projects/courage", scene);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "lottie.json"), JSON.stringify(make(), null, 1));

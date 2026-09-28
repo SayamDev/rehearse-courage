@@ -33,7 +33,7 @@ export function PressureMoment({ room }: { room: RoomId }) {
     void (async () => {
       for (const c of cues) {
         if (!live) return;
-        await speak({ role: c.role, set, text: c.line, slower });
+        await speak({ role: c.role, set, text: c.line, slower, accent: store.settings.accent });
       }
     })();
     return () => {

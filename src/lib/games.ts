@@ -121,3 +121,15 @@ export const FULL_ENOUGH = 0.5;
 export function freshRand(): () => number {
   return seeded(Math.floor(Math.random() * 2 ** 31));
 }
+
+/** Story dice: a first line to borrow when stuck. */
+export const STORY_STARTS = ["Once upon a time,", "Yesterday, something odd happened.", "Nobody believed me, but", "It all started when"];
+
+/** Breath balloon: what the balloon says, read aloud as the breath changes. */
+export const BALLOON_CUES = {
+  start: "Hold the button and breathe in.",
+  in: "Breathe in...",
+  full: "Full. Now let go and breathe out slowly.",
+  out: "And slowly out...",
+  done: "Five slow breaths. Nicely done.",
+} as const;

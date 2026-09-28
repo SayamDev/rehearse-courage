@@ -45,7 +45,7 @@ function WordPractice({ tool }: { tool: Tool }) {
           {tool.id === "easy-onset" ? "Let a little breath out first, then let the sound grow, like the bar." : "Touch the first sound lightly, as if it were fragile."}
         </p>
         <div className="mt-3 flex justify-center">
-          <SpokenLine role="narrator" text={word} className="sr-only">
+          <SpokenLine role="narrator" text={word} autoPlay className="sr-only">
             {word}
           </SpokenLine>
         </div>

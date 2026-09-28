@@ -2,7 +2,7 @@
 
 import { Flag } from "@phosphor-icons/react";
 import { LEVELS } from "@/lib/ladder";
-import { stoneStates, type StoneState } from "@/lib/scenes";
+import { stoneStates, type StoneState } from "@/lib/progress";
 import { useCourage } from "@/lib/store";
 import type { Level } from "@/lib/types";
 

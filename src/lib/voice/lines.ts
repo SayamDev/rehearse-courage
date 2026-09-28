@@ -1,39 +1,64 @@
-import { COACH_FALLBACK, COACH_LINES, PRESSURE_CUES } from "@/lib/content/coach";
+import { ACCEPTANCE_LINES, BODY_EXPLAINERS, BREATH_CUES, FOR_REAL_LINE, GROUNDING_STEPS, REFRAME_CARDS, SPEECH_TOOLS, STEP_DONE_LINE } from "@/lib/content/body";
+import { COACH_FALLBACK, COACH_LINES, PRESSURE_CUES, PRESSURE_LINES } from "@/lib/content/coach";
 import { COACH_REPLIES } from "@/lib/content/coach-replies";
 import { RESCUE_PHRASES } from "@/lib/content/phrases";
 import { SITUATIONS } from "@/lib/content/situations";
+import { BALLOON_CUES, BUILD_SENTENCES, HOT_SEAT, SNAP_ROUNDS, STORY_STARTS } from "@/lib/games";
 import type { RoomId, Words } from "@/lib/types";
 
 /**
  * Who says a line. The room decides who is talking to you at step 4: the
  * teacher in class, a friend with friends, the group's host when presenting.
- * The narrator reads everything else (the scene, ideas, missions, phrases).
+ * A classmate (or another friend, or someone in the audience) joins at
+ * step 5. The narrator reads everything else (scenes, ideas, missions,
+ * phrases, the Body kit and the games).
  */
 export type Role = "teacher" | "friend" | "host" | "narrator" | "classmate";
 
-/** Kids hear the kid wording, a child-sounding friend and a slightly slower pace. */
+/** Kids hear the kid wording, child-sounding friends and a slightly slower pace. */
 export type VoiceSet = "kids" | "grown";
 
-/** One voice: an engine and that engine's voice name. */
-export type Voice = { id: string; engine: "kokoro" | "omnivoice"; name: string; instruct?: string; seed?: number };
+/** British English (the default) or American English voices, chosen in Me. */
+export type Accent = "uk" | "us";
+export const ACCENTS: { value: Accent; label: string }[] = [
+  { value: "uk", label: "British" },
+  { value: "us", label: "American" },
+];
 
-const KOKORO = (name: string): Voice => ({ id: `kokoro:${name}`, engine: "kokoro", name });
+/**
+ * One voice. Every voice is Qwen3-TTS (VoiceDesign) run through VoiceStudio
+ * on the maker's Mac: free, natural, and designed from a plain description
+ * (`describe`). The maker listened to the cast before recording.
+ */
+export type Voice = { id: string; engine: "kokoro" | "omnivoice" | "qwen"; name: string; describe?: string; instruct?: string; seed?: number };
 
-/** Adult roles sound the same for everyone; only the friend changes with age. */
-export const VOICES: Record<Role, Record<VoiceSet, Voice>> = {
-  teacher: { kids: KOKORO("bf_emma"), grown: KOKORO("bf_emma") },
-  host: { kids: KOKORO("am_michael"), grown: KOKORO("am_michael") },
-  narrator: { kids: KOKORO("af_heart"), grown: KOKORO("af_heart") },
-  friend: {
-    kids: { id: "omni:friend-child", engine: "omnivoice", name: "friend-child", instruct: "female, child, british accent", seed: 7 },
-    grown: { id: "omni:friend-young", engine: "omnivoice", name: "friend-young", instruct: "female, young adult, british accent", seed: 11 },
-  },
-  // Someone else in the room at step 5: a classmate, another friend, someone in the audience.
-  classmate: {
-    kids: { id: "omni:classmate-child", engine: "omnivoice", name: "classmate-child", instruct: "male, child, british accent", seed: 5 },
-    grown: { id: "omni:classmate-young", engine: "omnivoice", name: "classmate-young", instruct: "male, young adult, british accent", seed: 9 },
-  },
-};
+const qwen = (name: string, describe: string): Voice => ({ id: `qwen:${name}`, engine: "qwen", name, describe });
+
+type Cast = Record<VoiceSet, Voice>;
+const same = (v: Voice): Cast => ({ kids: v, grown: v });
+
+function cast(accent: "British" | "American", tag: "uk" | "us"): Record<Role, Cast> {
+  return {
+    narrator: same(qwen(`narrator-${tag}`, `A warm, calm ${accent} woman in her thirties, speaking naturally and gently at an easy pace.`)),
+    teacher: same(qwen(`teacher-${tag}`, `A friendly, encouraging ${accent} female teacher in her forties, clear and kind, with a natural classroom tone.`)),
+    host: same(qwen(`host-${tag}`, `A relaxed, friendly ${accent} man in his thirties, warm and natural, hosting a small group.`)),
+    friend: {
+      kids: qwen(`friend-child-${tag}`, `A cheerful ten-year-old ${accent} girl, natural and friendly, talking to a classmate.`),
+      grown: qwen(`friend-young-${tag}`, `A friendly ${accent} woman in her early twenties, casual and natural, chatting with a friend.`),
+    },
+    classmate: {
+      kids: qwen(`classmate-child-${tag}`, `A cheerful ten-year-old ${accent} boy, natural and friendly.`),
+      grown: qwen(`classmate-young-${tag}`, `A friendly ${accent} man in his early twenties, casual and natural.`),
+    },
+  };
+}
+
+/** The cast, by accent. */
+export const VOICES: Record<Accent, Record<Role, Cast>> = { uk: cast("British", "uk"), us: cast("American", "us") };
+
+export function voiceFor(role: Role, set: VoiceSet, accent: Accent = "uk"): Voice {
+  return VOICES[accent][role][set];
+}
 
 /** Kids hear pre-recorded lines about 10% slower (pitch kept). */
 export const KIDS_RATE = 0.9;
@@ -60,36 +85,53 @@ export function clipId(voice: Voice, text: string): string {
   return hash(`${voice.id}|${spokenText(text)}`);
 }
 
-export type Line = { role: Role; set: VoiceSet; voice: Voice; text: string; id: string };
+export type Line = { role: Role; set: VoiceSet; accent: Accent; voice: Voice; text: string; id: string };
 
-function line(role: Role, set: VoiceSet, text: string): Line {
-  const voice = VOICES[role][set];
-  return { role, set, voice, text: spokenText(text), id: clipId(voice, text) };
-}
+const plain = (s: string): Words => ({ kid: s, grown: s });
 
-function both(role: Role, w: Words): Line[] {
-  return [line(role, "kids", w.kid), line(role, "grown", w.grown)];
+/** Every fixed line the app reads aloud, as [role, wording] pairs. */
+function script(): [Role, Words][] {
+  const out: [Role, Words][] = [];
+  const say = (role: Role, ...ws: Words[]) => ws.forEach((w) => out.push([role, w]));
+  for (const s of SITUATIONS) {
+    say("narrator", s.scene, s.mission, ...s.ideas);
+    const coach = COACH_LINES[s.id];
+    if (coach) say(ROOM_ROLE[s.room], coach);
+  }
+  for (const room of Object.keys(COACH_REPLIES) as RoomId[]) {
+    say(ROOM_ROLE[room], COACH_FALLBACK, ...COACH_REPLIES[room]);
+    say("narrator", PRESSURE_LINES[room]);
+    for (const c of PRESSURE_CUES[room]) say(c.role, c.text);
+  }
+  say("narrator", ...RESCUE_PHRASES.map((p) => p.text), ...RESCUE_PHRASES.map((p) => p.when));
+  // Body kit.
+  say("narrator", ...GROUNDING_STEPS.map((g) => plain(g.hint)), plain(BREATH_CUES.in), plain(BREATH_CUES.out), plain(STEP_DONE_LINE), plain(FOR_REAL_LINE));
+  say("narrator", ...ACCEPTANCE_LINES, ...SPEECH_TOOLS.map((t) => t.how), ...SPEECH_TOOLS.flatMap((t) => t.practice.map(plain)));
+  for (const kind of ["blushing", "sweating"] as const) {
+    say("narrator", ...BODY_EXPLAINERS[kind], ...REFRAME_CARDS[kind].flatMap((c) => [c.thought, c.tryThis]));
+  }
+  // Games.
+  say("narrator", ...HOT_SEAT, ...SNAP_ROUNDS.map((r) => r.moment), ...BUILD_SENTENCES, ...STORY_STARTS.map(plain), ...Object.values(BALLOON_CUES).map(plain));
+  return out;
 }
 
 /**
- * Every fixed line the app can read aloud, in both wordings, deduplicated by
- * clip. The recording script records these; the app plays a clip when one
- * exists and otherwise falls back to the on-device voices.
+ * Every fixed line in every voice it can be heard in (both wordings, both
+ * accents), deduplicated by clip. The recording script records these; the
+ * app plays a clip when one exists and otherwise falls back to the
+ * on-device voices.
  */
 export function allLines(): Line[] {
   const out: Line[] = [];
-  for (const s of SITUATIONS) {
-    out.push(...both("narrator", s.scene), ...both("narrator", s.mission));
-    for (const idea of s.ideas) out.push(...both("narrator", idea));
-    const coach = COACH_LINES[s.id];
-    if (coach) out.push(...both(ROOM_ROLE[s.room], coach));
+  for (const accent of ["uk", "us"] as Accent[]) {
+    for (const [role, w] of script()) {
+      for (const set of ["kids", "grown"] as VoiceSet[]) {
+        const voice = voiceFor(role, set, accent);
+        const text = spokenText(set === "kids" ? w.kid : w.grown);
+        out.push({ role, set, accent, voice, text, id: clipId(voice, text) });
+      }
+    }
   }
-  for (const room of Object.keys(COACH_REPLIES) as RoomId[]) {
-    out.push(...both(ROOM_ROLE[room], COACH_FALLBACK));
-    for (const reply of COACH_REPLIES[room]) out.push(...both(ROOM_ROLE[room], reply));
-  }
-  for (const p of RESCUE_PHRASES) out.push(...both("narrator", p.text));
-  for (const cues of Object.values(PRESSURE_CUES)) for (const c of cues) out.push(...both(c.role, c.text));
   const seen = new Set<string>();
   return out.filter((l) => (seen.has(l.id) ? false : (seen.add(l.id), true)));
 }

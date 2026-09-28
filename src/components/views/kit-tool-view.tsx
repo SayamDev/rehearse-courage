@@ -18,6 +18,7 @@ import { TidyTool } from "@/components/calm/tidy-tool";
 import { FrameBuilder } from "@/components/calm/frame-builder";
 import { SpeechPractice } from "@/components/calm/speech-practice";
 import { PaperCard } from "@/components/ui/paper-card";
+import { SpokenLine } from "@/components/voice/spoken-line";
 
 /**
  * One body-kit tool ("/kit/[tool]"). Opening a tool logs a kit event
@@ -85,9 +86,9 @@ export function KitToolView({ tool }: { tool: KitToolId }) {
           <>
             <h2 className="text-2xl text-ink">What your body is doing</h2>
             {BODY_EXPLAINERS[tool].map((w) => (
-              <p key={w.kid} className="mt-2 text-ink">
-                {words(w, age)}
-              </p>
+              <div key={w.kid} className="mt-2">
+                <SpokenLine role="narrator" text={words(w, age)} className="text-ink" />
+              </div>
             ))}
             <div className="mt-8">
               <ReframeCards kind={tool} age={age} />

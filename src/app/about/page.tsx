@@ -41,8 +41,9 @@ export default function AboutPage() {
         <p className="mt-1 text-muted">Designed and built by Sayam Ajmal, as part of the Rehearse project.</p>
         <p className="mt-6 font-semibold text-ink">Voices</p>
         <p className="mt-1 text-muted">
-          Recorded with Kokoro (Apache 2.0) and OmniVoice by k2-fsa (CC BY-NC 4.0), free and on the maker&apos;s own computer. Nothing you
-          say or type is used to make them.
+          Recorded with Qwen3-TTS by the Qwen team (Apache 2.0) through VoiceStudio, free and on the maker&apos;s own computer, in British
+          and American English. The optional voice you can save on your device is Kokoro (Apache 2.0). Nothing you say or type is used to
+          make them.
         </p>
       </div>
     </>

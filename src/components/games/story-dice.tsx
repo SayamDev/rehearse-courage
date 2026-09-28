@@ -4,10 +4,11 @@ import { useState } from "react";
 import {
   Balloon, BaseballCap, Bicycle, Book, Butterfly, Cake, CastleTurret, Cat, Crown, DiceFive, Dog, Fish, Ghost, Guitar, Key, MapTrifold, Moon, Pizza, Robot, Rocket, SoccerBall, Sun, Train, Tree, Umbrella, type Icon,
 } from "@phosphor-icons/react";
-import { rollDice, freshRand, type DiceFace } from "@/lib/games";
+import { rollDice, freshRand, STORY_STARTS, type DiceFace } from "@/lib/games";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Button } from "@/components/ui/button";
 import { SayAndListen } from "@/components/voice/say-and-listen";
+import { SpokenLine } from "@/components/voice/spoken-line";
 
 const FACE: Record<DiceFace, { icon: Icon; word: string }> = {
   cat: { icon: Cat, word: "a cat" }, rocket: { icon: Rocket, word: "a rocket" }, umbrella: { icon: Umbrella, word: "an umbrella" },
@@ -20,7 +21,7 @@ const FACE: Record<DiceFace, { icon: Icon; word: string }> = {
   football: { icon: SoccerBall, word: "a football" }, cap: { icon: BaseballCap, word: "a cap" }, butterfly: { icon: Butterfly, word: "a butterfly" },
 };
 const INKS = ["bg-sky", "bg-sun", "bg-coral"];
-const STARTS = ["Once upon a time,", "Yesterday, something odd happened.", "Nobody believed me, but", "It all started when"];
+const STARTS = STORY_STARTS;
 
 /** Story dice: roll three pictures, then tell a tiny story that has all three. Any story counts. */
 export function StoryDice() {
@@ -68,8 +69,11 @@ export function StoryDice() {
             Tell a tiny story with {FACE[faces[0]].word}, {FACE[faces[1]].word} and {FACE[faces[2]].word}. Three sentences is plenty.
           </p>
           <p className="mt-2 text-muted">
-            Stuck? Start with: <span className="font-semibold text-ink">&ldquo;{start}&rdquo;</span>
+            Stuck? Start with:
           </p>
+          <SpokenLine role="narrator" text={start} className="font-semibold text-ink">
+            &ldquo;{start}&rdquo;
+          </SpokenLine>
           <div className="mt-4">
             <SayAndListen key={roll} label="Tell your story" />
           </div>

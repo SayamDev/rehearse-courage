@@ -7,6 +7,7 @@ import { BUILD_SENTENCES, scramble, freshRand, sentenceWords, shuffle } from "@/
 import { useCourage } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { SayAndListen } from "@/components/voice/say-and-listen";
+import { SpokenLine } from "@/components/voice/spoken-line";
 
 /**
  * Word builder: tap the words in order to put a sentence back together
@@ -79,7 +80,11 @@ export function WordBuilder() {
       {complete ? (
         <div className="mt-5 border-t border-line pt-5" aria-live="polite">
           <p className="font-semibold text-ink">{same ? "That reads well." : "Your way works. The usual order is:"}</p>
-          {!same ? <p className="mt-1 text-ink">&ldquo;{target.join(" ")}&rdquo;</p> : null}
+          <div className="mt-1">
+            <SpokenLine role="narrator" text={target.join(" ")} autoPlay className="text-ink">
+              &ldquo;{target.join(" ")}&rdquo;
+            </SpokenLine>
+          </div>
           <p className="mb-3 mt-1 text-muted">Now say it out loud, once or twice.</p>
           <SayAndListen key={i} label="Say it" />
           <Button variant="secondary" icon={ArrowRight} iconEnd onClick={() => reset(i + 1)} className="mt-3 w-full">
