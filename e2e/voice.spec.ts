@@ -2,8 +2,15 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 import { RETURNING, seed } from "./helpers";
 
-test("Hear it plays the recorded line, and nothing plays until it is tapped", async ({ page }) => {
+test("the coach's line plays by itself when the step opens", async ({ page }) => {
   await seed(page, { ...RETURNING, age: "adult" });
+  const clip = page.waitForRequest((r) => /\/voice\/[0-9a-f]{8}\.m4a$/.test(r.url()));
+  await page.goto("/step/friends-join?level=4");
+  await clip;
+});
+
+test("with auto-play off, Hear it plays the recorded line and nothing plays until it is tapped", async ({ page }) => {
+  await seed(page, { ...RETURNING, age: "adult", settings: { ...RETURNING.settings, playCoach: false } });
   await page.goto("/step/friends-join?level=4");
   const coach = page.locator("figure").filter({ hasText: "Cobi, your coach" });
   await expect(coach.getByRole("button", { name: "Hear it" })).toBeVisible();
@@ -36,9 +43,9 @@ test("the voice offer appears once after a first practice, and Not now counts as
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("courage:v1")!).voiceOffered)).toBe(true);
 });
 
-test("Me has the voice settings, with auto-play off by default", async ({ page }) => {
+test("Me has the voice settings, with the coach playing by itself by default", async ({ page }) => {
   await seed(page);
   await page.goto("/me");
   await expect(page.getByRole("heading", { name: "Voices" })).toBeVisible();
-  await expect(page.getByRole("switch", { name: "Play the coach's lines automatically" })).not.toBeChecked();
+  await expect(page.getByRole("switch", { name: "Play the coach's lines automatically" })).toBeChecked();
 });

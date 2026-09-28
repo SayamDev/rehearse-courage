@@ -136,7 +136,7 @@ export function HomeView() {
       </SceneBand>
 
       <div className="px-4">
-        <PaperCard className="relative mx-auto -mt-6 max-w-[560px] md:-mt-[clamp(7rem,13vw,13rem)]">
+        <PaperCard className="relative mx-auto mt-4 max-w-[560px] md:-mt-[clamp(7rem,13vw,13rem)]">
           {model.done ? (
             <>
               <h2 className="text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink">You have walked every path.</h2>

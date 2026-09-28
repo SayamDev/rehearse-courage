@@ -13,6 +13,7 @@ import { LEVELS } from "@/lib/ladder";
 import { ROOM_LABEL } from "@/lib/rooms";
 import { checkCrisis } from "@/lib/safety/crisis";
 import { useSpeak, waitForRecording } from "@/lib/speak";
+import { looksLikeWords, NOT_WORDS } from "@/lib/sense";
 import { recordStep } from "@/lib/state";
 import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
@@ -147,6 +148,8 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   const [elapsed, setElapsed] = useState(0);
   const [reply, setReply] = useState<CobiReply | null>(null);
   const [thinking, setThinking] = useState(false);
+  // Typed text that looked like random letters: a gentle note instead of praise.
+  const [notWords, setNotWords] = useState(false);
   const typeRef = useRef<HTMLTextAreaElement>(null);
   const focusType = useRef(false);
   const replyRef = useRef<HTMLElement>(null);
@@ -226,6 +229,23 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
     window.scrollTo({ top: 0 });
   };
 
+  /** Typed words only (never speech): random letters get a kind note and the field back, not a well done. */
+  const wordsOk = () => {
+    if (looksLikeWords(text)) return true;
+    setNotWords(true);
+    typeRef.current?.focus();
+    return false;
+  };
+  const onType = (v: string) => {
+    setText(v);
+    setNotWords(false);
+  };
+  const notWordsNote = notWords ? (
+    <p id="not-words" role="status" className="mt-2 text-ink">
+      {NOT_WORDS}
+    </p>
+  ) : null;
+
   const spokenSeconds = () => (speak.seconds > 0 ? speak.seconds : null);
 
   /**
@@ -235,7 +255,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
    * are never saved.
    */
   const askCobi = async (by: "speak" | "type") => {
-    if (thinking) return;
+    if (thinking || (by === "type" && !wordsOk())) return;
     setThinking(true);
     const deps = browserAiDeps(store.settings.deviceModel);
     let answer = by === "type" ? text : "";
@@ -380,10 +400,13 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
               <TextField
                 label={step.ideas.length > 0 ? "Or write your own (optional)" : "Write it down (optional)"}
                 value={text}
-                onChange={setText}
+                onChange={onType}
+                fieldRef={typeRef}
+                describedBy={notWords ? "not-words" : undefined}
                 rows={2}
               />
-              <Button className="mt-6" icon={Check} onClick={() => finish({ seconds: null, typed: text.trim() !== "" })}>
+              {notWordsNote}
+              <Button className="mt-6" icon={Check} onClick={() => wordsOk() && finish({ seconds: null, typed: text.trim() !== "" })}>
                 I&apos;ve thought of it
               </Button>
             </>
@@ -396,9 +419,12 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
                 label="Type it here"
                 hint="Only you can see this, and it is not saved."
                 value={text}
-                onChange={setText}
+                onChange={onType}
+                fieldRef={typeRef}
+                describedBy={notWords ? "not-words" : undefined}
               />
-              <Button className="mt-6" icon={Check} onClick={() => finish({ seconds: null, typed: text.trim() !== "" })}>
+              {notWordsNote}
+              <Button className="mt-6" icon={Check} onClick={() => wordsOk() && finish({ seconds: null, typed: text.trim() !== "" })}>
                 Done
               </Button>
             </>
@@ -461,17 +487,18 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
               <TextField
                 label="Type what you would say"
                 value={text}
-                onChange={setText}
+                onChange={onType}
                 fieldRef={typeRef}
-                describedBy={speak.state === "blocked" ? "mic-off" : undefined}
+                describedBy={[speak.state === "blocked" ? "mic-off" : null, notWords ? "not-words" : null].filter(Boolean).join(" ") || undefined}
               />
+              {notWordsNote}
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
                 {level === 4 ? (
                   <Button icon={ChatCircle} onClick={() => askCobi("type")} aria-disabled={thinking}>
                     Hear Cobi&apos;s reply
                   </Button>
                 ) : (
-                  <Button icon={Check} onClick={() => finish({ seconds: null, typed: true })}>
+                  <Button icon={Check} onClick={() => wordsOk() && finish({ seconds: null, typed: true })}>
                     Done
                   </Button>
                 )}

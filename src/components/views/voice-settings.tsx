@@ -128,15 +128,15 @@ export function NaturalVoice({ onDone }: { onDone?: () => void }) {
   );
 }
 
-/** Voices in Me: auto-play (off by default), a slower pace, and the optional natural voice. */
+/** Voices in Me: the coach playing by itself (on by default), a slower pace, and the optional natural voice. */
 export function VoiceSettings() {
   const store = useCourage();
   const set = (patch: Partial<Settings>) => act((s) => updateSettings(s, patch));
   return (
     <>
-      <p className="mt-2 text-ink">Tap Hear it beside a line to hear it read aloud. Every line is also written on screen.</p>
+      <p className="mt-2 text-ink">The coach&apos;s lines play by themselves. Tap Hear it beside any line to hear it again. Every line is also written on screen.</p>
       <div className="mt-3 divide-y divide-line">
-        <Switch checked={store.settings.autoPlay} onChange={(v) => set({ autoPlay: v })} label="Play the coach's lines automatically" />
+        <Switch checked={store.settings.playCoach} onChange={(v) => set({ playCoach: v })} label="Play the coach's lines automatically" />
         <Switch checked={store.settings.slowerVoice} onChange={(v) => set({ slowerVoice: v })} label="Read lines a little slower" />
       </div>
       <h3 className="mt-5 text-xl text-ink">Natural voice on this device</h3>
