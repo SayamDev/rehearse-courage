@@ -49,3 +49,12 @@ test("Me has the voice settings, with the coach playing by itself by default", a
   await expect(page.getByRole("heading", { name: "Voices" })).toBeVisible();
   await expect(page.getByRole("switch", { name: "Play the coach's lines automatically" })).toBeChecked();
 });
+
+test("step 5 plays the room's two short lines by themselves", async ({ page }) => {
+  await seed(page, { ...RETURNING, age: "adult" });
+  const clip = page.waitForRequest((r) => /\/voice\/[0-9a-f]{8}\.m4a$/.test(r.url()));
+  await page.goto("/step/class-answer?level=5");
+  await expect(page.getByText("Take your time. We're listening.")).toBeVisible();
+  await expect(page.getByText("Go on, what do you think?")).toBeVisible();
+  await clip;
+});

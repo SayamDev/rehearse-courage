@@ -15,7 +15,12 @@ import { clipId, KIDS_RATE, spokenText, VOICES, type Role, type VoiceSet } from 
  */
 
 /** Kokoro stand-ins for voices that only exist as recordings (the friends). */
-const KOKORO_STAND_IN: Record<string, string> = { "omni:friend-child": "af_sky", "omni:friend-young": "af_bella" };
+const KOKORO_STAND_IN: Record<string, string> = {
+  "omni:friend-child": "af_sky",
+  "omni:friend-young": "af_bella",
+  "omni:classmate-child": "am_puck",
+  "omni:classmate-young": "am_adam",
+};
 
 /* ---------- What is playing, so the matching button can show it ---------- */
 

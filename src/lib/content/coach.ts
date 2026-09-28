@@ -36,6 +36,25 @@ export const PRESSURE_LINES: Record<RoomId, Words> = {
   presenting: w("The room goes quiet and looks at you."),
 };
 
+/**
+ * Step 5, "a little pressure": two short lines from the people in the room,
+ * played one after the other, so the moment feels real. Kind, never rushing.
+ */
+export const PRESSURE_CUES: Record<RoomId, { role: "teacher" | "friend" | "host" | "classmate"; text: Words }[]> = {
+  class: [
+    { role: "teacher", text: w("Take your time. We're listening.") },
+    { role: "classmate", text: w("Go on, what do you think?") },
+  ],
+  friends: [
+    { role: "friend", text: w("So what do you reckon?", "So, what do you think?") },
+    { role: "classmate", text: w("Yeah, go on.") },
+  ],
+  presenting: [
+    { role: "host", text: w("Whenever you're ready.") },
+    { role: "classmate", text: w("We're all ears.") },
+  ],
+};
+
 export function coachLine(situationId: string): Words {
   return COACH_LINES[situationId] ?? COACH_FALLBACK;
 }
