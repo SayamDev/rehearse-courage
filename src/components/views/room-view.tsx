@@ -129,7 +129,7 @@ export function RoomView({ room }: { room: RoomId }) {
           </div>
 
           <div className="mx-auto max-w-[1100px] px-4 md:px-8">
-            <PaperCard className="relative mx-auto -mt-6 max-w-[560px] md:-mt-[clamp(7rem,13vw,13rem)]">
+            <PaperCard className="relative mx-auto mt-4 max-w-[560px] md:-mt-[clamp(7rem,13vw,13rem)]">
               {/* Announced when a row or stone changes what the card shows. */}
               <div aria-live="polite">
                 <p className="text-muted">

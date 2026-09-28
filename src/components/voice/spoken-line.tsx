@@ -17,8 +17,8 @@ export function useVoiceSet(): VoiceSet {
  * A line that can be read aloud: the text itself (always on screen, so it is
  * the caption) and a small "Hear it" button. While it plays, the text is
  * softly highlighted and the button becomes Stop. With `autoPlay`, the line
- * plays once when it first appears, but only if the person turned on
- * "Play lines automatically" in Me; nothing plays by surprise otherwise.
+ * plays once when it first appears, unless the person turned off "Play the
+ * coach's lines automatically" in Me.
  */
 export function SpokenLine({
   role,
@@ -42,7 +42,7 @@ export function SpokenLine({
   const key = lineKey(role, set, text);
   const active = playing?.key === key;
   const slower = store.settings.slowerVoice;
-  const auto = autoPlay && store.hydrated && store.settings.autoPlay;
+  const auto = autoPlay && store.hydrated && store.settings.playCoach;
 
   useEffect(() => {
     if (auto) void speak({ role, set, text, slower });

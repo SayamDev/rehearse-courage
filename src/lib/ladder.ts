@@ -27,12 +27,21 @@ export function nextLevel(records: StepRecord[], situationId: string): Level {
   return Math.min(highestLevel(records, situationId) + 1, 6) as Level;
 }
 
-/** One step to suggest on Home: least advanced unfinished situation, preferred rooms first. */
+/**
+ * One step to suggest on Home. Keeps climbing the ladder you are on: the
+ * situation you practised most recently, until it is finished. Only then
+ * (or before any practice) does it pick the least advanced unfinished
+ * situation, preferred rooms first. Your own steps are never suggested here.
+ */
 export function suggestNext(
   records: StepRecord[],
   situations: Situation[],
   hard: HardThing[],
 ): { situationId: string; level: Level } | null {
+  const latest = [...records].sort((a, b) => b.at.localeCompare(a.at)).find((r) => situations.some((s) => s.id === r.situationId));
+  if (latest && highestLevel(records, latest.situationId) < 6) {
+    return { situationId: latest.situationId, level: nextLevel(records, latest.situationId) };
+  }
   const preferred = hard.map((h) => HARD_TO_ROOM[h]).filter((r): r is RoomId => Boolean(r));
   const order = [...new Set([...preferred, ...ROOM_IDS])];
   for (const room of order) {

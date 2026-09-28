@@ -37,8 +37,8 @@ export type Settings = {
   deviceModel: boolean;
   /** "Don't show this again" on the keep-your-progress-safe pop-up. */
   saveNudgeOff: boolean;
-  /** Off by default: lines only play when "Hear it" is tapped, so nothing plays by surprise. */
-  autoPlay: boolean;
+  /** On by default: the coach's line and Cobi's reply play when they appear (Hear it replays them). */
+  playCoach: boolean;
   /** Off by default: read lines a little slower (kids already hear them about 10% slower). */
   slowerVoice: boolean;
 };
@@ -96,7 +96,7 @@ export const DEFAULT_STATE: CourageState = {
     onlineHelp: true,
     deviceModel: false,
     saveNudgeOff: false,
-    autoPlay: false,
+    playCoach: true,
     slowerVoice: false,
   },
 };
@@ -175,7 +175,7 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = 
   "onlineHelp",
   "deviceModel",
   "saveNudgeOff",
-  "autoPlay",
+  "playCoach",
   "slowerVoice",
 ];
 
