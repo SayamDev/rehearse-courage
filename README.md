@@ -13,7 +13,7 @@ A Rehearse project, by Sayam Ajmal.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/home-laptop-dark.png">
-  <img alt="Home: Hi Sam, today's one step. A Join a conversation card on step 4 of 6, today's tiny dare, the firefly companion and courage level 3, Ember" src="docs/screenshots/home-laptop.png" width="880">
+  <img alt="Home: Hi Sam, today's one step. A Join a conversation card on step 4 of 6, today's tiny dare, the firefly companion and courage level 3, Ember, with the light or dark switch next to Need a pause in the top bar" src="docs/screenshots/home-laptop.png" width="880">
 </picture>
 
 </div>
