@@ -37,6 +37,10 @@ export type Settings = {
   deviceModel: boolean;
   /** "Don't show this again" on the keep-your-progress-safe pop-up. */
   saveNudgeOff: boolean;
+  /** Off by default: lines only play when "Hear it" is tapped, so nothing plays by surprise. */
+  autoPlay: boolean;
+  /** Off by default: read lines a little slower (kids already hear them about 10% slower). */
+  slowerVoice: boolean;
 };
 
 export type CourageState = {
@@ -58,6 +62,8 @@ export type CourageState = {
   welcomed: boolean;
   /** When a backup file was last saved from Me or the pop-up. */
   lastBackup: string | null;
+  /** The natural-voice download has been offered once by its pop-up, whatever the answer. */
+  voiceOffered: boolean;
   settings: Settings;
 };
 
@@ -78,6 +84,7 @@ export const DEFAULT_STATE: CourageState = {
   cameBack: false,
   welcomed: false,
   lastBackup: null,
+  voiceOffered: false,
   settings: {
     reduceMotion: false,
     textSize: "normal",
@@ -89,6 +96,8 @@ export const DEFAULT_STATE: CourageState = {
     onlineHelp: true,
     deviceModel: false,
     saveNudgeOff: false,
+    autoPlay: false,
+    slowerVoice: false,
   },
 };
 
@@ -166,6 +175,8 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = 
   "onlineHelp",
   "deviceModel",
   "saveNudgeOff",
+  "autoPlay",
+  "slowerVoice",
 ];
 
 const THEMES: Theme[] = ["system", "light", "dark"];
@@ -207,6 +218,7 @@ export function normalize(raw: unknown): CourageState {
     // Saves from before the welcome guide existed: anyone who already practised has found their way.
     welcomed: p.welcomed === true || (p.welcomed === undefined && arr<unknown>(p.records).length > 0),
     lastBackup: isParseableDate(p.lastBackup) ? p.lastBackup : null,
+    voiceOffered: p.voiceOffered === true,
     settings: normalizeSettings(p.settings),
   };
 }
@@ -261,4 +273,9 @@ export function markBackedUp(s: CourageState, now: Date): CourageState {
 
 export function updateSettings(s: CourageState, patch: Partial<Settings>): CourageState {
   return { ...s, settings: { ...s.settings, ...patch } };
+}
+
+/** The voice pop-up had its one turn. */
+export function markVoiceOffered(s: CourageState): CourageState {
+  return { ...s, voiceOffered: true };
 }

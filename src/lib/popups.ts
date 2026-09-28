@@ -28,6 +28,17 @@ export function nameAskDue(s: Pick<CourageState, "companion" | "welcomed" | "nam
   return !!s.companion && s.welcomed && !s.nameAsked && pathname === "/";
 }
 
+/**
+ * The natural-voice download, offered once: on Home, after a first practice
+ * (so Hear it has been seen) and after the name question had its turn.
+ */
+export function voiceOfferDue(
+  s: Pick<CourageState, "companion" | "welcomed" | "nameAsked" | "voiceOffered" | "records">,
+  pathname: string,
+): boolean {
+  return !!s.companion && s.welcomed && s.nameAsked && !s.voiceOffered && s.records.length > 0 && pathname === "/";
+}
+
 export function saveNudgeDue(
   s: Pick<CourageState, "records" | "lastBackup" | "welcomed"> & { settings: { saveNudgeOff: boolean } },
   now: Date,

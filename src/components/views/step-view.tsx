@@ -19,6 +19,8 @@ import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId, StepRecord } from "@/lib/types";
 import { SceneArt } from "@/components/scene/scene-art";
 import { SceneBand } from "@/components/scene/scene-band";
+import { SpokenLine } from "@/components/voice/spoken-line";
+import { ROOM_ROLE } from "@/lib/voice/lines";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { IdeaList } from "@/components/ui/idea-list";
 import { PaperCard } from "@/components/ui/paper-card";
@@ -308,18 +310,22 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
             <>
               {/* Steps 2 to 5: the moment is a reminder; the new task is the heading. */}
               <p className="text-muted">The moment</p>
-              <p className="mt-1 text-ink">{step.scene}</p>
+              <div className="mt-1">
+                <SpokenLine role="narrator" text={step.scene} className="text-ink" />
+              </div>
               <h2 className="mt-4 text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{TASK[level]}</h2>
               <p className="mt-1 text-ink">{taskHint(level, step.room)}</p>
             </>
           ) : (
-            <h2 className="text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{step.scene}</h2>
+            <SpokenLine role="narrator" text={step.scene} as="h2" className="text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink" />
           )}
 
           {level === 6 ? (
             <>
               <p className="mt-4 text-muted">Your mission</p>
-              <p className="mt-1 text-lg font-semibold text-ink">{step.mission}</p>
+              <div className="mt-1">
+                <SpokenLine role="narrator" text={step.mission} className="text-lg font-semibold text-ink" />
+              </div>
             </>
           ) : step.ideas.length > 0 && level === 1 ? (
             <div className="mt-5">
@@ -339,7 +345,9 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
           {level === 4 ? (
             <figure className="mt-5 rounded-2xl bg-surface-2 px-4 py-3">
               <figcaption className="text-muted">{COACH_NAME}</figcaption>
-              <blockquote className="mt-1 text-ink">{words(coachLine(step.id), store.age)}</blockquote>
+              <div className="mt-1">
+                <SpokenLine role={ROOM_ROLE[step.room]} text={words(coachLine(step.id), store.age)} as="blockquote" className="text-ink" autoPlay />
+              </div>
             </figure>
           ) : null}
           {level === 4 && online ? (
@@ -492,7 +500,9 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
                 <>
                   <figure ref={replyRef} tabIndex={-1} className="rounded-2xl bg-surface-2 px-4 py-3 outline-none">
                     <figcaption className="text-muted">{COACH_NAME}</figcaption>
-                    <blockquote className="mt-1 text-ink">{reply.text}</blockquote>
+                    <div className="mt-1">
+                      <SpokenLine role={ROOM_ROLE[step.room]} text={reply.text} as="blockquote" className="text-ink" autoPlay />
+                    </div>
                   </figure>
                   {reply.source === "device" ? <p className="mt-2 text-muted">This reply came from the AI on this device.</p> : null}
                   <div className="mt-6 grid gap-3 sm:grid-cols-2">

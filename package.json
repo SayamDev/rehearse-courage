@@ -16,12 +16,14 @@
     "test:e2e": "playwright test",
     "cf:build": "sh scripts/cf.sh build-only",
     "cf:preview": "sh scripts/cf.sh preview",
-    "cf:deploy": "sh scripts/cf.sh deploy"
+    "cf:deploy": "sh scripts/cf.sh deploy",
+    "voices:record": "tsx scripts/voices/record.mts"
   },
   "dependencies": {
     "@mlc-ai/web-llm": "^0.2.85",
     "@opennextjs/cloudflare": "^1.20.6",
     "@phosphor-icons/react": "^2.1.10",
+    "kokoro-js": "^1.2.1",
     "lottie-web": "^5.13.0",
     "motion": "^13.4.4",
     "next": "16.3.6",
@@ -39,6 +41,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.0.2",
     "wrangler": "^4.142.0"

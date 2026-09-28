@@ -1,15 +1,22 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { act, useCourage } from "@/lib/store";
+import { stopSpeaking } from "@/lib/voice/speak";
 import { visit } from "@/lib/state";
 
 /**
- * Mirrors reduced motion, large text and theme onto <html>, and records the
- * visit once per app load. Renders nothing.
+ * Mirrors reduced motion, large text and theme onto <html>, records the
+ * visit once per app load, and stops any line read aloud when the page
+ * changes. Renders nothing.
  */
 export function SettingsEffects() {
   const { settings } = useCourage();
+  const pathname = usePathname();
+
+  // A line never follows you to another screen.
+  useEffect(() => () => stopSpeaking(), [pathname]);
 
   useEffect(() => {
     act((s) => visit(s, new Date()).state);
