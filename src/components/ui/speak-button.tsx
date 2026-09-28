@@ -12,7 +12,7 @@ const LABEL: Record<SpeakState, string> = {
   idle: "Hold to speak",
   done: "Hold to speak",
   blocked: "Hold to speak",
-  asking: "Opening the microphone",
+  asking: "Allow the microphone to start",
   listening: "Listening. Let go or tap to stop",
 };
 
@@ -28,6 +28,8 @@ export function SpeakButton({
   label = "Hold to speak",
   variant = "primary",
   className = "",
+  level = 0,
+  seconds = 0,
   ref,
 }: {
   ref?: React.Ref<HTMLButtonElement>;
@@ -39,6 +41,10 @@ export function SpeakButton({
   onStart: () => void;
   onStop: () => void;
   className?: string;
+  /** Live loudness 0 to 1 while recording, for the moving bars. */
+  level?: number;
+  /** Seconds of voice so far, shown while recording. */
+  seconds?: number;
 }) {
   const downAt = useRef<number | null>(null);
   const live = state === "listening" || state === "asking";
@@ -72,6 +78,7 @@ export function SpeakButton({
   };
 
   const IconCmp = state === "blocked" ? MicrophoneSlash : Microphone;
+  const recording = state === "listening";
 
   return (
     <button
@@ -82,10 +89,40 @@ export function SpeakButton({
       onPointerCancel={up}
       onClick={click}
       onContextMenu={(e) => e.preventDefault()}
-      className={`${buttonClass(variant, "lg")} touch-none select-none ${live ? "stone-pulse" : ""} ${className}`}
+      aria-label={recording ? `Recording, ${seconds} seconds. Let go or tap to stop` : undefined}
+      className={`${
+        recording
+          ? "inline-flex min-h-[64px] items-center justify-center gap-3 rounded-[var(--radius-control)] border-[3px] border-die bg-coral px-5 font-display font-bold text-[#13262b] shadow-sticker rec-ring"
+          : buttonClass(variant, "lg")
+      } touch-none select-none ${className}`}
     >
-      <IconCmp size={22} weight="regular" aria-hidden />
-      {state === "asking" || state === "listening" ? LABEL[state] : label}
+      {recording ? (
+        <>
+          {/* A red dot that pulses, and bars that move with your voice: it is plainly recording. */}
+          <span aria-hidden className="rec-dot size-3 shrink-0 rounded-full bg-[#c81e1e]" />
+          <span aria-hidden className="flex h-7 items-center gap-[3px]">
+            {BARS.map((k, i) => (
+              <span
+                key={i}
+                className="w-[4px] rounded-full bg-[#13262b] transition-[height] duration-100 ease-out"
+                style={{ height: `${Math.round(18 + Math.min(1, level * k) * 82)}%` }}
+              />
+            ))}
+          </span>
+          <span aria-hidden>
+            Recording <span className="tabular">{seconds}s</span>
+            <span className="block text-sm font-semibold">Let go or tap to stop</span>
+          </span>
+        </>
+      ) : (
+        <>
+          <IconCmp size={22} weight="regular" aria-hidden />
+          {state === "asking" ? LABEL.asking : label}
+        </>
+      )}
     </button>
   );
 }
+
+/** How much each bar reacts, centre strongest, so the row looks like a voice. */
+const BARS = [0.55, 0.85, 1.2, 0.95, 0.6, 0.8, 0.5];

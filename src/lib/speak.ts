@@ -27,7 +27,8 @@ export function rms(samples: ArrayLike<number>): number {
 }
 
 export type SpeakState = "idle" | "asking" | "listening" | "done" | "blocked";
-export type SpeakSnapshot = { state: SpeakState; seconds: number; recording: Blob | null };
+/** `level` is the live loudness, 0 to 1, while listening (for the moving bars); absent otherwise. */
+export type SpeakSnapshot = { state: SpeakState; seconds: number; recording: Blob | null; level?: number };
 
 /** The platform pieces the controller needs, injectable so the lifecycle can be tested without a browser. */
 export type SpeakDeps = {
@@ -107,8 +108,10 @@ export function createSpeakController(deps: SpeakDeps) {
 
     const recorder = keep && deps.record ? deps.record(stream, (b) => set({ recording: b })) : null;
     const cancelTick = deps.every(FRAME_MS, () => {
-      frames.push(meter.level());
-      set({ seconds: voicedSeconds(frames, VOICE_THRESHOLD, FRAME_MS) });
+      const raw = meter.level();
+      frames.push(raw);
+      // 0 to 1 for the live bars: normal speech sits around 0.02 to 0.15 RMS.
+      set({ seconds: voicedSeconds(frames, VOICE_THRESHOLD, FRAME_MS), level: Math.min(1, raw / 0.12) });
     });
     release = () => {
       cancelTick();
@@ -128,7 +131,7 @@ export function createSpeakController(deps: SpeakDeps) {
     }
     if (snap.state !== "listening") return;
     releaseAll();
-    set({ state: "done", seconds: voicedSeconds(frames, VOICE_THRESHOLD, FRAME_MS) });
+    set({ state: "done", seconds: voicedSeconds(frames, VOICE_THRESHOLD, FRAME_MS), level: 0 });
   }
 
   function reset() {
