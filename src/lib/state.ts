@@ -43,6 +43,8 @@ export type Settings = {
   slowerVoice: boolean;
   /** Off by default: the companion sits beside you and practises too while you do a step (body doubling). */
   bodyDouble: boolean;
+  /** Off by default: under 13, what they say at step 4 is turned into text on this device (Whisper, downloaded once). */
+  deviceListen: boolean;
   /** Which English the voices speak: British (the default) or American. */
   accent: "uk" | "us";
 };
@@ -106,6 +108,7 @@ export const DEFAULT_STATE: CourageState = {
     playCoach: true,
     slowerVoice: false,
     bodyDouble: false,
+    deviceListen: false,
     accent: "uk",
   },
 };
@@ -187,6 +190,7 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize" | "ac
   "playCoach",
   "slowerVoice",
   "bodyDouble",
+  "deviceListen",
 ];
 
 const THEMES: Theme[] = ["system", "light", "dark"];

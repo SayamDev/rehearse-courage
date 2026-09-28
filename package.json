@@ -20,6 +20,7 @@
     "voices:record": "tsx scripts/voices/record.mts"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
     "@mlc-ai/web-llm": "^0.2.85",
     "@opennextjs/cloudflare": "^1.20.6",
     "@phosphor-icons/react": "^2.1.10",

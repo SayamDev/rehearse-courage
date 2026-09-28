@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { DownloadSimple, Trash } from "@phosphor-icons/react";
+import { effectiveAge } from "@/lib/age";
 import { STEP_DONE_LINE } from "@/lib/content/body";
+import { checkListenCache, LISTEN_SERVER_STATE, listenState, loadListener, onListenChange, removeListener } from "@/lib/voice/listen";
 import { updateSettings, type Settings } from "@/lib/state";
 import { ACCENTS } from "@/lib/voice/lines";
 import { speak } from "@/lib/voice/speak";
@@ -172,6 +174,74 @@ export function VoiceSettings() {
         Most lines are already recorded. A natural voice you can save on this device reads the rest, like your own steps. Nothing you type leaves the device.
       </p>
       <NaturalVoice />
+      <ListenOnDevice />
+    </>
+  );
+}
+
+/**
+ * Under 13 only: listening on this device (Whisper tiny, about 40 MB, once).
+ * Cobi can then show what it heard at step 4, and the words are checked for
+ * signs someone needs support, while the voice never leaves the device.
+ */
+export function ListenOnDevice() {
+  const store = useCourage();
+  const state = useSyncExternalStore(onListenChange, listenState, () => LISTEN_SERVER_STATE);
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    void checkListenCache();
+  }, []);
+  if (effectiveAge(store.age) !== "under13") return null;
+  const on = store.settings.deviceListen && state.cached === true;
+
+  const download = async () => {
+    setMessage("");
+    try {
+      await loadListener();
+      act((s) => updateSettings(s, { deviceListen: true }));
+      setMessage("Saved on this device. At step 4, Cobi will show what it heard.");
+    } catch {
+      setMessage("The download did not finish. You can try again.");
+    }
+  };
+
+  return (
+    <>
+      <h3 className="mt-6 text-xl text-ink">Listening on this device</h3>
+      <p className="mt-1 text-ink">
+        At step 4, Cobi can show what it heard you say. The listening happens only on this device: your voice is never sent anywhere. A one-time
+        download of about 40 MB, best on Wi-Fi.
+      </p>
+      {state.status === "loading" ? (
+        <div className="mt-3">
+          <p id="listen-progress" className="text-ink">
+            Downloading... You can keep using the app.
+          </p>
+          <div role="progressbar" aria-labelledby="listen-progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={state.progress} className="mt-2 h-3 overflow-hidden rounded-full bg-surface-2">
+            <div className="h-full rounded-full bg-accent transition-[width] duration-[var(--dur-ui)]" style={{ width: `${Math.max(state.progress, 6)}%` }} />
+          </div>
+        </div>
+      ) : on ? (
+        <Button
+          variant="secondary"
+          icon={Trash}
+          className="mt-3"
+          onClick={async () => {
+            await removeListener();
+            act((s) => updateSettings(s, { deviceListen: false }));
+            setMessage("Removed from this device.");
+          }}
+        >
+          Remove from this device
+        </Button>
+      ) : (
+        <Button variant="secondary" icon={DownloadSimple} className="mt-3" onClick={download}>
+          Download (about 40 MB)
+        </Button>
+      )}
+      <p role="status" className="mt-2 min-h-[1.55em] text-ink">
+        {message}
+      </p>
     </>
   );
 }

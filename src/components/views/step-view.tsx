@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ChatCircle, Check, Keyboard, Microphone, X } from "@phosphor-icons/react";
-import { words } from "@/lib/age";
+import { effectiveAge, words } from "@/lib/age";
 import { browserAiDeps } from "@/lib/ai/browser";
 import { canUseOnline, coachAnswer, transcribeAnswer } from "@/lib/ai/client";
 import { COACH_NAME, coachLine, PRESSURE_LINES } from "@/lib/content/coach";
@@ -15,6 +15,7 @@ import { checkCrisis } from "@/lib/safety/crisis";
 import { useSpeak, waitForRecording } from "@/lib/speak";
 import { looksLikeWords, NOT_WORDS } from "@/lib/sense";
 import { saveRecording } from "@/lib/recordings";
+import { checkListenCache, heardSomething, loadListener, transcribeOnDevice } from "@/lib/voice/listen";
 import { recordStep } from "@/lib/state";
 import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
@@ -56,7 +57,7 @@ function taskHint(level: Level, room: RoomId): string {
   return "A little pressure, like the real moment. The words can be the same as before.";
 }
 
-type CobiReply = { text: string; source: "online" | "device" | "prewritten"; by: "speak" | "type" };
+type CobiReply = { text: string; source: "online" | "device" | "prewritten"; by: "speak" | "type"; heard?: string };
 
 /** Resolves a pre-written situation or one of the person's own steps into what the page shows. */
 function useStep(id: string): Step | null | undefined {
@@ -138,7 +139,15 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   const level: Level = resolveLevel(levelParam, store.records, id);
   const online = canUseOnline(store);
   // At step 4, 13 and over with online help on: keep the audio in memory for one transcription.
-  const speak = useSpeak({ keep: store.settings.keepRecordings, capture: level === 4 && online });
+  // Under 13 (never online): what they say at step 4 can be turned into text on this device, when they chose to.
+  const listenHere = level === 4 && !online && effectiveAge(store.age) === "under13" && store.settings.deviceListen;
+  useEffect(() => {
+    if (!listenHere) return;
+    void checkListenCache().then((saved) => {
+      if (saved) void loadListener().catch(() => undefined);
+    });
+  }, [listenHere]);
+  const speak = useSpeak({ keep: store.settings.keepRecordings, capture: level === 4 && (online || listenHere) });
 
   const [idea, setIdea] = useState<string | null>(null);
   const [text, setText] = useState("");
@@ -274,6 +283,19 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       }
       if (heard.kind === "text") answer = heard.text;
     }
+    let heardHere: string | undefined;
+    if (by === "speak" && listenHere) {
+      const said = await transcribeOnDevice(await waitForRecording(speak.latest));
+      if (!alive.current) return;
+      if (heardSomething(said)) {
+        if (checkCrisis(said!).crisis) {
+          finish({ seconds: spokenSeconds(), typed: false, crisis: true });
+          return;
+        }
+        answer = said!;
+        heardHere = said!;
+      }
+    }
     const out = await coachAnswer(
       store,
       {
@@ -292,7 +314,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       finish({ seconds: by === "speak" ? spokenSeconds() : null, typed: by === "type", crisis: true });
       return;
     }
-    setReply({ text: out.text, source: out.source, by });
+    setReply({ text: out.text, source: out.source, by, heard: heardHere });
   };
 
   const againFromReply = () => {
@@ -524,6 +546,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
               {reply ? (
                 <>
                   <figure ref={replyRef} tabIndex={-1} className="rounded-2xl bg-surface-2 px-4 py-3 outline-none">
+                    {reply.heard ? <p className="mb-2 text-sm text-muted">Cobi heard: &ldquo;{reply.heard}&rdquo;</p> : null}
                     <figcaption className="text-muted">{COACH_NAME}</figcaption>
                     <div className="mt-1">
                       <SpokenLine role={ROOM_ROLE[step.room]} text={reply.text} as="blockquote" className="text-ink" autoPlay />

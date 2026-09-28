@@ -24,6 +24,7 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
     body: [
       "When you speak, the app counts how many seconds you talked, on this device. The sound is not kept, unless you turn on \"Keep my recordings on this device\" in Me. Even then it stays on this device.",
       "The only time sound leaves the device is for people aged 13 and over with online AI help on, when they ask for Cobi's reply at step 4 or speak into tidy. That one short recording is sent to be written down as text, then it is gone. See \"AI, for 13 and over\" below.",
+      "Under 13, you can choose \"Listening on this device\" in Me (a one-time download). Then what you say at step 4 is written down as text on this device only, so Cobi can show what it heard. The sound and the words never leave the device.",
     ],
   },
   {

@@ -34,7 +34,7 @@ const speciesName = (id: Species) => SPECIES.find((s) => s.id === id)?.name ?? i
 
 /**
  * Four calm screens (your name, age, what feels hard, meet your firefly) shown one at a
- * time over the home-class art at night. Nothing here is required: every
+ * time, with the firefly above (and the kinetic welcome on the first). Nothing here is required: every
  * step can be skipped, and the whole flow can be left half-done (see
  * page.tsx's redirect, which only cares whether a companion exists yet).
  */
