@@ -17,6 +17,11 @@ export type ListenOut =
 
 type Asr = (audio: Float32Array) => Promise<{ text: string } | { text: string }[]>;
 
+// Hugging Face refuses model downloads referred from workers.dev. Worker scripts can be
+// cached without the page's no-referrer header, so every request from here says so itself.
+const nativeFetch = self.fetch.bind(self);
+self.fetch = (input: RequestInfo | URL, init?: RequestInit) => nativeFetch(input, { ...init, referrerPolicy: "no-referrer" });
+
 export const LISTEN_MODEL = "onnx-community/whisper-tiny.en";
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 let asr: Asr | null = null;

@@ -111,6 +111,8 @@ Lottie: edit `scripts/lottie/build.mjs` (and `type.mjs` for type), run `node scr
 
 ## Gotchas learned the hard way
 
+- **Model downloads (natural voice, on-device listening) and Hugging Face:** HF refuses requests referred from workers.dev. The page sends no referrer (next.config.ts), static files do too (`public/_headers`), and both model workers force `referrerPolicy: "no-referrer"` on every fetch, because a browser can keep an old cached worker script without the header. Keep all three.
+
 - **Worker size:** anything big imported by client code also lands in the server bundle. WebLLM is copied to `public/vendor/web-llm.js` at build time (`scripts/vendor-webllm.mjs`, runs on `predev`/`prebuild`, git-ignored) and imported from a runtime URL with `turbopackIgnore`. Check with `npm run cf:build`, then `npx wrangler deploy --dry-run --outdir /tmp/wr` (must stay under 3 MB gzip).
 - **Wrangler "Worker name missing":** run wrangler commands from the project folder (or add `--name rehearse-courage`).
 - **AI routes need `Content-Length`** (bodies are refused unread otherwise). Browsers send it; tests must too.
