@@ -190,8 +190,10 @@ export function JourneyView() {
                                 ? "border-[3px] border-die bg-accent text-on-accent shadow-sticker"
                                 : d.today
                                   ? "border-2 border-dashed border-accent text-ink"
-                                  : "bg-surface-2 text-muted"
-                            } ${d.future ? "opacity-50" : ""}`}
+                                  : d.future
+                                    ? "border border-line text-muted"
+                                    : "bg-surface-2 text-muted"
+                            }`}
                           >
                             {d.day}
                             <span className="sr-only">{d.brave ? ", brave day" : d.today ? ", today" : ""}</span>
