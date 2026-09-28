@@ -3,7 +3,9 @@ import { COACH_FALLBACK, COACH_LINES, PRESSURE_CUES, PRESSURE_LINES } from "@/li
 import { COACH_REPLIES } from "@/lib/content/coach-replies";
 import { RESCUE_PHRASES } from "@/lib/content/phrases";
 import { SITUATIONS } from "@/lib/content/situations";
-import { BALLOON_CUES, BUILD_SENTENCES, HOT_SEAT, SNAP_ROUNDS, STORY_STARTS } from "@/lib/games";
+import { DARES } from "@/lib/content/dares";
+import { READY_LINES } from "@/lib/content/ready";
+import { BALLOON_CUES, BUILD_SENTENCES, DESCRIBE_HINTS, HOT_SEAT, KEEP_GOING, SAY_LINES, SNAP_ROUNDS, STORY_STARTS } from "@/lib/games";
 import type { RoomId, Words } from "@/lib/types";
 
 /**
@@ -112,6 +114,10 @@ function script(): [Role, Words][] {
   }
   // Games.
   say("narrator", ...HOT_SEAT, ...SNAP_ROUNDS.map((r) => r.moment), ...BUILD_SENTENCES, ...STORY_STARTS.map(plain), ...Object.values(BALLOON_CUES).map(plain));
+  say("narrator", ...SAY_LINES, ...DESCRIBE_HINTS, ...KEEP_GOING.flatMap((k) => k.ideas));
+  say("friend", ...KEEP_GOING.map((k) => k.says));
+  // Tiny dares and Right before.
+  say("narrator", ...DARES.map((d) => d.text), READY_LINES.wobbly, READY_LINES.go);
   return out;
 }
 

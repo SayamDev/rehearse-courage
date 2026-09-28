@@ -2,7 +2,15 @@ import type { Words } from "./types";
 
 const w = (kid: string, grown: string = kid): Words => ({ kid, grown });
 
-export type GameId = "word-builder" | "rescue-snap" | "hot-seat" | "breath-balloon" | "story-dice";
+export type GameId =
+  | "word-builder"
+  | "rescue-snap"
+  | "hot-seat"
+  | "breath-balloon"
+  | "story-dice"
+  | "say-it-like"
+  | "describe-it"
+  | "keep-it-going";
 
 /** The warm-up games: about a minute or two each, nothing to lose, no clocks. */
 export const GAMES: { id: GameId; title: string; line: Words; time: string }[] = [
@@ -11,6 +19,9 @@ export const GAMES: { id: GameId; title: string; line: Words; time: string }[] =
   { id: "rescue-snap", title: "Rescue snap", line: w("Match a tricky moment to the words that help.", "Match an awkward moment to a rescue phrase."), time: "2 min" },
   { id: "word-builder", title: "Word builder", line: w("Put the words in order, then say it.", "Put a sentence back in order, then say it out loud."), time: "2 min" },
   { id: "breath-balloon", title: "Breath balloon", line: w("Breathe in to blow up the balloon.", "Fill the balloon with slow breaths."), time: "1 min" },
+  { id: "say-it-like", title: "Say it like", line: w("Say a line in a silly voice, like a robot or a pirate.", "Say an everyday line in a different style, like a news reader."), time: "2 min" },
+  { id: "describe-it", title: "Describe it", line: w("Describe a picture without saying what it is.", "Describe a picture without naming it."), time: "2 min" },
+  { id: "keep-it-going", title: "Keep it going", line: w("A friend says something. Ask them a question back.", "Someone shares something. Find a question to keep it going."), time: "2 min" },
 ];
 
 export function gameById(id: string) {
@@ -122,6 +133,14 @@ export function freshRand(): () => number {
   return seeded(Math.floor(Math.random() * 2 ** 31));
 }
 
+/** A different index from `current` (when there is more than one), for "next card" buttons. -1 means none yet: any card. */
+export function nextIndex(current: number, length: number, rand: () => number): number {
+  if (length < 2) return 0;
+  if (current < 0 || current >= length) return Math.floor(rand() * length);
+  const n = Math.floor(rand() * (length - 1));
+  return n >= current ? n + 1 : n;
+}
+
 /** Story dice: a first line to borrow when stuck. */
 export const STORY_STARTS = ["Once upon a time,", "Yesterday, something odd happened.", "Nobody believed me, but", "It all started when"];
 
@@ -133,3 +152,57 @@ export const BALLOON_CUES = {
   out: "And slowly out...",
   done: "Five slow breaths. Nicely done.",
 } as const;
+
+/* ---------- Say it like ---------- */
+
+/** Everyday lines, the kind people freeze on, to say in a playful style. */
+export const SAY_LINES: Words[] = [
+  w("Can I have a glass of water, please?", "Could I get a glass of water, please?"),
+  w("Good morning, everyone."),
+  w("I think the answer is seven."),
+  w("Can I sit here?", "Is anyone sitting here?"),
+  w("My favourite food is pizza.", "My favourite food is pasta."),
+  w("Excuse me, where is the library?", "Excuse me, where is the station?"),
+  w("Thank you very much."),
+  w("Can you say that again, please?"),
+];
+
+/** Styles to say it in. Playing with your voice warms it up, and there is no wrong way to do it. */
+export const SAY_STYLES: Words[] = [
+  w("in a whisper"),
+  w("like a robot"),
+  w("like a news reader"),
+  w("like a sleepy bear", "like you just woke up"),
+  w("like a pirate"),
+  w("really excited"),
+  w("like a secret agent"),
+  w("in slow motion"),
+  w("like a sports commentator"),
+  w("like a king or queen", "like a very posh butler"),
+];
+
+/* ---------- Describe it ---------- */
+
+/** Questions to lean on when describing a picture. */
+export const DESCRIBE_HINTS: Words[] = [
+  w("What colour is it?", "What does it look like?"),
+  w("Where would you find it?"),
+  w("What is it used for?", "What do people do with it?"),
+  w("Is it big or small?", "What does it feel like?"),
+];
+
+/* ---------- Keep it going ---------- */
+
+/** Someone shares something; the game is finding a question back. Two ideas each, shown only if wanted. */
+export const KEEP_GOING: { says: Words; ideas: Words[] }[] = [
+  { says: w("I went to the beach at the weekend."), ideas: [w("Who did you go with?"), w("Did you go in the sea?", "Was it busy?")] },
+  { says: w("I just got a new game.", "I've just started a new series."), ideas: [w("What kind of game is it?", "What's it about?"), w("Is it fun?", "Would you recommend it?")] },
+  { says: w("My dog did something funny today."), ideas: [w("What did he do?"), w("What is your dog called?", "What's your dog's name?")] },
+  { says: w("I'm really tired today."), ideas: [w("Oh no, did you sleep badly?"), w("Was it a busy day?", "Busy week?")] },
+  { says: w("I started learning the guitar."), ideas: [w("What song are you learning?"), w("Is it hard?", "How long have you been playing?")] },
+  { says: w("We're going on holiday next week."), ideas: [w("Where are you going?"), w("What are you most looking forward to?")] },
+  { says: w("I watched a really good film."), ideas: [w("What was it called?"), w("What was the best bit?")] },
+  { says: w("I made pancakes this morning."), ideas: [w("What did you put on them?"), w("Do you like cooking?", "Do you cook a lot?")] },
+  { says: w("My team won at the weekend."), ideas: [w("What was the score?"), w("Did you watch it?", "Were you there?")] },
+  { says: w("I'm a bit nervous about tomorrow."), ideas: [w("What's happening tomorrow?"), w("Is there anything that would help?")] },
+];

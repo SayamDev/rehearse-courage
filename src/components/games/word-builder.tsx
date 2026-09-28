@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { ArrowCounterClockwise, ArrowRight } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
-import { BUILD_SENTENCES, scramble, freshRand, sentenceWords, shuffle } from "@/lib/games";
+import { BUILD_SENTENCES, scramble, freshRand, seeded, sentenceWords, shuffle } from "@/lib/games";
 import { useCourage } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { SayAndListen } from "@/components/voice/say-and-listen";
@@ -17,10 +17,11 @@ import { SpokenLine } from "@/components/voice/spoken-line";
 export function WordBuilder() {
   const { age } = useCourage();
   const [rand] = useState(() => ({ current: freshRand() }));
-  const [order] = useState(() => shuffle(BUILD_SENTENCES, rand.current));
+  // The first sentence and its scramble are the same on the server and in the browser (so the page hydrates cleanly).
+  const [order] = useState(() => [BUILD_SENTENCES[0], ...shuffle(BUILD_SENTENCES.slice(1), rand.current)]);
   const [i, setI] = useState(0);
   const target = sentenceWords(words(order[i % order.length], age));
-  const [pool, setPool] = useState(() => scramble(target, rand.current).map((word, k) => ({ word, k })));
+  const [pool, setPool] = useState(() => scramble(target, seeded(1)).map((word, k) => ({ word, k })));
   const [placed, setPlaced] = useState<{ word: string; k: number }[]>([]);
   const complete = pool.length === 0;
   const built = placed.map((p) => p.word).join(" ");

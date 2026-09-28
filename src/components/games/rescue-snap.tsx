@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowRight, Check, Sparkle } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
 import { RESCUE_PHRASES } from "@/lib/content/phrases";
-import { freshRand, shuffle, SNAP_ROUNDS } from "@/lib/games";
+import { freshRand, seeded, shuffle, SNAP_ROUNDS } from "@/lib/games";
 import { useCourage } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { SpokenLine } from "@/components/voice/spoken-line";
@@ -19,12 +19,13 @@ const phrase = (id: string) => RESCUE_PHRASES.find((p) => p.id === id)!;
 export function RescueSnap() {
   const { age } = useCourage();
   const [rand] = useState(() => ({ current: freshRand() }));
-  const [order] = useState(() => shuffle(SNAP_ROUNDS, rand.current));
+  // The first round is the same on the server and in the browser (so the page hydrates cleanly); the rest are shuffled.
+  const [order] = useState(() => [SNAP_ROUNDS[0], ...shuffle(SNAP_ROUNDS.slice(1), rand.current)]);
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<string | null>(null);
   const [snaps, setSnaps] = useState(0);
   const round = order[i];
-  const [options, setOptions] = useState(() => shuffle([order[0].answer, ...order[0].others], rand.current));
+  const [options, setOptions] = useState(() => shuffle([order[0].answer, ...order[0].others], seeded(1)));
   const finished = i >= order.length;
 
   const pick = (id: string) => {

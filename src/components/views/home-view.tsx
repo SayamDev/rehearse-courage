@@ -144,7 +144,7 @@ export function HomeView() {
                 All games
               </Link>
             </div>
-            <ul role="list" className="-mx-4 mt-3 flex list-none gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
+            <ul role="list" className="-mx-4 mt-3 flex list-none gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0">
               {GAMES.map((g) => {
                 const { icon: GameIcon, ink } = GAME_META[g.id];
                 return (

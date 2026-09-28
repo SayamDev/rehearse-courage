@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { GAMES, gameById } from "@/lib/games";
 import { GameView } from "@/components/games/game-view";
 
-// Only the five games exist; anything else is a 404.
+// Only these games exist; anything else is a 404.
 export const dynamicParams = false;
 
 export function generateStaticParams() {

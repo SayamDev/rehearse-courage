@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { RESCUE_PHRASES } from "./content/phrases";
-import { deflate, DICE_FACES, GAMES, gameById, inflate, rollDice, scramble, seeded, SNAP_ROUNDS } from "./games";
+import { deflate, nextIndex, DESCRIBE_HINTS, DICE_FACES, GAMES, gameById, inflate, KEEP_GOING, rollDice, SAY_LINES, SAY_STYLES, scramble, seeded, SNAP_ROUNDS } from "./games";
 
 describe("games", () => {
-  it("has five games, found by id", () => {
-    expect(GAMES).toHaveLength(5);
+  it("has eight games, found by id", () => {
+    expect(GAMES).toHaveLength(8);
     expect(gameById("story-dice")?.title).toBe("Story dice");
     expect(gameById("nope")).toBeUndefined();
   });
@@ -35,5 +35,25 @@ describe("games", () => {
     expect(inflate(0.8, 4000)).toBe(1);
     expect(deflate(1, 3000)).toBe(0.5);
     expect(deflate(0.1, 6000)).toBe(0);
+  });
+
+  it("new game copy is plain: no dashes or exclamation marks, two ideas per chat line", () => {
+    const all = [...SAY_LINES, ...SAY_STYLES, ...DESCRIBE_HINTS, ...KEEP_GOING.flatMap((k) => [k.says, ...k.ideas])];
+    for (const t of all.flatMap((x) => [x.kid, x.grown])) expect(t).not.toMatch(/[–—!]/);
+    for (const k of KEEP_GOING) expect(k.ideas).toHaveLength(2);
+    expect(SAY_STYLES.length).toBeGreaterThanOrEqual(8);
+  });
+
+  it("next card is always a different one", () => {
+    const rand = seeded(3);
+    for (let k = 0; k < 100; k++) {
+      const cur = k % 8;
+      const n = nextIndex(cur, 8, rand);
+      expect(n).not.toBe(cur);
+      expect(n).toBeGreaterThanOrEqual(0);
+      expect(n).toBeLessThan(8);
+    }
+    expect(nextIndex(-1, 5, () => 0)).toBe(0);
+    expect(nextIndex(0, 1, rand)).toBe(0);
   });
 });
