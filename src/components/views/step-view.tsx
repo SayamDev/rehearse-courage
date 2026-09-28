@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ChatCircle, Check, Keyboard, Microphone, X } from "@phosphor-icons/react";
+import { ArrowCounterClockwise, ArrowLeft, ArrowRight, ChatCircle, Check, Footprints, Keyboard, Microphone, Plant } from "@phosphor-icons/react";
 import { effectiveAge, words } from "@/lib/age";
 import { browserAiDeps } from "@/lib/ai/browser";
 import { canUseOnline, coachAnswer, transcribeAnswer } from "@/lib/ai/client";
@@ -16,7 +16,7 @@ import { useSpeak, waitForRecording } from "@/lib/speak";
 import { looksLikeWords, NOT_WORDS } from "@/lib/sense";
 import { saveRecording } from "@/lib/recordings";
 import { checkListenCache, heardSomething, loadListener, transcribeOnDevice } from "@/lib/voice/listen";
-import { recordStep } from "@/lib/state";
+import { logEvent, recordStep, saveProud } from "@/lib/state";
 import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId, StepRecord } from "@/lib/types";
@@ -29,7 +29,7 @@ import { IdeaList } from "@/components/ui/idea-list";
 import { PaperCard } from "@/components/ui/paper-card";
 import { SpeakButton } from "@/components/ui/speak-button";
 import { Switch } from "@/components/ui/switch";
-import { StepDone } from "./step-done";
+import { NotYet, StepDone } from "./step-done";
 
 const TITLE = "text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]";
 const FIELD =
@@ -152,7 +152,9 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
 
   const [idea, setIdea] = useState<string | null>(null);
   const [text, setText] = useState("");
-  const [note, setNote] = useState("");
+  // Step 6: Not yet was chosen (it still counts).
+  const [notYet, setNotYet] = useState(false);
+  const [outcome, setOutcome] = useState<"did" | "tried">("did");
   const [roughDay, setRoughDay] = useState(false);
   const [mode, setMode] = useState<"speak" | "type">("speak");
   const [result, setResult] = useState<StepResult | null>(null);
@@ -224,24 +226,44 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
 
   const roomPath = `/room/${step.room}`;
 
-  if (result) return <StepDone result={result} room={step.room} title={step.title} />;
+  if (result) return <StepDone result={result} room={step.room} title={step.title} outcome={outcome} />;
+  if (notYet) return <NotYet situationId={step.id} room={step.room} title={step.title} />;
 
-  const finish = ({ seconds, typed, crisis = false }: { seconds: number | null; typed: boolean; crisis?: boolean }) => {
+  const finish = ({
+    seconds,
+    typed,
+    crisis = false,
+    tried,
+  }: {
+    seconds: number | null;
+    typed: boolean;
+    crisis?: boolean;
+    /** Step 6 only: how it went. */
+    tried?: "did" | "tried";
+  }) => {
     const record: StepRecord = { situationId: step.id, level, at: new Date().toISOString(), seconds, typed, roughDay };
     const before = store.records;
-    const earned = act((s) => recordStep(s, record));
+    const events = store.events;
+    const earned = act((s) => {
+      const out = recordStep(s, record);
+      if (!tried) return out;
+      // A real-life try goes straight onto the journey; how it felt can be added next.
+      const proud = saveProud(out.state, { situationId: step.id, at: record.at, outcome: tried });
+      return { state: proud.state, newlyEarned: [...out.newlyEarned, ...proud.newlyEarned] };
+    });
+    if (tried) setOutcome(tried);
     // Then vs Now: a spoken step's recording is kept on this device when the person chose to keep recordings.
     const blob = speak.latest().recording;
     if (store.settings.keepRecordings && blob && seconds !== null) {
       void saveRecording(step.room, { at: record.at, situationId: step.id, level, blob });
     }
     speak.reset();
-    const flagged = crisis || [text, note].some((t) => t.trim() && checkCrisis(t).crisis);
+    const flagged = crisis || (text.trim() !== "" && checkCrisis(text).crisis);
     if (flagged) {
       router.push(`/help?crisis=1&from=${encodeURIComponent(`/step/${step.id}`)}`);
       return;
     }
-    setResult(stepResult(before, record, earned, store.events));
+    setResult(stepResult(before, record, earned, events));
     window.scrollTo({ top: 0 });
   };
 
@@ -575,16 +597,29 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
           {/* Level 6: try it for real. */}
           {level === 6 ? (
             <>
-              <TextField label="A note for yourself (optional)" value={note} onChange={setNote} rows={2} />
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <Button icon={Check} onClick={() => finish({ seconds: null, typed: false })}>
+              <p className="mt-5 text-ink">When you have had a go, come back and say how it went.</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <Button icon={Check} onClick={() => finish({ seconds: null, typed: false, tried: "did" })}>
                   I did it
                 </Button>
-                <ButtonLink href={roomPath} variant="secondary" icon={X}>
+                <Button variant="secondary" icon={Footprints} onClick={() => finish({ seconds: null, typed: false, tried: "tried" })}>
+                  I tried
+                </Button>
+                <Button
+                  variant="secondary"
+                  icon={Plant}
+                  onClick={() => {
+                    act((s) => logEvent(s, "notYet", new Date(), step.id));
+                    setNotYet(true);
+                    window.scrollTo({ top: 0 });
+                  }}
+                >
                   Not yet
-                </ButtonLink>
+                </Button>
               </div>
-              <p className="mt-3 text-muted">Not yet is fine. The mission will be here whenever you want it.</p>
+              <p className="mt-3 text-muted">
+                I tried counts just the same, even if it did not go to plan. Not yet is fine too.
+              </p>
             </>
           ) : null}
         </PaperCard>
