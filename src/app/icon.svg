@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>Rehearse Courage</title>
+  <!-- A teal sticker with a speech bubble (speaking up) holding the firefly's warm light (courage). -->
+  <rect width="64" height="64" rx="16" fill="#2ec4b6"/>
+  <path d="M20 11h24a11 11 0 0 1 11 11v12a11 11 0 0 1-11 11H29l-11 9v-9.6A11 11 0 0 1 9 34V22a11 11 0 0 1 11-11z" fill="#ffffff"/>
+  <circle cx="32" cy="28" r="12" fill="#ffc83d" opacity="0.35"/>
+  <circle cx="32" cy="28" r="7.5" fill="#ffc83d"/>
+  <circle cx="29.5" cy="25.5" r="2.2" fill="#fff6d6"/>
+</svg>
