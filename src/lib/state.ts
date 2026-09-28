@@ -44,6 +44,10 @@ export type CourageState = {
   age: AgeBand | null;
   hardThings: HardThing[];
   companion: { species: Species; name: string } | null;
+  /** What the person wants to be called (optional). Shown on Me and Home; never sent anywhere. */
+  name: string | null;
+  /** The name question has been asked (first visit or the one-time pop-up), whatever the answer. */
+  nameAsked: boolean;
   records: StepRecord[];
   customSteps: CustomStep[];
   events: AppEvent[];
@@ -64,6 +68,8 @@ export const DEFAULT_STATE: CourageState = {
   age: null,
   hardThings: [],
   companion: null,
+  name: null,
+  nameAsked: false,
   records: [],
   customSteps: [],
   events: [],
@@ -93,6 +99,16 @@ const isParseableDate = (v: unknown): v is string => typeof v === "string" && !N
 const dedupe = <T>(items: T[]): T[] => [...new Set(items)];
 
 /** Companion name rule shared by normalize and setCompanion: trim, cap at 24 chars, fall back to species name. */
+/** Longest name kept: a first name or nickname is plenty. */
+export const MAX_NAME = 30;
+
+/** Trims and tidies a typed name; blank means no name. Control characters are dropped. */
+export function cleanPersonName(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const name = raw.replace(/[\u0000-\u001f\u007f]/g, "").replace(/\s+/g, " ").trim().slice(0, MAX_NAME).trim();
+  return name || null;
+}
+
 function cleanCompanionName(species: Species, name: string): string {
   return name.trim().slice(0, 24) || (SPECIES.find((x) => x.id === species)?.name ?? "Friend");
 }
@@ -180,6 +196,8 @@ export function normalize(raw: unknown): CourageState {
     age: AGES.includes(p.age as AgeBand) ? (p.age as AgeBand) : null,
     hardThings: dedupe(arr<unknown>(p.hardThings).filter(isValidHardThing)),
     companion,
+    name: cleanPersonName(p.name),
+    nameAsked: p.nameAsked === true || cleanPersonName(p.name) !== null,
     records: arr<unknown>(p.records).filter(isValidRecord),
     customSteps: arr<unknown>(p.customSteps).filter(isValidCustomStep).map(normalizeCustomStep),
     events: arr<unknown>(p.events).filter(isValidEvent),
@@ -196,6 +214,11 @@ export function normalize(raw: unknown): CourageState {
 function withBadges(state: CourageState): Result {
   const fresh = newBadges(state.earned, state);
   return { state: fresh.length ? { ...state, earned: [...state.earned, ...fresh] } : state, newlyEarned: fresh };
+}
+
+/** Saves (or, with blank or null, removes) the person's name. Either way the question counts as asked. */
+export function setName(s: CourageState, name: string | null): CourageState {
+  return { ...s, name: cleanPersonName(name), nameAsked: true };
 }
 
 export function setAge(s: CourageState, age: AgeBand | null): CourageState {

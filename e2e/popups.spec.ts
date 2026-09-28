@@ -62,3 +62,29 @@ test("never on a practice step or while Need a pause is open", async ({ page }) 
   await page.waitForTimeout(2500);
   await expect(page.getByRole("dialog", { name: "Keep your progress safe" })).toHaveCount(0);
 });
+
+test("people from before names existed are asked once, and it shows on Home and Me", async ({ page }) => {
+  await seed(page, { ...RETURNING, nameAsked: false });
+  await page.goto("/");
+  const dialog = page.getByRole("dialog", { name: "What should we call you?" });
+  await expect(dialog).toBeVisible();
+  await dialog.getByLabel("Your name").fill("Sam");
+  await dialog.getByRole("button", { name: "Save" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText("Hi Sam, today's one step")).toBeVisible();
+  await page.goto("/me");
+  await expect(page.getByRole("heading", { level: 1, name: "Sam" })).toBeVisible();
+  await page.goto("/");
+  await page.waitForTimeout(1800);
+  await expect(dialog).toBeHidden();
+});
+
+test("skipping the name question counts as asked", async ({ page }) => {
+  await seed(page, { ...RETURNING, nameAsked: false });
+  await page.goto("/");
+  const dialog = page.getByRole("dialog", { name: "What should we call you?" });
+  await dialog.getByRole("button", { name: "Skip" }).click();
+  await expect(dialog).toBeHidden();
+  await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("courage:v1")!).nameAsked)).toBe(true);
+  await expect(page.getByText("Today's one step", { exact: true })).toBeVisible();
+});

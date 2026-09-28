@@ -10,6 +10,9 @@ import {
   setHardThings,
   updateSettings,
   visit,
+  cleanPersonName,
+  MAX_NAME,
+  setName,
 } from "./state";
 import { exportBackup, importBackup } from "./backup";
 import type { StepRecord } from "./types";
@@ -192,5 +195,36 @@ describe("text size setting", () => {
     expect(normalize({ settings: { textSize: "huge" } }).settings.textSize).toBe("normal");
     expect(normalize({ settings: { largeText: true } }).settings.textSize).toBe("large");
     expect(normalize({ settings: { largeText: true, textSize: "normal" } }).settings.textSize).toBe("normal");
+  });
+});
+
+describe("person's name", () => {
+  test("is tidied: trimmed, inner spaces collapsed, control characters dropped, capped", () => {
+    expect(cleanPersonName("  Sam  ")).toBe("Sam");
+    expect(cleanPersonName("Mary   Jo")).toBe("Mary Jo");
+    expect(cleanPersonName("Al\u0000ex")).toBe("Alex");
+    expect(cleanPersonName("x".repeat(40))).toHaveLength(MAX_NAME);
+    expect(cleanPersonName("   ")).toBeNull();
+    expect(cleanPersonName(42)).toBeNull();
+  });
+
+  test("setName saves it and marks the question asked; blank removes it but still counts as asked", () => {
+    const named = setName(normalize({}), " Sam ");
+    expect(named.name).toBe("Sam");
+    expect(named.nameAsked).toBe(true);
+    const skipped = setName(normalize({}), "");
+    expect(skipped.name).toBeNull();
+    expect(skipped.nameAsked).toBe(true);
+  });
+
+  test("old saves without a name load with no name and the question not yet asked", () => {
+    const s = normalize({ version: 1 });
+    expect(s.name).toBeNull();
+    expect(s.nameAsked).toBe(false);
+  });
+
+  test("a saved name survives a backup round trip", () => {
+    const s = setName(normalize({}), "Sam");
+    expect(importBackup(exportBackup(s)).name).toBe("Sam");
   });
 });

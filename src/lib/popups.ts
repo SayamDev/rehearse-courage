@@ -23,6 +23,11 @@ export function welcomeDue(s: Pick<CourageState, "companion" | "welcomed" | "rec
   return !!s.companion && !s.welcomed && s.records.length === 0 && pathname === "/";
 }
 
+/** Everyone who started before names existed: asked once, on Home, after the welcome guide. */
+export function nameAskDue(s: Pick<CourageState, "companion" | "welcomed" | "nameAsked">, pathname: string): boolean {
+  return !!s.companion && s.welcomed && !s.nameAsked && pathname === "/";
+}
+
 export function saveNudgeDue(
   s: Pick<CourageState, "records" | "lastBackup" | "welcomed"> & { settings: { saveNudgeOff: boolean } },
   now: Date,

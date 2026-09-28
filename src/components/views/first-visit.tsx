@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "@phosphor-icons/react";
 import { act } from "@/lib/store";
-import { setAge, setCompanion, setHardThings } from "@/lib/state";
+import { MAX_NAME, setAge, setCompanion, setHardThings, setName } from "@/lib/state";
 import { AGE_OPTIONS, TOTAL_STEPS, hardThingOptions, nextStep, prevStep, toggleHardThing } from "@/lib/onboarding";
 import { SPECIES } from "@/lib/companion";
 import type { AgeBand, HardThing, Species } from "@/lib/types";
@@ -32,7 +32,7 @@ const headingClass = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink outline-
 const speciesName = (id: Species) => SPECIES.find((s) => s.id === id)?.name ?? id;
 
 /**
- * Three calm screens (age, what feels hard, meet your firefly) shown one at a
+ * Four calm screens (your name, age, what feels hard, meet your firefly) shown one at a
  * time over the home-class art at night. Nothing here is required: every
  * step can be skipped, and the whole flow can be left half-done (see
  * page.tsx's redirect, which only cares whether a companion exists yet).
@@ -44,6 +44,7 @@ export function FirstVisit() {
   const [hardThings, setHardDraft] = useState<HardThing[]>([]);
   const species = SPECIES_NOW;
   const [name, setNameDraft] = useState("");
+  const [you, setYou] = useState("");
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
@@ -59,7 +60,7 @@ export function FirstVisit() {
   }
 
   function finish() {
-    act((s) => setCompanion(setHardThings(setAge(s, age), hardThings), species, name));
+    act((s) => setCompanion(setHardThings(setAge(setName(s, you), age), hardThings), species, name));
     router.push("/");
   }
 
@@ -109,10 +110,11 @@ export function FirstVisit() {
           </button>
         ) : null}
 
-        {step === 1 ? (
+        {step === 1 ? <StepYou headingRef={headingRef} name={you} onNameChange={setYou} onContinue={advance} /> : null}
+        {step === 2 ? (
           <StepAge headingRef={headingRef} age={age} onPick={(value) => { setAgeDraft(value); advance(); }} />
         ) : null}
-        {step === 2 ? (
+        {step === 3 ? (
           <StepHardThings
             headingRef={headingRef}
             hardThings={hardThings}
@@ -120,7 +122,7 @@ export function FirstVisit() {
             onContinue={advance}
           />
         ) : null}
-        {step === 3 ? (
+        {step === 4 ? (
           <StepName headingRef={headingRef} species={species} name={name} onNameChange={setNameDraft} onFinish={finish} />
         ) : null}
 
@@ -133,6 +135,48 @@ export function FirstVisit() {
         </button>
       </PaperCard>
     </div>
+  );
+}
+
+function StepYou({
+  headingRef,
+  name,
+  onNameChange,
+  onContinue,
+}: {
+  headingRef: React.RefObject<HTMLHeadingElement | null>;
+  name: string;
+  onNameChange: (value: string) => void;
+  onContinue: () => void;
+}) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onContinue();
+      }}
+    >
+      <h1 ref={headingRef} tabIndex={-1} className={headingClass}>
+        What should we call you?
+      </h1>
+      <p className="mt-2 text-muted">A first name or a nickname is plenty. Skip if you would rather not say.</p>
+      <label htmlFor="your-name" className="mb-2 mt-5 block font-semibold text-ink">
+        Your name
+      </label>
+      <input
+        id="your-name"
+        type="text"
+        value={name}
+        maxLength={MAX_NAME}
+        autoComplete="given-name"
+        onChange={(e) => onNameChange(e.target.value)}
+        className="h-12 w-full rounded-full border border-line bg-surface-2 px-5 text-ink placeholder:text-muted focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
+      />
+      <p className="mt-2 text-sm text-muted">It stays on this device and is never sent anywhere.</p>
+      <Button type="submit" variant="primary" className="mt-6 w-full sm:w-auto">
+        Continue
+      </Button>
+    </form>
   );
 }
 

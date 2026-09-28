@@ -3,6 +3,7 @@
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { quietPage } from "@/lib/popups";
+import { NameAsk } from "./name-ask";
 import { SaveNudge } from "./save-nudge";
 import { WelcomeGuide } from "./welcome-guide";
 
@@ -13,6 +14,7 @@ function PopupsInner() {
   return (
     <>
       <WelcomeGuide pathname={pathname} quiet={quiet} />
+      <NameAsk pathname={pathname} quiet={quiet} />
       <SaveNudge quiet={quiet} />
     </>
   );
