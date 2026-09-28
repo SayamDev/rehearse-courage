@@ -73,8 +73,8 @@ export function HomeView() {
         </div>
       </div>
 
-      <div className="mt-6 grid gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:gap-8">
-        <div className="grid content-start gap-6">
+      <div className="mt-6 grid grid-cols-[minmax(0,1fr)] gap-6 lg:mt-8 lg:grid-cols-[minmax(0,1.65fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-6">
           <PaperCard>
             {model.done || !room ? (
               <>
@@ -189,7 +189,7 @@ export function HomeView() {
           </section>
         </div>
 
-        <aside aria-label="Your week" className="grid content-start gap-6">
+        <aside aria-label="Your week" className="grid min-w-0 grid-cols-[minmax(0,1fr)] content-start gap-6 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)]">
           <div className={`${SIDE_CARD} hidden flex-col items-center text-center lg:flex`}>
             <Companion species={store.companion.species} stage={stage} size={140} />
             <p className="mt-3 text-ink">

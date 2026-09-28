@@ -11,7 +11,7 @@ import { PauseMark } from "@/components/calm/pause-mark";
  * the same corner on every page, in the calm blue (never the teal of progress).
  */
 const CLASS =
-  "flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[color-mix(in_srgb,var(--calm)_14%,var(--surface))] px-3.5 font-display font-bold text-help transition-colors duration-[var(--dur-feedback)] hover:bg-[color-mix(in_srgb,var(--calm)_22%,var(--surface))] active:bg-[color-mix(in_srgb,var(--calm)_28%,var(--surface))]";
+  "flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[color-mix(in_srgb,var(--calm)_14%,var(--surface))] px-3.5 font-display text-[0.95rem] font-bold text-help transition-colors max-[359px]:px-3 sm:text-base duration-[var(--dur-feedback)] hover:bg-[color-mix(in_srgb,var(--calm)_22%,var(--surface))] active:bg-[color-mix(in_srgb,var(--calm)_28%,var(--surface))]";
 
 /** The current URL plus calm=1, keeping the page's own params (e.g. a step's ?level) so nothing behind the dialog changes. */
 export function calmHref(pathname: string, search: string): string {
@@ -25,7 +25,8 @@ function PanicLink({ search }: { search: string }) {
   return (
     <Link href={calmHref(pathname, search)} className={CLASS}>
       <PauseMark size={22} />
-      Need a pause
+      {/* The narrowest phones keep just the mark; the label is still read out. */}
+      <span className="max-[359px]:sr-only">Need a pause</span>
     </Link>
   );
 }

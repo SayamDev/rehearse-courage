@@ -130,7 +130,7 @@ export function RescueDeck({ onCrisis }: { onCrisis: () => void }) {
               value={typed}
               maxLength={200}
               onChange={(e) => setTyped(e.target.value)}
-              className="min-h-[52px] flex-1 rounded-[var(--radius-control)] border-2 border-line bg-surface px-4 text-ink focus-visible:border-ink"
+              className="min-h-[52px] min-w-0 flex-1 rounded-[var(--radius-control)] border-2 border-line bg-surface px-4 text-ink focus-visible:border-ink"
             />
             <Button type="submit" variant="secondary" icon={Check}>
               Done

@@ -78,7 +78,7 @@ function NameField({ name }: { name: string | null }) {
             setDraft(e.target.value);
             setMessage("");
           }}
-          className="min-h-[52px] flex-1 rounded-2xl border border-line bg-surface px-4 text-ink focus-visible:border-ink"
+          className="min-h-[52px] min-w-0 flex-1 rounded-2xl border border-line bg-surface px-4 text-ink focus-visible:border-ink"
         />
         <Button type="submit" variant="secondary">
           Save
@@ -163,12 +163,12 @@ export function MeView() {
   };
 
   return (
-    <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-10 lg:max-w-[1100px] lg:px-8">
+    <div className="mx-auto max-w-[720px] px-4 pt-6 md:max-w-[1100px] md:px-8 md:pt-10">
       {/* Their name when they gave one; the nav label stays "Me". */}
       <h1 className="break-words text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-ink">{store.name ?? "Me"}</h1>
 
-      {/* Laptop: two columns (you and your settings; your details and data) so the page is not one long narrow strip. */}
-      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
+      {/* Tablet and laptop: two columns (you and your settings; your details and data) so the page is not one long narrow strip. */}
+      <div className="md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] md:items-start md:gap-6 lg:gap-8">
         <div>
           <PaperCard className="mt-5">
             <div className="flex items-center gap-5">

@@ -29,7 +29,7 @@ export function BadgesView() {
     <div>
       <ArtHeader lottie="/lottie/badges.json" title="Badges" line="Small steps. Real courage." />
 
-      <div className="relative mx-auto -mt-4 max-w-[1100px] px-4">
+      <div className="relative mx-auto mt-6 max-w-[1100px] px-4 md:px-8">
         <PaperCard className="!p-5 sm:!p-6">
         <section aria-labelledby="quests-heading">
           <h2 id="quests-heading" className="text-2xl text-ink">
