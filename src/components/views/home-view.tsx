@@ -146,7 +146,7 @@ export function HomeView() {
             </>
           ) : (
             <>
-              <p className="text-muted">Today&apos;s one step</p>
+              <p className="text-muted">{store.name ? <>Hi {store.name}, today&apos;s one step</> : <>Today&apos;s one step</>}</p>
               <h2 className="mt-1 text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] text-ink">{model.title}</h2>
               <p className="mt-3 text-muted">
                 Step <span className="tabular">{model.level}</span> of 6

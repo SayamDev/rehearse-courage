@@ -9,7 +9,7 @@ import { importBackup } from "@/lib/backup";
 import { stageFor, type Stage } from "@/lib/companion";
 import { braveDaysThisWeek, missionsDone, totalPoints } from "@/lib/courage";
 import { AGE_OPTIONS, hardThingOptions, toggleHardThing } from "@/lib/onboarding";
-import { setAge, setHardThings, updateSettings, type Settings, type TextSize, type Theme } from "@/lib/state";
+import { MAX_NAME, setAge, setHardThings, setName, updateSettings, type Settings, type TextSize, type Theme } from "@/lib/state";
 import { saveBackupFile } from "@/lib/save-backup";
 import { act, clearEverything, useCourage } from "@/lib/store";
 import { Companion } from "@/components/scene/companion";
@@ -42,6 +42,65 @@ const CHIP =
   "flex min-h-11 items-center rounded-full border px-4 py-2.5 font-semibold transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3";
 const chip = (on: boolean) =>
   `${CHIP} ${on ? "border-transparent bg-chrome text-on-chrome" : "border-line bg-surface-2 text-ink hover:bg-line/50 active:bg-line/70"}`;
+
+/** Their name, saved only on this device: edit it or remove it. */
+function NameField({ name }: { name: string | null }) {
+  const inputId = useId();
+  const statusId = useId();
+  const [draft, setDraft] = useState(name ?? "");
+  const [message, setMessage] = useState("");
+
+  return (
+    <form
+      className="mt-3"
+      onSubmit={(e) => {
+        e.preventDefault();
+        act((s) => setName(s, draft));
+        setMessage(draft.trim() ? "Saved." : "Name removed.");
+      }}
+    >
+      <label htmlFor={inputId} className="block font-semibold text-ink">
+        Your name
+      </label>
+      <p className="text-muted">Shown on Home and here. It stays on this device.</p>
+      <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+        <input
+          id={inputId}
+          type="text"
+          value={draft}
+          maxLength={MAX_NAME}
+          autoComplete="given-name"
+          aria-describedby={statusId}
+          onChange={(e) => {
+            setDraft(e.target.value);
+            setMessage("");
+          }}
+          className="min-h-[52px] flex-1 rounded-2xl border border-line bg-surface px-4 text-ink focus-visible:border-ink"
+        />
+        <Button type="submit" variant="secondary">
+          Save
+        </Button>
+        {name ? (
+          <Button
+            type="button"
+            variant="secondary"
+            icon={Trash}
+            onClick={() => {
+              act((s) => setName(s, null));
+              setDraft("");
+              setMessage("Name removed.");
+            }}
+          >
+            Remove
+          </Button>
+        ) : null}
+      </div>
+      <p id={statusId} role="status" className="mt-2 min-h-[1.55em] text-ink">
+        {message}
+      </p>
+    </form>
+  );
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   const id = useId();
@@ -102,7 +161,8 @@ export function MeView() {
 
   return (
     <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-10 lg:max-w-[1100px] lg:px-8">
-      <h1 className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-ink">Me</h1>
+      {/* Their name when they gave one; the nav label stays "Me". */}
+      <h1 className="break-words text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-ink">{store.name ?? "Me"}</h1>
 
       {/* Laptop: two columns (you and your settings; your details and data) so the page is not one long narrow strip. */}
       <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
@@ -158,7 +218,8 @@ export function MeView() {
 
         <div className="lg:[&>section:first-child]:mt-5">
           <Section title="About you">
-            <fieldset className="mt-3">
+            <NameField name={store.name} />
+            <fieldset className="mt-5">
               <legend className="font-semibold text-ink">Age</legend>
               <p className="text-muted">Not set means the app treats you as under 13.</p>
               <div className="mt-2 flex flex-wrap gap-2">

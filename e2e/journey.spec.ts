@@ -5,7 +5,9 @@ test("first visit, first step, step done, back to the map", async ({ page }) => 
   await page.goto("/");
   await expect(page).toHaveURL(/\/start$/);
 
-  // Skip age (means under 13) and what feels hard, meet the firefly, keep its name.
+  // Give a name, skip age (means under 13) and what feels hard, meet the firefly, keep its name.
+  await page.getByLabel("Your name").fill("Sam");
+  await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Skip" }).click();
   await page.getByRole("button", { name: "Skip" }).click();
   await expect(page.getByRole("heading", { name: "Meet your firefly" })).toBeVisible();
@@ -17,7 +19,7 @@ test("first visit, first step, step done, back to the map", async ({ page }) => 
   await expect(welcome).toBeVisible();
   await welcome.getByRole("button", { name: "Let's start" }).click();
   await expect(welcome).toBeHidden();
-  await expect(page.getByText("Today's one step")).toBeVisible();
+  await expect(page.getByText("Hi Sam, today's one step")).toBeVisible();
   await page.getByRole("link", { name: "Start" }).click();
 
   await expect(page).toHaveURL(/\/step\/[\w-]+\?level=1/);

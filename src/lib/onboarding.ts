@@ -1,8 +1,8 @@
 import type { AgeBand, HardThing } from "./types";
 import { HARD_THINGS } from "./types";
 
-/** The three calm screens of first-visit setup (age, hard things, meet and name the firefly). */
-export const TOTAL_STEPS = 3;
+/** The four calm screens of first-visit setup (your name, age, hard things, meet and name the firefly). */
+export const TOTAL_STEPS = 4;
 
 /** Keeps a step number inside the valid range, so a stray +1/-1 can never wander off the flow. */
 export function clampStep(step: number): number {

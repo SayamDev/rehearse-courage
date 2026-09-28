@@ -6,6 +6,8 @@ export const RETURNING = {
   age: "teen",
   hardThings: ["class"],
   companion: { species: "firefly", name: "Glow" },
+  name: null,
+  nameAsked: true,
   records: [],
   customSteps: [],
   events: [],

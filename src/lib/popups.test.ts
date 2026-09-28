@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import { normalize } from "./state";
-import { quietPage, saveNudgeDue, welcomeDue } from "./popups";
+import { nameAskDue, quietPage, saveNudgeDue, welcomeDue } from "./popups";
 
 const rec = { situationId: "class-answer", level: 1, at: "2026-09-20T10:00:00.000Z", seconds: null, typed: false, roughDay: false };
 const now = new Date("2026-09-28T10:00:00Z");
@@ -45,4 +45,15 @@ test("quiet pages get no pop-ups", () => {
   expect(quietPage("/", "calm=1")).toBe(true);
   expect(quietPage("/", "")).toBe(false);
   expect(quietPage("/map", "")).toBe(false);
+});
+
+describe("name question", () => {
+  const base = { companion: { species: "firefly" as const, name: "Glow" }, welcomed: true, nameAsked: false };
+  test("asks once on Home after the welcome guide", () => {
+    expect(nameAskDue(base, "/")).toBe(true);
+    expect(nameAskDue(base, "/map")).toBe(false);
+    expect(nameAskDue({ ...base, welcomed: false }, "/")).toBe(false);
+    expect(nameAskDue({ ...base, nameAsked: true }, "/")).toBe(false);
+    expect(nameAskDue({ ...base, companion: null }, "/")).toBe(false);
+  });
 });
