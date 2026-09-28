@@ -91,3 +91,16 @@ test("print: the parents and teachers guide has a print button", async ({ page }
   await page.goto("/for-adults");
   await expect(page.getByRole("button", { name: "Print this guide" })).toBeVisible();
 });
+
+test("top bar: one tap switches light and dark, and it is remembered", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/map");
+  await page.getByRole("button", { name: "Switch to dark colours" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.getByRole("button", { name: "Switch to light colours" })).toBeFocused();
+  await expect.poll(async () => (await saved(page)).settings.theme).toBe("dark");
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await page.getByRole("button", { name: "Switch to light colours" }).click();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+});

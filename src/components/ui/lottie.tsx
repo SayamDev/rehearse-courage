@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useDarkTheme } from "@/lib/use-dark-theme";
 
 /** Reduced motion from the device or from Me (data-motion on <html>). */
 function prefersReducedMotion(): boolean {
@@ -12,12 +13,6 @@ function prefersReducedMotion(): boolean {
  * scripts/lottie/build.mjs). It starts once half of it is on screen. Under reduced motion it shows the final frame and never moves.
  * Always decorative: the text beside it says what happened.
  */
-/** Dark colours in use: picked in Me, or the device is dark and Me does not force light. */
-export function isDark(): boolean {
-  const theme = document.documentElement.dataset.theme;
-  return theme === "dark" || (theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-}
-
 export function Lottie({
   src,
   data: given,
@@ -39,6 +34,11 @@ export function Lottie({
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
+  // Only animations with a dark twin redraw when the colours change.
+  const darkNow = useDarkTheme();
+  const dark = themed && darkNow;
+  // After the first play, a redraw (new colours) goes straight to the last frame instead of playing again.
+  const played = useRef(false);
 
   useEffect(() => {
     let live = true;
@@ -46,10 +46,11 @@ export function Lottie({
     void (async () => {
       const [{ default: lottie }, data] = await Promise.all([
         import("lottie-web/build/player/lottie_light"),
-        given ?? fetch(themed && isDark() ? src!.replace(/\.json$/, "-dark.json") : src!).then((r) => r.json()),
+        given ?? fetch(dark ? src!.replace(/\.json$/, "-dark.json") : src!).then((r) => r.json()),
       ]);
       if (!live || !ref.current) return;
-      const reduce = still || prefersReducedMotion();
+      const reduce = still || played.current || prefersReducedMotion();
+      played.current = true;
       const anim = lottie.loadAnimation({
         container: ref.current,
         renderer: "svg",
@@ -82,7 +83,7 @@ export function Lottie({
       live = false;
       destroy?.();
     };
-  }, [src, given, still, loop, themed]);
+  }, [src, given, still, loop, dark]);
 
   return <div ref={ref} aria-hidden className={className} style={style} />;
 }

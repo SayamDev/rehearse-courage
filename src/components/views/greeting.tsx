@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { dayKey } from "@/lib/dates";
 import { greetingLottie, type GlyphAtlas } from "@/lib/lottie/greeting";
-import { isDark, Lottie } from "@/components/ui/lottie";
+import { Lottie } from "@/components/ui/lottie";
+import { useDarkTheme } from "@/lib/use-dark-theme";
 
 const SEEN_KEY = "courage:greeted";
 let atlasLoad: Promise<GlyphAtlas | null> | null = null;
@@ -23,6 +24,7 @@ const loadAtlas = () =>
  * does not have) the plain heading shows instead.
  */
 export function Greeting({ name, className = "" }: { name: string | null; className?: string }) {
+  const dark = useDarkTheme();
   const [doc, setDoc] = useState<{ data: object; ratio: number; width: number } | null>(null);
   const [still, setStill] = useState(true);
   const text = name ? `Hi ${name}, today's one step` : "Today's one step";
@@ -31,7 +33,7 @@ export function Greeting({ name, className = "" }: { name: string | null; classN
     let live = true;
     void loadAtlas().then((atlas) => {
       if (!live || !atlas) return;
-      const data = greetingLottie(atlas, name, isDark() ? "dark" : "light");
+      const data = greetingLottie(atlas, name, dark ? "dark" : "light");
       if (!data) return;
       const today = dayKey(new Date());
       let seen = false;
@@ -47,7 +49,7 @@ export function Greeting({ name, className = "" }: { name: string | null; classN
     return () => {
       live = false;
     };
-  }, [name]);
+  }, [name, dark]);
 
   return (
     <div className={className}>
