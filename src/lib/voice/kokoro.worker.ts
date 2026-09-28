@@ -20,6 +20,11 @@ export type WorkerOut =
   | { type: "error"; message: string }
   | { type: "audio"; id: number; blob: Blob | null };
 
+// Hugging Face refuses model downloads referred from workers.dev. Worker scripts can be
+// cached without the page's no-referrer header, so every request from here says so itself.
+const nativeFetch = self.fetch.bind(self);
+self.fetch = (input: RequestInfo | URL, init?: RequestInit) => nativeFetch(input, { ...init, referrerPolicy: "no-referrer" });
+
 const MODEL_ID = "onnx-community/Kokoro-82M-v1.0-ONNX";
 const ctx = self as unknown as DedicatedWorkerGlobalScope;
 let tts: Tts | null = null;

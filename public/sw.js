@@ -5,8 +5,8 @@
  * - /api is never cached: answers and AI calls always go to the network.
  * Nothing here sends data anywhere.
  */
-// Bump to throw away every cached file.
-const VERSION = "courage-v1";
+// Bump to throw away every cached file. v2: scripts saved without Referrer-Policy, so the voice workers could not download their models.
+const VERSION = "courage-v2";
 const PAGES = `${VERSION}-pages`;
 const ASSETS = `${VERSION}-assets`;
 const OFFLINE = "/offline";

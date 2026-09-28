@@ -1,8 +1,11 @@
 # Cloudflare serves these static files directly, without the app's own headers (next.config.ts).
 # Keep in sync with next.config.ts: the page is cross-origin isolated for on-device voices.
+# Referrer-Policy matters for the voice and listening workers: they download their models
+# from Hugging Face, which refuses requests referred from workers.dev.
 /*
   Cross-Origin-Opener-Policy: same-origin
   Cross-Origin-Embedder-Policy: credentialless
+  Referrer-Policy: no-referrer
 
 # The offline service worker must always be checked for updates.
 /sw.js
