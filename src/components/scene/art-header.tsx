@@ -2,9 +2,8 @@ import Image from "next/image";
 
 /**
  * A banner of scene art with the page title over the dark night sky side.
- * Kit and Badges header art (header-kit, header-badges) is not made yet
- * (see design/art-manifest.md), so both use the quiet hill from Panic now
- * until it is.
+ * Kit and Badges pass their own banners (header-kit, header-badges); the
+ * quiet hill from Panic now is the default.
  */
 export function ArtHeader({ title, line, art = "/art/panic.webp" }: { title: string; line: string; art?: string }) {
   return (

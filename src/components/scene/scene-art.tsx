@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { sceneCrop, SCENES, type CropKind } from "@/lib/scenes";
+import { sceneArt, sceneCrop, SCENES, type CropKind } from "@/lib/scenes";
 import type { RoomId } from "@/lib/types";
 
 /**
@@ -8,7 +8,8 @@ import type { RoomId } from "@/lib/types";
  * its aspect ratio — see cropAspect in scenes.ts). "island" (the default)
  * zooms onto just the island so it reads at phone width; "wide" is a
  * gentler crop (the full art unless a scene defines otherwise) for screens
- * that want more of the scene around it.
+ * that want more of the scene around it. "step" shows the scene's own
+ * practice-step art (the classroom) when it has one.
  *
  * Implemented with plain percentage math rather than CSS object-view-box
  * (not yet supported everywhere): an inner layer is sized and shifted so
@@ -41,7 +42,7 @@ export function SceneArt({
         }}
       >
         <Image
-          src={scene.art}
+          src={sceneArt(scene, crop)}
           alt=""
           fill
           sizes="(min-width: 768px) 700px, 100vw"

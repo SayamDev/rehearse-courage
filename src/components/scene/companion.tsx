@@ -4,15 +4,16 @@ import { SPECIES } from "@/lib/companion";
 import type { Species } from "@/lib/types";
 
 /**
- * Firefly stills (public/art/firefly/*.webp) do not exist yet, see
- * design/art-manifest.md. Once they land, fill this map by stage (and, if
- * hedgehog/fox get their own art in Plan 6, add per-species maps of the same
- * shape) — nothing else in this component needs to change.
+ * Firefly stills by stage, on a flat cream ground that fills the round frame.
+ * If hedgehog/fox get their own art in Plan 6, add per-species maps of the
+ * same shape.
  */
-const FIREFLY_STILL: Partial<Record<Stage, string>> = {};
-
-/** Fallback: a portrait crop of the firefly already drawn on the breathing kit tile. */
-const FIREFLY_FALLBACK = "/art/kit/breathing.webp";
+const FIREFLY_STILL: Record<Stage, string> = {
+  hiding: "/art/firefly/hiding.webp",
+  peeking: "/art/firefly/peeking.webp",
+  waving: "/art/firefly/waving.webp",
+  speaking: "/art/firefly/speaking.webp",
+};
 
 const STAGE_WORD: Record<Stage, string> = {
   hiding: "curled up",
@@ -34,7 +35,7 @@ const speciesName = (id: Species) => SPECIES.find((s) => s.id === id)?.name ?? i
  */
 export function Companion({ species, stage, size = 96 }: { species: Species; stage: Stage; size?: number }) {
   const isFirefly = species === "firefly";
-  const src = FIREFLY_STILL[stage] ?? FIREFLY_FALLBACK;
+  const src = FIREFLY_STILL[stage];
   const glow = GLOW_STRENGTH[stage];
 
   return (
@@ -56,7 +57,7 @@ export function Companion({ species, stage, size = 96 }: { species: Species; sta
           alt=""
           fill
           sizes={`${size}px`}
-          className="scale-125 object-cover"
+          className="object-cover"
         />
       </div>
       {!isFirefly && process.env.NODE_ENV !== "production" ? (

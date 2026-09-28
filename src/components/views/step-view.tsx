@@ -292,7 +292,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       </p>
 
       <div className="relative mx-auto mt-5 h-[24dvh] min-h-[150px] max-w-[720px] overflow-hidden rounded-card md:h-[260px]">
-        <SceneArt room={step.room} priority className="object-top" />
+        <SceneArt room={step.room} crop="step" priority className="object-top" />
       </div>
 
       <PaperCard className="relative mx-auto -mt-8 max-w-[640px]">
