@@ -8,6 +8,7 @@ export const RETURNING = {
   companion: { species: "firefly", name: "Glow" },
   name: null,
   nameAsked: true,
+  voiceOffered: true,
   records: [],
   customSteps: [],
   events: [],

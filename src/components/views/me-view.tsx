@@ -18,6 +18,7 @@ import { PaperCard } from "@/components/ui/paper-card";
 import { StatsPill } from "@/components/ui/stats-pill";
 import { Switch } from "@/components/ui/switch";
 import { AiSettings } from "./ai-settings";
+import { VoiceSettings } from "./voice-settings";
 
 const STAGE_WORD: Record<Stage, string> = {
   hiding: "Curled up with their lantern",
@@ -243,6 +244,10 @@ export function MeView() {
                 })}
               </div>
             </fieldset>
+          </Section>
+
+          <Section title="Voices">
+            <VoiceSettings />
           </Section>
 
           <Section title="AI help">

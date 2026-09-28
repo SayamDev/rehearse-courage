@@ -39,6 +39,11 @@ export default function AboutPage() {
         </div>
         <p className="mt-8 font-display text-2xl font-bold text-ink">Made by Sayam Ajmal</p>
         <p className="mt-1 text-muted">Designed and built by Sayam Ajmal, as part of the Rehearse project.</p>
+        <p className="mt-6 font-semibold text-ink">Voices</p>
+        <p className="mt-1 text-muted">
+          Recorded with Kokoro (Apache 2.0) and OmniVoice by k2-fsa (CC BY-NC 4.0), free and on the maker&apos;s own computer. Nothing you
+          say or type is used to make them.
+        </p>
       </div>
     </>
   );

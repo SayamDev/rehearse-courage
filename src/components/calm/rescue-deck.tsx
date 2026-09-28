@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { ArrowRight, Check } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
 import { RESCUE_PHRASES } from "@/lib/content/phrases";
+import { SpokenLine } from "@/components/voice/spoken-line";
 import { checkCrisis } from "@/lib/safety/crisis";
 import { useSpeak } from "@/lib/speak";
 import { logEvent } from "@/lib/state";
@@ -67,9 +68,11 @@ export function RescueDeck({ onCrisis }: { onCrisis: () => void }) {
         <p className="tabular text-muted">
           Phrase {i + 1} of {RESCUE_PHRASES.length}
         </p>
-        <p className="mt-2 font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] font-bold text-ink">
-          &ldquo;{words(phrase.text, age)}&rdquo;
-        </p>
+        <div className="mt-2">
+          <SpokenLine role="narrator" text={words(phrase.text, age)} className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] font-bold text-ink">
+            &ldquo;{words(phrase.text, age)}&rdquo;
+          </SpokenLine>
+        </div>
         <p className="mt-2 text-ink">{words(phrase.when, age)}</p>
         {done ? (
           <p className="mt-3 flex items-center gap-2 font-semibold text-ink">
