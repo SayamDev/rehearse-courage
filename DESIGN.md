@@ -54,6 +54,7 @@ Top bar on every page: teal sticker wordmark, section links from 768px, a round 
 - Badges without painted art yet: a bold Phosphor icon on a sticker ink, in the same round die-cut (`BADGE_ICON` in `sticker.tsx`).
 - Journey (`/journey`): level card, four stat stickers, proud moments, a lantern calendar (brave days are teal stickers; other days are plain, never marked as missed), newest badges.
 - Right before (`/ready`): one screen at a time with a four-part progress bar, like a step.
+- Icons: the browser tab uses `src/app/icon.svg` (and `favicon.ico` built from it): a teal rounded square with a white speech bubble holding the firefly's warm sun-yellow light, simple enough to read at 16px. Home-screen and app icons keep the painted firefly (`apple-icon.png`, `public/icons/`).
 - Print: `@media print` in `globals.css` prints light on white with no top bar or tabs (`data-no-print` hides chrome); `/for-adults` has a Print button.
 
 ## Motion
