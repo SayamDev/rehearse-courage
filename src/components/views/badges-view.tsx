@@ -12,7 +12,7 @@ import { Sticker } from "@/components/ui/sticker";
 
 /**
  * Badges ("/badges"): today's optional quests with gentle progress text
- * (no bars), then all twelve badges as stickers. Earned ones are in colour
+ * (no bars), then every badge as a sticker. Earned ones are in colour
  * with what you did; the rest are soft outlines with how to find them.
  * Nothing is ever locked, lost or counted down.
  */

@@ -58,7 +58,7 @@ export function HomeView() {
   const model = homeModel(store, now);
   const stage = stageFor(model.points, missionsDone(store.records));
   const room: RoomId | null = model.done ? null : (situationById(model.situationId)?.room ?? "class");
-  const week = braveWeek(store.records, now);
+  const week = braveWeek(store.records, now, store.events);
   const quests = dailyQuests(today).map((q) => ({ q, done: questProgress(q, store.records, store.events, today) }));
 
   return (

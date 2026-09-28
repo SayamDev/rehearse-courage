@@ -241,7 +241,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
       router.push(`/help?crisis=1&from=${encodeURIComponent(`/step/${step.id}`)}`);
       return;
     }
-    setResult(stepResult(before, record, earned));
+    setResult(stepResult(before, record, earned, store.events));
     window.scrollTo({ top: 0 });
   };
 

@@ -4,13 +4,16 @@ import { MAX_CUSTOM, makeCustomStep } from "./ladder";
 import { SPECIES } from "./companion";
 import {
   EVENT_KINDS,
+  FEELINGS,
   HARD_THINGS,
   ROOM_IDS,
   type AgeBand,
   type AppEvent,
   type CustomStep,
   type EventKind,
+  type Feeling,
   type HardThing,
+  type ProudMoment,
   type RoomId,
   type Species,
   type StepRecord,
@@ -72,6 +75,8 @@ export type CourageState = {
   voiceOffered: boolean;
   /** Rescue phrase ids the person starred, shown first in the deck. */
   savedPhrases: string[];
+  /** Real-life tries at step 6, newest last, for the journey page. */
+  proud: ProudMoment[];
   settings: Settings;
 };
 
@@ -94,6 +99,7 @@ export const DEFAULT_STATE: CourageState = {
   lastBackup: null,
   voiceOffered: false,
   savedPhrases: [],
+  proud: [],
   settings: {
     reduceMotion: false,
     textSize: "normal",
@@ -170,6 +176,30 @@ function isValidEvent(v: unknown): v is AppEvent {
   return (EVENT_KINDS as string[]).includes(v.kind as string) && isParseableDate(v.at);
 }
 
+/** Keeps kind and time, and a short detail only when it is one. */
+function normalizeEvent(v: AppEvent): AppEvent {
+  const detail = typeof v.detail === "string" && v.detail.length > 0 && v.detail.length <= 60 ? v.detail : undefined;
+  return detail ? { kind: v.kind, at: v.at, detail } : { kind: v.kind, at: v.at };
+}
+
+/** Longest note kept with a proud moment. */
+export const MAX_PROUD_NOTE = 200;
+/** Proud moments kept (the newest). */
+export const MAX_PROUD = 300;
+
+function cleanNote(raw: unknown): string | null {
+  if (typeof raw !== "string") return null;
+  const note = raw.replace(/[\u0000-\u001f\u007f]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_PROUD_NOTE).trim();
+  return note || null;
+}
+
+function normalizeProud(v: unknown): ProudMoment | null {
+  if (!isObject(v) || typeof v.situationId !== "string" || !isParseableDate(v.at)) return null;
+  if (v.outcome !== "did" && v.outcome !== "tried") return null;
+  const feel = (FEELINGS as unknown[]).includes(v.feel) ? (v.feel as Feeling) : null;
+  return { situationId: v.situationId, at: v.at, outcome: v.outcome, feel, note: cleanNote(v.note) };
+}
+
 function isValidHardThing(v: unknown): v is HardThing {
   return typeof v === "string" && (HARD_THINGS as string[]).includes(v);
 }
@@ -226,7 +256,7 @@ export function normalize(raw: unknown): CourageState {
     nameAsked: p.nameAsked === true || cleanPersonName(p.name) !== null,
     records: arr<unknown>(p.records).filter(isValidRecord),
     customSteps: arr<unknown>(p.customSteps).filter(isValidCustomStep).map(normalizeCustomStep),
-    events: arr<unknown>(p.events).filter(isValidEvent),
+    events: arr<unknown>(p.events).filter(isValidEvent).map(normalizeEvent),
     earned: dedupe(arr<unknown>(p.earned).filter((v): v is string => typeof v === "string")),
     lastSeen: isParseableDate(p.lastSeen) ? p.lastSeen : null,
     cameBack: p.cameBack === true,
@@ -235,11 +265,15 @@ export function normalize(raw: unknown): CourageState {
     lastBackup: isParseableDate(p.lastBackup) ? p.lastBackup : null,
     voiceOffered: p.voiceOffered === true,
     savedPhrases: dedupe(arr<unknown>(p.savedPhrases).filter((v): v is string => typeof v === "string")).slice(0, 50),
+    proud: arr<unknown>(p.proud)
+      .map(normalizeProud)
+      .filter((v): v is ProudMoment => v !== null)
+      .slice(-MAX_PROUD),
     settings: normalizeSettings(p.settings),
   };
 }
 
-function withBadges(state: CourageState): Result {
+export function withBadges(state: CourageState): Result {
   const fresh = newBadges(state.earned, state);
   return { state: fresh.length ? { ...state, earned: [...state.earned, ...fresh] } : state, newlyEarned: fresh };
 }
@@ -269,8 +303,24 @@ export function addCustomStep(s: CourageState, room: RoomId, text: string, now: 
   return withBadges({ ...s, customSteps: [...s.customSteps, makeCustomStep(room, text, now)] });
 }
 
-export function logEvent(s: CourageState, kind: EventKind, now: Date): Result {
-  return withBadges({ ...s, events: [...s.events, { kind, at: now.toISOString() }] });
+export function logEvent(s: CourageState, kind: EventKind, now: Date, detail?: string): Result {
+  const event: AppEvent = detail ? { kind, at: now.toISOString(), detail } : { kind, at: now.toISOString() };
+  return withBadges({ ...s, events: [...s.events, event] });
+}
+
+/**
+ * After a real-life try at step 6: how it went (did it or tried) and, if
+ * they want, how it felt and a short note. One per try; saving again for
+ * the same try (same situation and time) updates it.
+ */
+export function saveProud(
+  s: CourageState,
+  moment: { situationId: string; at: string; outcome: "did" | "tried"; feel?: Feeling | null; note?: string | null },
+): Result {
+  const clean = normalizeProud({ ...moment, feel: moment.feel ?? null, note: moment.note ?? null });
+  if (!clean) return { state: s, newlyEarned: [] };
+  const rest = s.proud.filter((p) => !(p.situationId === clean.situationId && p.at === clean.at));
+  return withBadges({ ...s, proud: [...rest, clean].slice(-MAX_PROUD) });
 }
 
 /** Called when the app opens. A gap of 7 or more days is celebrated, never punished. */
