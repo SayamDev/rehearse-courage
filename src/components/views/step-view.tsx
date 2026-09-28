@@ -20,6 +20,7 @@ import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId, StepRecord } from "@/lib/types";
 import { BodyDouble } from "@/components/scene/body-double";
+import { PressureMoment } from "@/components/voice/pressure-moment";
 import { SpokenLine } from "@/components/voice/spoken-line";
 import { ROOM_ROLE } from "@/lib/voice/lines";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -382,6 +383,7 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
           {level === 5 ? (
             <div className="mt-5 rounded-2xl bg-surface-2 px-4 py-3 text-ink">
               <p>{words(PRESSURE_LINES[step.room], store.age)}</p>
+              <PressureMoment room={step.room} />
               {showTimer ? (
                 <p className="tabular mt-1 text-muted" aria-hidden>
                   {elapsed} seconds

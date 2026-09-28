@@ -1,4 +1,4 @@
-import { COACH_FALLBACK, COACH_LINES } from "@/lib/content/coach";
+import { COACH_FALLBACK, COACH_LINES, PRESSURE_CUES } from "@/lib/content/coach";
 import { COACH_REPLIES } from "@/lib/content/coach-replies";
 import { RESCUE_PHRASES } from "@/lib/content/phrases";
 import { SITUATIONS } from "@/lib/content/situations";
@@ -9,7 +9,7 @@ import type { RoomId, Words } from "@/lib/types";
  * teacher in class, a friend with friends, the group's host when presenting.
  * The narrator reads everything else (the scene, ideas, missions, phrases).
  */
-export type Role = "teacher" | "friend" | "host" | "narrator";
+export type Role = "teacher" | "friend" | "host" | "narrator" | "classmate";
 
 /** Kids hear the kid wording, a child-sounding friend and a slightly slower pace. */
 export type VoiceSet = "kids" | "grown";
@@ -27,6 +27,11 @@ export const VOICES: Record<Role, Record<VoiceSet, Voice>> = {
   friend: {
     kids: { id: "omni:friend-child", engine: "omnivoice", name: "friend-child", instruct: "female, child, british accent", seed: 7 },
     grown: { id: "omni:friend-young", engine: "omnivoice", name: "friend-young", instruct: "female, young adult, british accent", seed: 11 },
+  },
+  // Someone else in the room at step 5: a classmate, another friend, someone in the audience.
+  classmate: {
+    kids: { id: "omni:classmate-child", engine: "omnivoice", name: "classmate-child", instruct: "male, child, british accent", seed: 5 },
+    grown: { id: "omni:classmate-young", engine: "omnivoice", name: "classmate-young", instruct: "male, young adult, british accent", seed: 9 },
   },
 };
 
@@ -84,6 +89,7 @@ export function allLines(): Line[] {
     for (const reply of COACH_REPLIES[room]) out.push(...both(ROOM_ROLE[room], reply));
   }
   for (const p of RESCUE_PHRASES) out.push(...both("narrator", p.text));
+  for (const cues of Object.values(PRESSURE_CUES)) for (const c of cues) out.push(...both(c.role, c.text));
   const seen = new Set<string>();
   return out.filter((l) => (seen.has(l.id) ? false : (seen.add(l.id), true)));
 }
