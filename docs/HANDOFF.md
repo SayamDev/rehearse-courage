@@ -33,13 +33,15 @@ Tests on `main`: 430 unit tests, 132 Playwright tests (journeys, AI, pop-ups, ax
 
 ## What to do next (in rough priority)
 
-1. **Art (maker's Mac only, 12ui).** See "Art still needed". Biggest visible gap.
-2. **Voices: done (Plan 5a).** Every fixed line (141) is pre-recorded in `public/voice/` (Kokoro for teacher, host and narrator; VoiceStudio OmniVoice for a child-sounding friend for under 13 and a young-adult friend otherwise). "Hear it" beside the scene, mission, coach's line and reply, and rescue phrases; nothing plays unless tapped (auto-play is a Me setting). Me has a Voices section; the natural voice (Kokoro, about 90 MB) is offered once by a pop-up and never downloads by itself. **After changing any line's text, re-record:** open VoiceStudio, then `npm run voices:record` (only new or changed lines are recorded; friend voices stay consistent via `design/voice-refs/`). The name question and "Hi Sam" on Home are done too. Still open from Plan 5: on-device Whisper, extra voices for classmates in the step 5 moment.
-3. **Plan 5 rest:** mini-games (`/games/[id]`: word builder, rescue snap, hot seat, breath balloon, story dice), Then vs Now (opt-in recordings in IndexedDB), body double mode, on-device Whisper (Transformers.js) for under-13 speech to text.
-4. **PWA / offline:** `/offline` page, manifest, service worker (`/sw.js` headers are already in `next.config.ts`). Then add "Add to Home Screen / Install" to the save pop-up, like Rehearse.
-5. **Desktop polish:** the maker said the desktop layout felt off. Dark-mode edges and footer are fixed; ask for a fresh screenshot before changing more (the full-width bottom nav matches the comps).
-6. **Plan 6:** companion Lottie set (firefly first), real-user testing (teacher, teen, someone who stutters, someone with ADHD; STAMMA review of stuttering copy), launch.
-7. **Before launch:** re-check every helpline number in `src/lib/safety/crisis.ts` against official sites.
+Done on 2026-09-28 (PRs #12 to #18, all live): gibberish check for typed answers, coach lines auto-play (setting on by default), the calm teal Sticker Book redesign (top bar, phone tabs, progress track, no painted scenery), a hands-on Body kit, a fuller Home, kinetic Lottie type (name greeting, welcome, "That took courage", the six-step ladder), Need a pause redesign, PWA and offline, five warm-up games (`/games`), Then and now recordings, body double mode, and classmate voices at step 5 (151 of 151 lines recorded).
+
+1. **Real-user testing** (teacher, teen, someone who stutters, someone with ADHD; STAMMA review of the stuttering copy and the speech tools).
+2. **Before launch:** re-check every helpline number in `src/lib/safety/crisis.ts` against official sites.
+3. **On-device Whisper for under 13 (not built):** under 13 gets pre-written replies, so a transcript adds little; worth it only if kids' replies should respond to what they said (Transformers.js `onnx-community/whisper-tiny.en`, about 40 MB, opt-in like the natural voice).
+4. **Companion Lottie set (optional):** the maker likes the painted firefly stills; a vector firefly exists (`public/lottie/firefly.json`, used by body double).
+5. **Tidy:** `src/lib/scenes.ts` still references room and step paintings that are no longer shown (only its stone states are used).
+
+Lottie: edit `scripts/lottie/build.mjs` (and `type.mjs` for type), run `node scripts/lottie/build.mjs ~/Projects/bondling-lottie-player` and check frames in the Skottie player on port 3130 (project "courage").
 
 ## Documents (source of truth)
 
