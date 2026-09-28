@@ -14,6 +14,7 @@ import { saveBackupFile } from "@/lib/save-backup";
 import { act, clearEverything, useCourage } from "@/lib/store";
 import { Companion } from "@/components/scene/companion";
 import { InstallApp } from "@/components/shell/install-app";
+import { ThenNow } from "./then-now";
 import { Button } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { StatsPill } from "@/components/ui/stats-pill";
@@ -187,12 +188,17 @@ export function MeView() {
             <div className="mt-3 divide-y divide-line">
               <Switch checked={store.settings.reduceMotion} onChange={(v) => set({ reduceMotion: v })} label="Reduce motion" />
               <Switch checked={store.settings.sounds} onChange={(v) => set({ sounds: v })} label="Sounds" />
-              <Switch checked={store.settings.confetti} onChange={(v) => set({ confetti: v })} label="Paper sparks when you finish a step" />
+              <Switch checked={store.settings.confetti} onChange={(v) => set({ confetti: v })} label="Celebrate when you finish a step" />
               <Switch checked={store.settings.timers} onChange={(v) => set({ timers: v })} label="Show a timer on step 5" />
               <Switch
                 checked={store.settings.keepRecordings}
                 onChange={(v) => set({ keepRecordings: v })}
                 label="Keep my recordings on this device"
+              />
+              <Switch
+                checked={store.settings.bodyDouble}
+                onChange={(v) => set({ bodyDouble: v })}
+                label={`${store.companion?.name ?? "Your firefly"} practises beside you on a step`}
               />
             </div>
             <fieldset className="mt-4">
@@ -245,6 +251,10 @@ export function MeView() {
                 })}
               </div>
             </fieldset>
+          </Section>
+
+          <Section title="Then and now">
+            <ThenNow />
           </Section>
 
           <Section title="Voices">

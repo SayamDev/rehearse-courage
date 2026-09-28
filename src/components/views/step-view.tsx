@@ -14,10 +14,12 @@ import { ROOM_LABEL } from "@/lib/rooms";
 import { checkCrisis } from "@/lib/safety/crisis";
 import { useSpeak, waitForRecording } from "@/lib/speak";
 import { looksLikeWords, NOT_WORDS } from "@/lib/sense";
+import { saveRecording } from "@/lib/recordings";
 import { recordStep } from "@/lib/state";
 import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId, StepRecord } from "@/lib/types";
+import { BodyDouble } from "@/components/scene/body-double";
 import { SpokenLine } from "@/components/voice/spoken-line";
 import { ROOM_ROLE } from "@/lib/voice/lines";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -217,6 +219,11 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
     const record: StepRecord = { situationId: step.id, level, at: new Date().toISOString(), seconds, typed, roughDay };
     const before = store.records;
     const earned = act((s) => recordStep(s, record));
+    // Then vs Now: a spoken step's recording is kept on this device when the person chose to keep recordings.
+    const blob = speak.latest().recording;
+    if (store.settings.keepRecordings && blob && seconds !== null) {
+      void saveRecording(step.room, { at: record.at, situationId: step.id, level, blob });
+    }
     speak.reset();
     const flagged = crisis || [text, note].some((t) => t.trim() && checkCrisis(t).crisis);
     if (flagged) {
@@ -312,6 +319,9 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
         <p className="mt-1 text-muted">
           {ROOM_LABEL[step.room]} step <span className="tabular">{level}</span>: {LEVELS[level - 1].name}
         </p>
+        <div className="mt-4 empty:hidden">
+          <BodyDouble part="companion" />
+        </div>
       </header>
 
       <div className="px-4">
@@ -556,6 +566,9 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
             </>
           ) : null}
         </PaperCard>
+        <div className="mx-auto mt-4 max-w-[640px]">
+          <BodyDouble part="invite" />
+        </div>
       </div>
     </div>
   );
