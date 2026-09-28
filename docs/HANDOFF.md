@@ -35,11 +35,20 @@ Tests on `main`: 430 unit tests, 132 Playwright tests (journeys, AI, pop-ups, ax
 
 Done on 2026-09-28 (PRs #12 to #18, all live): gibberish check for typed answers, coach lines auto-play (setting on by default), the calm teal Sticker Book redesign (top bar, phone tabs, progress track, no painted scenery), a hands-on Body kit, a fuller Home, kinetic Lottie type (name greeting, welcome, "That took courage", the six-step ladder), Need a pause redesign, PWA and offline, five warm-up games (`/games`), Then and now recordings, body double mode, and classmate voices at step 5 (151 of 151 lines recorded).
 
+Also live (PRs #20, #21): responsive fixes plus a no-sideways-scroll test at 320 and 768px; the recording state (coral button, blinking dot, bars that move with the voice), a microphone check on the last first-visit screen and in Me > Settings; Me as a profile band plus four tabs (You, Settings, Voices & AI, Your data; tab in the URL hash); `/for-adults` for parents and teachers.
+
+**In progress on branch `voices-celebration` (pushed, not merged):**
+- Every role is now a natural OmniVoice (VoiceStudio) in **British (default) and American** (`src/lib/voice/lines.ts`, setting `accent`, chips in Me > Voices & AI). 570 clips. Voices now also cover grounding, breathing (first three breaths guided), speech tools, body explainers and reframe cards, all five games, the step-done line and the step 6 line. "Read lines out automatically" (setting `playCoach`) covers all of it.
+- **Recording must finish before merging** (otherwise lines fall back to the device voice): open VoiceStudio, then `npm run voices:record` (about 13 s a clip; it skips clips that exist and deletes stale ones at the end). Then commit `public/voice` and `design/voice-refs`.
+- Step 6 celebration: `for-real` Lottie ("You did it for real." with rays, flag and burst), its own heading, card and spoken line.
+- On-device listening for under 13 (`src/lib/voice/listen.ts` + `listen.worker.ts`, Whisper tiny via `@huggingface/transformers`, opt-in download in Me, setting `deviceListen`): at step 4 Cobi shows "Cobi heard: ..." and the words get the on-device crisis check. Privacy page updated. Not yet tested on a real device.
+- Tidy: `src/lib/scenes.ts` replaced by `src/lib/progress.ts`; unused paintings deleted.
+- To finish: recordings done, `npm test`, `npm run test:e2e` (the voice tests need the clips), PR, merge, `npm run cf:deploy`. Listen to a few British and American clips first.
+
+Next after that:
 1. **Real-user testing** (teacher, teen, someone who stutters, someone with ADHD; STAMMA review of the stuttering copy and the speech tools).
 2. **Before launch:** re-check every helpline number in `src/lib/safety/crisis.ts` against official sites.
-3. **On-device Whisper for under 13 (not built):** under 13 gets pre-written replies, so a transcript adds little; worth it only if kids' replies should respond to what they said (Transformers.js `onnx-community/whisper-tiny.en`, about 40 MB, opt-in like the natural voice).
-4. **Companion Lottie set (optional):** the maker likes the painted firefly stills; a vector firefly exists (`public/lottie/firefly.json`, used by body double).
-5. **Tidy:** `src/lib/scenes.ts` still references room and step paintings that are no longer shown (only its stone states are used).
+3. **Companion Lottie set (optional):** the maker likes the painted firefly stills; a vector firefly exists (`public/lottie/firefly.json`, used by body double).
 
 Lottie: edit `scripts/lottie/build.mjs` (and `type.mjs` for type), run `node scripts/lottie/build.mjs ~/Projects/bondling-lottie-player` and check frames in the Skottie player on port 3130 (project "courage").
 
