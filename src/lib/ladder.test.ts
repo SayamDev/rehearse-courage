@@ -44,9 +44,31 @@ describe("ladder", () => {
     expect(suggestNext([], SITUATIONS, [])).toEqual({ situationId: "class-answer", level: 1 });
   });
 
-  test("suggestion continues the least advanced situation in the preferred room", () => {
-    const r = [rec("friends-join", 3), rec("friends-opinion", 1)];
+  test("with the last situation finished, it picks the least advanced one in the preferred room", () => {
+    const r = [rec("friends-opinion", 1), ...([1, 2, 3, 4, 5, 6] as Level[]).map((l) => rec("friends-join", l, `2026-09-28T11:0${l}:00`))];
     expect(suggestNext(r, SITUATIONS, ["friends"])).toEqual({ situationId: "friends-disagree", level: 1 });
+  });
+
+  test("suggestion keeps climbing the situation you practised last, instead of hopping to another", () => {
+    const at = (m: number) => `2026-09-28T10:0${m}:00.000Z`;
+    const r: StepRecord[] = [
+      { situationId: "class-answer", level: 1, at: at(1), seconds: null, typed: false, roughDay: false },
+      { situationId: "class-ask", level: 1, at: at(2), seconds: null, typed: false, roughDay: false },
+      { situationId: "class-ask", level: 2, at: at(3), seconds: null, typed: false, roughDay: false },
+    ];
+    expect(suggestNext(r, SITUATIONS, ["class"])).toEqual({ situationId: "class-ask", level: 3 });
+  });
+
+  test("once the situation you were on is finished, it moves to the least advanced one", () => {
+    const r: StepRecord[] = ([1, 2, 3, 4, 5, 6] as Level[]).map((level, i) => ({
+      situationId: "class-answer",
+      level,
+      at: `2026-09-28T10:0${i}:00.000Z`,
+      seconds: null,
+      typed: false,
+      roughDay: false,
+    }));
+    expect(suggestNext(r, SITUATIONS, ["class"])).toEqual({ situationId: "class-ask", level: 1 });
   });
 
   test("suggestion is null when everything is finished", () => {
