@@ -16,20 +16,20 @@ import { clipId, KIDS_RATE, spokenText, voiceFor, type Accent, type Role, type V
 
 /** The closest Kokoro voice to each recorded voice, for lines without a clip (live replies, your own steps). */
 const KOKORO_STAND_IN: Record<string, string> = {
-  "omni:narrator-uk": "bf_isabella",
-  "omni:teacher-uk": "bf_emma",
-  "omni:host-uk": "bm_george",
-  "omni:friend-child": "bf_lily",
-  "omni:friend-young": "bf_alice",
-  "omni:classmate-child": "bm_lewis",
-  "omni:classmate-young": "bm_lewis",
-  "omni:narrator-us": "af_heart",
-  "omni:teacher-us": "af_bella",
-  "omni:host-us": "am_michael",
-  "omni:friend-child-us": "af_sky",
-  "omni:friend-young-us": "af_nicole",
-  "omni:classmate-child-us": "am_puck",
-  "omni:classmate-young-us": "am_adam",
+  "qwen:narrator-uk": "bf_isabella",
+  "qwen:teacher-uk": "bf_emma",
+  "qwen:host-uk": "bm_george",
+  "qwen:friend-child-uk": "bf_lily",
+  "qwen:friend-young-uk": "bf_alice",
+  "qwen:classmate-child-uk": "bm_lewis",
+  "qwen:classmate-young-uk": "bm_lewis",
+  "qwen:narrator-us": "af_heart",
+  "qwen:teacher-us": "af_bella",
+  "qwen:host-us": "am_michael",
+  "qwen:friend-child-us": "af_sky",
+  "qwen:friend-young-us": "af_nicole",
+  "qwen:classmate-child-us": "am_puck",
+  "qwen:classmate-young-us": "am_adam",
 };
 
 /* ---------- What is playing, so the matching button can show it ---------- */

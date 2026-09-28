@@ -32,6 +32,6 @@ describe("voice lines", () => {
     const hot = lines.filter((l) => l.text === "What made you smile this week?");
     expect(new Set(hot.map((l) => l.accent))).toEqual(new Set(["uk", "us"]));
     expect(lines.some((l) => l.text === "Breathe in slowly.")).toBe(true);
-    expect(lines.every((l) => l.voice.engine === "omnivoice")).toBe(true);
+    expect(lines.every((l) => l.voice.engine === "qwen")).toBe(true);
   });
 });

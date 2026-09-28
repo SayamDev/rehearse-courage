@@ -26,35 +26,35 @@ export const ACCENTS: { value: Accent; label: string }[] = [
 ];
 
 /**
- * One voice. Every voice is VoiceStudio's OmniVoice (natural, recorded on
- * the maker's Mac): designed once from a short description (`instruct`,
- * with a fixed seed), saved as a reference clip in design/voice-refs/, then
- * every line is read in that same voice so each character stays the same.
+ * One voice. Every voice is Qwen3-TTS (VoiceDesign) run through VoiceStudio
+ * on the maker's Mac: free, natural, and designed from a plain description
+ * (`describe`). The maker listened to the cast before recording.
  */
-export type Voice = { id: string; engine: "kokoro" | "omnivoice"; name: string; instruct?: string; seed?: number };
+export type Voice = { id: string; engine: "kokoro" | "omnivoice" | "qwen"; name: string; describe?: string; instruct?: string; seed?: number };
 
-const omni = (name: string, instruct: string, seed: number): Voice => ({ id: `omni:${name}`, engine: "omnivoice", name, instruct, seed });
+const qwen = (name: string, describe: string): Voice => ({ id: `qwen:${name}`, engine: "qwen", name, describe });
 
 type Cast = Record<VoiceSet, Voice>;
 const same = (v: Voice): Cast => ({ kids: v, grown: v });
 
-/** The cast, by accent. The British friend and classmate keep their original names, so their clips stay valid. */
-export const VOICES: Record<Accent, Record<Role, Cast>> = {
-  uk: {
-    narrator: same(omni("narrator-uk", "female, young adult, british accent", 21)),
-    teacher: same(omni("teacher-uk", "female, british accent", 23)),
-    host: same(omni("host-uk", "male, british accent", 25)),
-    friend: { kids: omni("friend-child", "female, child, british accent", 7), grown: omni("friend-young", "female, young adult, british accent", 11) },
-    classmate: { kids: omni("classmate-child", "male, child, british accent", 5), grown: omni("classmate-young", "male, young adult, british accent", 9) },
-  },
-  us: {
-    narrator: same(omni("narrator-us", "female, young adult, american accent", 22)),
-    teacher: same(omni("teacher-us", "female, american accent", 24)),
-    host: same(omni("host-us", "male, american accent", 26)),
-    friend: { kids: omni("friend-child-us", "female, child, american accent", 27), grown: omni("friend-young-us", "female, young adult, american accent", 28) },
-    classmate: { kids: omni("classmate-child-us", "male, child, american accent", 29), grown: omni("classmate-young-us", "male, young adult, american accent", 30) },
-  },
-};
+function cast(accent: "British" | "American", tag: "uk" | "us"): Record<Role, Cast> {
+  return {
+    narrator: same(qwen(`narrator-${tag}`, `A warm, calm ${accent} woman in her thirties, speaking naturally and gently at an easy pace.`)),
+    teacher: same(qwen(`teacher-${tag}`, `A friendly, encouraging ${accent} female teacher in her forties, clear and kind, with a natural classroom tone.`)),
+    host: same(qwen(`host-${tag}`, `A relaxed, friendly ${accent} man in his thirties, warm and natural, hosting a small group.`)),
+    friend: {
+      kids: qwen(`friend-child-${tag}`, `A cheerful ten-year-old ${accent} girl, natural and friendly, talking to a classmate.`),
+      grown: qwen(`friend-young-${tag}`, `A friendly ${accent} woman in her early twenties, casual and natural, chatting with a friend.`),
+    },
+    classmate: {
+      kids: qwen(`classmate-child-${tag}`, `A cheerful ten-year-old ${accent} boy, natural and friendly.`),
+      grown: qwen(`classmate-young-${tag}`, `A friendly ${accent} man in his early twenties, casual and natural.`),
+    },
+  };
+}
+
+/** The cast, by accent. */
+export const VOICES: Record<Accent, Record<Role, Cast>> = { uk: cast("British", "uk"), us: cast("American", "us") };
 
 export function voiceFor(role: Role, set: VoiceSet, accent: Accent = "uk"): Voice {
   return VOICES[accent][role][set];

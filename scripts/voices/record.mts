@@ -3,10 +3,11 @@
 //
 // Maker-only, free, runs on this Mac:
 //   - Kokoro lines use kokoro-js in Node (downloads the model once, about 90 MB).
-//   - Friend lines use VoiceStudio's OmniVoice. Start the VoiceStudio app first
-//     (its API listens on http://localhost:3900). Each friend voice is designed
-//     once from a short description, saved in design/voice-refs/, and every
-//     line is then spoken in that same voice so the character stays consistent.
+//   - Every voice today is Qwen3-TTS (VoiceDesign) through VoiceStudio's
+//     MLX-Audio engine. Start the VoiceStudio app first (its API listens on
+//     http://localhost:3900) and choose MLX-Audio with the Qwen3-TTS
+//     VoiceDesign model. Each voice comes from its description in lines.ts.
+//   - Older OmniVoice voices (design/voice-refs/) are still supported.
 //
 // Clips that already exist are skipped, so re-running only records new or
 // changed lines. Run: npm run voices:record
@@ -76,11 +77,22 @@ async function omniWav(voice: Voice, text: string, wav: string) {
   writeFileSync(wav, await studio(form));
 }
 
+/** Qwen3-TTS through VoiceStudio's MLX-Audio engine: the voice comes from its description. */
+async function qwenWav(voice: Voice, text: string, wav: string) {
+  const form = new FormData();
+  form.set("text", text);
+  form.set("language", "en");
+  form.set("instruct", voice.describe ?? "");
+  form.set("engine", "mlx-audio");
+  writeFileSync(wav, await studio(form));
+}
+
 async function record(line: Line) {
   const out = join(OUT, `${line.id}.m4a`);
   if (existsSync(out)) return false;
   const wav = join(TMP, `${line.id}.wav`);
   if (line.voice.engine === "kokoro") await kokoroWav(line.voice, line.text, wav);
+  else if (line.voice.engine === "qwen") await qwenWav(line.voice, line.text, wav);
   else await omniWav(line.voice, line.text, wav);
   encode(wav, out);
   return true;
