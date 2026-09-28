@@ -1,6 +1,39 @@
 # Art manifest — Plan 3, Task 1 (Paper Lantern Map scene art)
 
-Status: **DONE_WITH_CONCERNS**. 12ui hosted generation is still blocked on a prepaid
+Status: **DONE** (2026-09-28 batch below fills every gap the app uses). The
+history below is kept for provenance; the older status text follows.
+
+## 2026-09-28 batch (12ui free allowance, $0 charged)
+
+Seven `12ui draft` runs, 15 candidates in total, all on the daily free allowance
+(`12ui spend` shows $0.00). Every candidate was inspected at full size against the
+hard checks (no text, numbers, UI or stones baked in; plain empty dirt path; no
+firefly or creatures in scene art; calm lower third). Run dirs are temp
+(`/var/folders/.../T/12ui-*`) and not kept.
+
+| File | Run concept / reference | Pick | Why | Notes |
+|---|---|---|---|---|
+| `room-friends.webp` | Park island (oak, picnic table, gazebo), ref `home-class` | A | Longer, clearer path from island edge to gazebo | 1536x1024, 192 KB. Stones measured with a percent grid |
+| `room-presenting.webp` | Open-air stage with benches, ref `home-class` | A | Path ends cleanly at the stage steps; bigger island | 1536x1024, 199 KB |
+| `step-class.webp` | Outdoor classroom, animal classmates, blank chalkboard, ref `step.jpg` | A | Blank board, leftmost desk left empty, calm lower half | 1536x1024, 165 KB. Used by the step banner (`crop="step"`) |
+| `header-kit.webp` | Wide banner, lantern on a mossy boulder, ref `kit.jpg` | A | Open night sky on the left for the title | Cropped to a 1536x600 strip with the lantern about 42% down |
+| `header-badges.webp` | Wide banner, backpack and lantern on a cliff, ref `badges.jpg` | A | Same reason | 1536x600 strip |
+| `firefly/{hiding,peeking,waving,speaking}.webp` | 2x2 character sheet on flat `#F4E6CF`, ref `kit/breathing` | B (of 3) | Clearest progression; speaking pose distinct | Cropped per quadrant to 384px squares. Kept on the flat cream ground (the pale wings are too close to it to key out cleanly); the Companion frame is round, like the kit tiles |
+| `badges/{first-words,hand-up}.webp` | 4x2 coin sheet, ref `said-anyway` | A | More detail, matches the existing coins | Replace the old art that had a baked tick |
+| `badges/{typed-first,rescue-ready,room-explorer,my-own-step,then-and-now,dawn}.webp` | Same sheet | A | | Circular mask, transparent corners, 320px |
+
+Code: `SCENES.friends` / `presenting` now use the room art (the `provisional`
+flag is gone), `SCENES.class.step` points at the classroom, Companion uses the
+stills, every badge has art, Kit and Badges pass their headers to `ArtHeader`.
+
+Still open (not used by any screen as a gap): `map.webp` single composite (the
+map uses the layered `sky-map` + `island-*` set), and the map island cutouts
+still have 6 blank ring stones baked in (map cards only, no numbers drawn on
+them). Hedgehog and fox art wait for Plan 6.
+
+## Earlier status (2026-09-27)
+
+Status then: **DONE_WITH_CONCERNS**. 12ui hosted generation is still blocked on a prepaid
 wallet balance (free allowance resets 2026-09-28T00:00Z; do not retry generation or
 top up before then). Coverage was extended in the meantime by harvesting unused
 layers already extracted from earlier 12ui page conversions in the scratchpad

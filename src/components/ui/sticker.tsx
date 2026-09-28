@@ -1,38 +1,17 @@
 import Image from "next/image";
-import {
-  ClockCounterClockwise,
-  Compass,
-  Keyboard,
-  Lifebuoy,
-  PenNib,
-  SunHorizon,
-  type Icon,
-} from "@phosphor-icons/react";
+import { Compass } from "@phosphor-icons/react";
 import { BADGES } from "@/lib/achievements";
 
-/** Badges with real art in public/art/badges/<id>.webp. */
-const ART_IDS = new Set(["first-words", "hand-up", "said-anyway", "back-again", "out-in-the-wild", "calm-captain"]);
-
-/** Neutral die-cut placeholders for badges without art yet, one icon per badge. */
-const PLACEHOLDER_ICONS: Record<string, Icon> = {
-  "typed-first": Keyboard,
-  "rescue-ready": Lifebuoy,
-  "room-explorer": Compass,
-  "my-own-step": PenNib,
-  "then-and-now": ClockCounterClockwise,
-  dawn: SunHorizon,
-};
+/** Every badge has art in public/art/badges/<id>.webp; an unknown id falls back to a neutral icon. */
+const ART_IDS = new Set(BADGES.map((b) => b.id));
 
 const titleOf = (badgeId: string) => BADGES.find((b) => b.id === badgeId)?.title ?? badgeId;
 
 /**
  * A die-cut sticker for one badge. Earned: white 4px outline and a soft
- * shadow, art in colour when it exists, a neutral (not amber) placeholder
- * with a matching Phosphor icon when it does not; amber is reserved for
- * buttons, lit stones, the current nav item and glow. Unearned: a faint
- * stone-dim ring around a desaturated, low-opacity trace of the same badge
- * (the art itself grayscale and dim, or the same placeholder icon in
- * outline style) so the shape is recognisable but clearly not earned yet.
+ * shadow, art in colour (a neutral icon only for an unknown id). Unearned:
+ * a faint stone-dim ring around a grayscale, low-opacity trace of the same
+ * art, so the shape is recognisable but clearly not earned yet.
  */
 export function Sticker({
   badgeId,
@@ -48,7 +27,7 @@ export function Sticker({
 }) {
   const title = titleOf(badgeId);
   const hasArt = ART_IDS.has(badgeId);
-  const PlaceholderIcon = PLACEHOLDER_ICONS[badgeId] ?? Compass;
+  const PlaceholderIcon = Compass;
   const loading = eager ? "eager" : "lazy";
 
   if (!earned) {

@@ -7,7 +7,7 @@ export type StoneState = "lit" | "current" | "dim";
 export type CropBox = { x: number; y: number; w: number; h: number };
 
 /** "island" fills the frame with just the island (used by PathStones, so stones do not collide on a small phone). "wide" is a gentler crop for screens that want more of the scene (e.g. Home on a laptop); defaults to the full art. */
-export type CropKind = "island" | "wide";
+export type CropKind = "island" | "wide" | "step";
 
 export type Scene = {
   /** Path under public/, e.g. "/art/home-class.webp". */
@@ -23,12 +23,8 @@ export type Scene = {
   stones: { x: number; y: number }[];
   /** Step 6: the destination hotspot (a box, as percentages of the full art), lit when the mission is done. */
   destination: { x: number; y: number; w: number; h: number; label: string };
-  /**
-   * True while this scene's art is a stand-in (Friends and Presenting point at
-   * the map's island art, not dedicated room art) and its stone coordinates
-   * were measured on that stand-in. Re-measure once dedicated art lands.
-   */
-  provisional?: boolean;
+  /** Optional art for the practice step banner (e.g. the classroom); falls back to the island crop of `art`. */
+  step?: { art: string; width: number; height: number; focus: CropBox };
 };
 
 const FULL_ART: CropBox = { x: 0, y: 0, w: 100, h: 100 };
@@ -58,52 +54,52 @@ export const SCENES: Record<RoomId, Scene> = {
       { x: 59.7, y: 21.7 },
     ],
     destination: { x: 60.2, y: 11.8, w: 9, h: 9, label: "the school door" },
+    step: { art: "/art/step-class.webp", width: 1536, height: 1024, focus: { x: 12, y: 2, w: 76, h: 42 } },
   },
-  // Friends: dedicated room art is not generated yet (Task 1 gap). Uses the
-  // map's Friends island cutout, which already has 6 blank stepping stones
-  // baked into the art in a ring around the cottage; the code stones sit on
-  // top of 5 of them (measured with /dev/scenes, going around the ring from
-  // the far side to the one nearest the door), with the door itself as the
-  // destination hotspot.
+  // Friends: a park island (oak, picnic table), the dirt path ends at the
+  // gazebo. Coordinates measured on the real art with a percent grid.
   friends: {
-    art: "/art/island-friends.webp",
-    width: 2400,
-    height: 2664,
-    islandFocus: { x: 12, y: 15, w: 66, h: 55 },
+    art: "/art/room-friends.webp",
+    width: 1536,
+    height: 1024,
+    islandFocus: { x: 38, y: 10, w: 34, h: 42 },
     wideFocus: FULL_ART,
     stones: [
-      { x: 22, y: 41.1 },
-      { x: 22.5, y: 55.8 },
-      { x: 34.4, y: 60.9 },
-      { x: 56.5, y: 60.9 },
-      { x: 68.6, y: 55.8 },
+      { x: 49, y: 43.5 },
+      { x: 54, y: 39.5 },
+      { x: 58, y: 35 },
+      { x: 62, y: 31.5 },
+      { x: 65, y: 26.5 },
     ],
-    destination: { x: 41.4, y: 23, w: 14, h: 10, label: "the friends' door" },
-    provisional: true,
+    destination: { x: 61.5, y: 12, w: 9, h: 13, label: "the gazebo" },
   },
-  // Presenting: same situation as Friends. Uses the map's Presenting island
-  // cutout, which has 6 blank stepping stones around the little stage;
-  // coordinates measured the same way with /dev/scenes.
+  // Presenting: a small open-air stage with benches; the path ends at the
+  // stage steps. Measured the same way.
   presenting: {
-    art: "/art/island-presenting.webp",
-    width: 2400,
-    height: 2690,
-    islandFocus: { x: 17, y: 3, w: 62, h: 54 },
+    art: "/art/room-presenting.webp",
+    width: 1536,
+    height: 1024,
+    islandFocus: { x: 36, y: 9, w: 34, h: 43 },
     wideFocus: FULL_ART,
     stones: [
-      { x: 26.1, y: 28.5 },
-      { x: 27.4, y: 37.8 },
-      { x: 41.5, y: 44.9 },
-      { x: 54.9, y: 44.9 },
-      { x: 69.8, y: 37.8 },
+      { x: 48.3, y: 44.5 },
+      { x: 53, y: 40.2 },
+      { x: 56.2, y: 36 },
+      { x: 54.5, y: 31.2 },
+      { x: 52.9, y: 26 },
     ],
-    destination: { x: 30.5, y: 11, w: 16, h: 10, label: "the stage" },
-    provisional: true,
+    destination: { x: 45.5, y: 11.5, w: 14.5, h: 14.5, label: "the stage" },
   },
 };
 
 export function sceneCrop(scene: Scene, crop: CropKind): CropBox {
+  if (crop === "step") return scene.step?.focus ?? scene.islandFocus;
   return crop === "island" ? scene.islandFocus : scene.wideFocus;
+}
+
+/** The art file for a crop: the step banner has its own art when the scene defines one. */
+export function sceneArt(scene: Scene, crop: CropKind): string {
+  return crop === "step" && scene.step ? scene.step.art : scene.art;
 }
 
 /** Maps a point given as a percentage of the full art into a percentage of the given crop frame. */
