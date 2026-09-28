@@ -3,13 +3,14 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ArrowRight, Eye, Lifebuoy, UsersThree, X } from "@phosphor-icons/react";
+import { ArrowRight, ChatCircleDots, Mountains, UsersThree, X } from "@phosphor-icons/react";
 import { logEvent } from "@/lib/state";
 import { act } from "@/lib/store";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Button } from "@/components/ui/button";
 import { BreathingLantern } from "./breathing-lantern";
 import { Grounding } from "./grounding";
+import { PauseMark } from "./pause-mark";
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
 
@@ -108,12 +109,12 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-labelledby="panic-title"
-      className="fixed inset-0 z-50 overflow-y-auto bg-canvas"
+      className="fixed inset-0 z-50 overflow-y-auto bg-[color-mix(in_srgb,var(--calm)_9%,var(--canvas))]"
     >
       <div className="relative mx-auto flex min-h-full max-w-[900px] flex-col px-4 pb-10 pt-6 md:pt-10">
         <header className="flex items-start justify-between gap-4 text-ink">
           <div className="flex items-start gap-3">
-            <Lifebuoy size={36} weight="regular" aria-hidden className="mt-1 shrink-0 text-help" />
+            <PauseMark size={36} className="mt-1 shrink-0 text-help" />
             <div>
               <h1 id="panic-title" ref={headingRef} tabIndex={-1} className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] outline-none">
                 Need a pause
@@ -132,42 +133,47 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
           ) : (
             <>
               <BreathingLantern reduce={reduce} tone="calm" />
-              <p className="mt-2 text-center text-ink">You are safe. This feeling will pass.</p>
+              <p className="mt-3 text-center text-lg text-ink">You are safe. This feeling will pass.</p>
             </>
           )}
         </div>
 
         {!grounding ? (
-          <div className="mx-auto mt-5 grid w-full max-w-[760px] gap-3 md:grid-cols-2">
-            <button
-              ref={groundingTile}
-              type="button"
-              onClick={() => setGrounding(true)}
-              className="flex min-h-11 items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-4 text-left shadow-card transition-colors duration-[var(--dur-ui)] hover:bg-surface-2 active:bg-line/60"
-            >
-              <span aria-hidden className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-calm text-surface">
-                <Eye size={30} weight="regular" />
-              </span>
-              <span className="flex-1">
-                <span className="block font-display text-xl font-bold text-ink">5-4-3-2-1</span>
-                <span className="block text-muted">Ground yourself in the present.</span>
-              </span>
-              <ArrowRight size={22} weight="regular" aria-hidden className="text-ink" />
-            </button>
-            <Link
-              href="/help"
-              className="flex min-h-11 items-center gap-4 rounded-card bg-surface p-4 shadow-card transition-colors duration-[var(--dur-ui)] hover:bg-surface-2 active:bg-line/60"
-            >
-              <span aria-hidden className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-chrome text-on-chrome">
-                <UsersThree size={30} weight="regular" />
-              </span>
-              <span className="flex-1">
-                <span className="block font-display text-xl font-bold text-ink">Talk to someone</span>
-                <span className="block text-muted">Free support lines, any time.</span>
-              </span>
-              <ArrowRight size={22} weight="regular" aria-hidden className="text-ink" />
-            </Link>
-          </div>
+          <>
+            <h2 className="mx-auto mt-8 w-full max-w-[760px] text-xl text-ink">When you are ready</h2>
+            <div className="mx-auto mt-3 grid w-full max-w-[760px] gap-3 md:grid-cols-3">
+              <button ref={groundingTile} type="button" onClick={() => setGrounding(true)} className="flex min-h-11 items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-4 text-left shadow-card transition-[transform,border-color] duration-[var(--dur-ui)] hover:-translate-y-0.5 hover:border-stone-dim">
+                <span aria-hidden className="flex size-12 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker bg-lime">
+                  <Mountains size={24} weight="bold" />
+                </span>
+                <span className="flex-1">
+                  <span className="block font-display text-lg font-bold text-ink">5-4-3-2-1</span>
+                  <span className="block text-sm text-muted">Come back to right here.</span>
+                </span>
+                <ArrowRight size={20} weight="bold" aria-hidden className="text-muted" />
+              </button>
+              <Link href="/kit/rescue" className="flex min-h-11 items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-4 text-left shadow-card transition-[transform,border-color] duration-[var(--dur-ui)] hover:-translate-y-0.5 hover:border-stone-dim">
+                <span aria-hidden className="flex size-12 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker bg-sun">
+                  <ChatCircleDots size={24} weight="bold" />
+                </span>
+                <span className="flex-1">
+                  <span className="block font-display text-lg font-bold text-ink">Rescue phrases</span>
+                  <span className="block text-sm text-muted">Words for when your mind goes blank.</span>
+                </span>
+                <ArrowRight size={20} weight="bold" aria-hidden className="text-muted" />
+              </Link>
+              <Link href="/help" className="flex min-h-11 items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-4 text-left shadow-card transition-[transform,border-color] duration-[var(--dur-ui)] hover:-translate-y-0.5 hover:border-stone-dim">
+                <span aria-hidden className="flex size-12 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker bg-sky">
+                  <UsersThree size={24} weight="bold" />
+                </span>
+                <span className="flex-1">
+                  <span className="block font-display text-lg font-bold text-ink">Talk to someone</span>
+                  <span className="block text-sm text-muted">Free support lines, any time.</span>
+                </span>
+                <ArrowRight size={20} weight="bold" aria-hidden className="text-muted" />
+              </Link>
+            </div>
+          </>
         ) : null}
       </div>
     </div>

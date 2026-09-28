@@ -21,8 +21,8 @@
   --stone-dim: #7a9195;
   --focus: #1f6fd1;
   /* Need a pause and the calm tools: a quiet blue, never the teal of progress. */
-  --calm: #2f6fae;
-  --help: #2f6fae;
+  --calm: #265a8f;
+  --help: #265a8f;
   --on-help: #ffffff;
   --chrome-edge: transparent;
   /* Sticker inks (flat, bright, always with ink text) and the white die-cut border. */
@@ -330,4 +330,20 @@ a {
     box-shadow: var(--sticker-shadow);
     overflow: hidden;
   }
+}
+
+/* Speech tools, easy start: the sound grows gently from nothing, once per word. */
+@keyframes swell {
+  from {
+    transform: scaleX(0.06);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+.swell {
+  transform-origin: left center;
+  animation: swell 2.4s cubic-bezier(0.6, 0, 0.4, 1) both;
 }

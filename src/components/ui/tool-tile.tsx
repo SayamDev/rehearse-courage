@@ -1,60 +1,46 @@
-import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, type Icon } from "@phosphor-icons/react";
+import { ArrowRight, Clock, type Icon } from "@phosphor-icons/react";
 
 /**
- * One body-kit tool: round illustration, title, one line of copy, an arrow
- * and a small "helps with" chip. Matches the two-column tile grid on the
- * kit comp. The whole tile is the link, so touch targets stay generous.
+ * One Body kit tool: a sticker icon, the title, one line on what it is for,
+ * and roughly how long it takes. The whole tile is the link.
  */
 export function ToolTile({
   href,
-  art,
+  icon: IconCmp,
+  ink,
   title,
   line,
-  helps,
-  eager = false,
-  icon: IconCmp,
+  time,
 }: {
   href: string;
-  /** Round illustration, or null to show `icon` on a quiet fill until art exists. */
-  art: string | null;
-  icon?: Icon;
+  icon: Icon;
+  /** The sticker's background class, e.g. "bg-sky". */
+  ink: string;
   title: string;
   line: string;
-  helps: string;
-  /** Load the art immediately instead of lazily, for a tile shown above the fold. */
-  eager?: boolean;
+  time: string;
 }) {
   return (
     <Link
       href={href}
-      className="group flex items-center gap-4 rounded-card border border-line bg-surface p-4 transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-surface-2 active:bg-surface-2 focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
+      className="group flex h-full items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-4 shadow-card transition-[transform,border-color] duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-stone-dim"
     >
-      <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-full bg-surface-2">
-        {art ? (
-          <Image src={art} alt="" fill sizes="64px" loading={eager ? "eager" : "lazy"} className="object-cover" />
-        ) : IconCmp ? (
-          <span className="flex h-full w-full items-center justify-center text-ink">
-            <IconCmp size={30} weight="regular" aria-hidden />
-          </span>
-        ) : null}
+      <span
+        aria-hidden
+        className={`flex size-14 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker transition-transform duration-[var(--dur-ui)] group-hover:rotate-0 ${ink}`}
+      >
+        <IconCmp size={28} weight="bold" />
       </span>
       <span className="min-w-0 flex-1">
-        <span className="flex items-center justify-between gap-2">
-          <span className="font-display text-lg font-bold text-ink">{title}</span>
-          <ArrowRight
-            size={20}
-            weight="regular"
-            aria-hidden
-            className="shrink-0 text-muted transition-transform duration-[var(--dur-ui)] ease-[var(--ease-out)] group-hover:translate-x-0.5"
-          />
-        </span>
-        <span className="mt-0.5 block text-sm text-muted">{line}</span>
-        <span className="mt-2 inline-block rounded-full bg-surface-2 px-3 py-1 text-xs font-semibold text-ink">
-          {helps}
+        <span className="block font-display text-lg font-bold leading-tight text-ink">{title}</span>
+        <span className="mt-0.5 block text-muted">{line}</span>
+        <span className="mt-1.5 inline-flex items-center gap-1 text-sm font-semibold text-ink">
+          <Clock size={16} weight="bold" aria-hidden />
+          {time}
         </span>
       </span>
+      <ArrowRight size={20} weight="bold" aria-hidden className="shrink-0 text-muted transition-transform duration-[var(--dur-ui)] group-hover:translate-x-0.5" />
     </Link>
   );
 }

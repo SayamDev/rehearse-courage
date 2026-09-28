@@ -20,7 +20,7 @@ test("first visit, first step, step done, back to the map", async ({ page }) => 
   await welcome.getByRole("button", { name: "Let's start" }).click();
   await expect(welcome).toBeHidden();
   await expect(page.getByText("Hi Sam, today's one step")).toBeVisible();
-  await page.getByRole("link", { name: "Start" }).click();
+  await page.getByRole("link", { name: "Start", exact: true }).click();
 
   await expect(page).toHaveURL(/\/step\/[\w-]+\?level=1/);
   await page.getByRole("button", { name: "I've thought of it" }).click();

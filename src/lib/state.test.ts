@@ -1,5 +1,6 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, it, test } from "vitest";
 import {
+  toggleSavedPhrase,
   DEFAULT_STATE,
   addCustomStep,
   logEvent,
@@ -226,5 +227,16 @@ describe("person's name", () => {
   test("a saved name survives a backup round trip", () => {
     const s = setName(normalize({}), "Sam");
     expect(importBackup(exportBackup(s)).name).toBe("Sam");
+  });
+});
+
+describe("toggleSavedPhrase", () => {
+  it("stars and un-stars a phrase, and old saves start with none", () => {
+    const s = normalize({});
+    expect(s.savedPhrases).toEqual([]);
+    const on = toggleSavedPhrase(s, "come-back");
+    expect(on.savedPhrases).toEqual(["come-back"]);
+    expect(toggleSavedPhrase(on, "come-back").savedPhrases).toEqual([]);
+    expect(normalize({ savedPhrases: ["a", "a", 3] }).savedPhrases).toEqual(["a"]);
   });
 });

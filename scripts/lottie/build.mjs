@@ -6,6 +6,9 @@
 // Run: node scripts/lottie/build.mjs [extra output dir for the Skottie player]
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { loadType } from "./type.mjs";
+
+const type = loadType(join(process.cwd(), "scripts/lottie/fonts/Bricolage.ttf"));
 
 const FR = 60;
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255).concat(1);
@@ -358,6 +361,209 @@ function badges() {
   return doc("Badges medal", 400, 400, op, [sparkles, medal]);
 }
 
+/* ---------- Kinetic type ---------- */
+
+// Type colour flips with the theme, so every type piece is built twice.
+const THEMES = { light: { ink: hex("#13262b"), muted: hex("#4c6166") }, dark: { ink: hex("#eaf4f3"), muted: hex("#a7bbbd") } };
+
+/**
+ * One line of vector type as a layer, every letter its own group so it can
+ * move on its own. `motion` is "rise" (letters rise and fade in) or "pop"
+ * (letters scale up past full size and settle). Letters stagger from `start`.
+ */
+function typeLayer(nm, text, { x, y, size, weight = 800, color, start = 0, stagger = 3, dur = 22, motion = "rise", op }) {
+  const t = type(text, { size, weight });
+  const cy = -t.capHeight / 2;
+  const letters = t.glyphs.map((g, k) => {
+    const t0 = start + k * stagger;
+    const base = { a: [g.cx, cy], o: anim([[t0, 0, EASE.settle], [t0 + Math.round(dur * 0.5), 100]]) };
+    const move =
+      motion === "rise"
+        ? { p: anim([[t0, [g.cx, cy + size * 0.45], EASE.settle], [t0 + dur, [g.cx, cy]]]) }
+        : {
+            p: [g.cx, cy],
+            s: anim([[t0, [20, 20], EASE.pop], [t0 + Math.round(dur * 0.55), [114, 114], EASE.settle], [t0 + dur, [100, 100]]]),
+            r: anim([[t0, k % 2 ? 10 : -10, EASE.settle], [t0 + dur, 0]]),
+          };
+    return group(`letter ${g.char}`, [...g.shapes, fill(color)], { ...base, ...move });
+  });
+  return { layer: layer(nm, letters, { op, ks: { p: [x, y, 0] } }), width: t.width, capHeight: t.capHeight };
+}
+
+/** A marker sweep behind a word: a rounded sticker bar that wipes in from the left. */
+function sweep(nm, { x, y, w, h, color, start, dur = 18, tilt = -2, op }) {
+  return layer(
+    nm,
+    [
+      group("bar", [{ ty: "rc", d: 1, p: fixed([w / 2, 0]), s: fixed([w, h]), r: fixed(h / 2) }, fill(color), stroke(C.white, 6)], {
+        s: anim([[start, [0, 100], EASE.settle], [start + dur, [100, 100]]]),
+      }),
+    ],
+    { op, ks: { p: [x, y, 0], r: tilt } },
+  );
+}
+
+/** First visit: "Speak up, / one small step / at a time." rising in, with a sun sweep behind "small". */
+function welcome(theme) {
+  ind = 0;
+  const op = 150;
+  const { ink } = THEMES[theme];
+  const size = 76;
+  const lh = 88;
+  const x = 24;
+  const l1 = typeLayer("line 1", "Speak up,", { x, y: 84, size, color: ink, start: 2, op });
+  const pre = type("one ", { size }).width;
+  const l2a = typeLayer("line 2a", "one ", { x, y: 84 + lh, size, color: ink, start: 22, op });
+  const l2b = typeLayer("small", "small", { x: x + pre, y: 84 + lh, size, color: hex("#13262b"), start: 30, op, motion: "pop" });
+  const smallW = type("small", { size }).width;
+  const l2c = typeLayer("line 2c", " step", { x: x + pre + smallW, y: 84 + lh, size, color: ink, start: 44, op });
+  const l3 = typeLayer("line 3", "at a time.", { x, y: 84 + lh * 2, size, color: ink, start: 58, op });
+  const bar = sweep("sweep", { x: x + pre - 10, y: 84 + lh - l2b.capHeight / 2 + 4, w: smallW + 20, h: l2b.capHeight + 34, color: C.sun, start: 24, op });
+  return doc("Welcome", 640, 300, op, [l1.layer, l2a.layer, l2b.layer, l2c.layer, l3.layer, bar]);
+}
+
+/** Step done: a teal check pops, then "That took / courage." stamps in letter by letter, underlined in sun. */
+function courage(theme) {
+  ind = 0;
+  const op = 120;
+  const { ink, muted } = THEMES[theme];
+  const cx = 110;
+  const cy = 130;
+  const check = layer(
+    "check",
+    [group("tick", [path([[-30, 2], [-8, 24], [34, -22]]), trim(anim([[12, 0, EASE.settle], [30, 100]])), stroke(C.ink, 14)])],
+    { op, ks: { p: [cx, cy, 0] } },
+  );
+  const disc = layer("disc", [group("disc", [el([0, 0], [150, 150]), fill(C.teal), stroke(C.white, 12)])], {
+    op,
+    ks: { p: [cx, cy, 0], s: anim([[0, [0, 0, 100], EASE.pop], [14, [112, 112, 100], EASE.settle], [26, [100, 100, 100]]]), r: anim([[0, -24, EASE.pop], [26, -6]]) },
+  });
+  const inks = [C.sun, C.sky, C.coral, C.grape, C.lime, C.sun];
+  const burst = layer(
+    "burst",
+    inks.map((c, i) => {
+      const a = (i / inks.length) * Math.PI * 2 - Math.PI / 2;
+      return group(`dot ${i}`, [el([0, 0], [16, 16]), fill(c), stroke(C.white, 4)], {
+        p: anim([[8, [0, 0], EASE.settle], [40, [Math.cos(a) * 112, Math.sin(a) * 112]]]),
+        s: anim([[8, [40, 40], EASE.settle], [26, [100, 100], EASE.exit], [52, [0, 0]]]),
+      });
+    }),
+    { op, ks: { p: [cx, cy, 0] } },
+  );
+  const tx = 222;
+  const top = typeLayer("that took", "That took", { x: tx, y: 104, size: 40, weight: 700, color: muted, start: 16, stagger: 2, op });
+  const big = typeLayer("courage", "courage.", { x: tx, y: 186, size: 80, color: ink, start: 26, stagger: 3, dur: 20, motion: "pop", op });
+  const under = layer(
+    "underline",
+    [group("swoosh", [path([[0, 0], [big.width - 20, -4]], false, [[0, 0], [-60, 8]], [[60, 10], [0, 0]]), trim(anim([[56, 0, EASE.settle], [76, 100]])), stroke(C.sun, 12)])],
+    { op, ks: { p: [tx + 6, 208, 0] } },
+  );
+  return doc("That took courage", 640, 260, op, [check, disc, burst, top.layer, big.layer, under]);
+}
+
+/** Map: the six steps of every situation as rising stair blocks, labelled, with a lantern that hops to the top. */
+function ladder(theme) {
+  ind = 0;
+  const op = 180;
+  const { ink } = THEMES[theme];
+  const labels = [["Think it"], ["Type or", "whisper it"], ["Say it out", "loud, alone"], ["Say it to", "the coach"], ["With a little", "pressure"], ["Try it", "for real"]];
+  const inks = [C.sky, C.lime, C.sun, C.grape, C.coral, C.teal];
+  const W = 960;
+  const colW = 150;
+  const x0 = 45;
+  const floor = 320;
+  const layers = [];
+  const tops = [];
+  labels.forEach((lines, k) => {
+    const cx = x0 + k * colW + colW / 2;
+    const h = 56 + k * 34;
+    const t0 = 6 + k * 9;
+    tops.push([cx, floor - h]);
+    const n = type(String(k + 1), { size: 40 });
+    layers.push(
+      typeLayer(`number ${k + 1}`, String(k + 1), { x: cx - n.width / 2, y: floor - h + 50, size: 40, color: hex("#13262b"), start: t0 + 12, op, motion: "pop" }).layer,
+    );
+    layers.push(
+      layer(`step ${k + 1}`, [group("block", [{ ty: "rc", d: 1, p: fixed([0, -h / 2]), s: fixed([colW - 18, h]), r: fixed(18) }, fill(inks[k]), stroke(C.white, 8)])], {
+        op,
+        ks: { p: [cx, floor, 0], s: anim([[t0, [100, 0, 100], EASE.pop], [t0 + 16, [100, 108, 100], EASE.settle], [t0 + 26, [100, 100, 100]]]) },
+      }),
+    );
+    lines.forEach((text, j) => {
+      const t = type(text, { size: 21, weight: 650 });
+      layers.push(typeLayer(`label ${k + 1}.${j + 1}`, text, { x: cx - t.width / 2, y: floor + 38 + j * 26, size: 21, weight: 650, color: ink, start: t0 + 18, stagger: 1, dur: 16, op }).layer);
+    });
+  });
+  // The lantern hops up the stairs, one arc per step, and rests beside the flag.
+  const hopStart = 84;
+  const hop = [];
+  tops.forEach(([x, y], k) => {
+    const t = hopStart + k * 14;
+    if (k > 0) hop.push([t - 7, [(tops[k - 1][0] + x) / 2, Math.min(tops[k - 1][1], y) - 46], EASE.settle]);
+    hop.push([t, [x - 30, y - 20], EASE.exit]);
+  });
+  const lantern = layer(
+    "lantern",
+    [
+      group("glow", [el([0, 0], [56, 56]), fill(C.sun, 30)]),
+      group("light", [el([0, 0], [26, 26]), fill(C.sun), stroke(C.white, 5)]),
+    ],
+    { op, ks: { p: anim([[0, [tops[0][0] - 30, tops[0][1] - 20], EASE.travel], ...hop]), o: anim([[hopStart - 8, 0, EASE.settle], [hopStart, 100]]) } },
+  );
+  const [fx, fy] = tops[5];
+  const flag = layer(
+    "flag",
+    [
+      group("cloth", [path([[4, -64], [44, -52], [4, -40]], true), fill(C.coral), stroke(C.white, 5)]),
+      group("pole", [path([[0, 0], [0, -66]]), stroke(ink, 5)]),
+    ],
+    { op, ks: { p: [fx + 22, fy, 0], s: anim([[70, [100, 0, 100], EASE.pop], [84, [100, 110, 100], EASE.settle], [92, [100, 100, 100]]]) } },
+  );
+  return doc("The courage ladder", W, 420, op, [lantern, flag, ...layers]);
+}
+
+/** Phones: the same ladder as a diagonal staircase climbing up to the right, each label beside its step. */
+function ladderTall(theme) {
+  ind = 0;
+  const op = 180;
+  const { ink } = THEMES[theme];
+  const labels = ["Think it", "Type or whisper it", "Say it out loud", "Say it to the coach", "A little pressure", "Try it for real"];
+  const inks = [C.sky, C.lime, C.sun, C.grape, C.coral, C.teal];
+  const size = 76;
+  const gap = 104;
+  const layers = [];
+  const tops = [];
+  labels.forEach((text, k) => {
+    const x = 40 + k * 34;
+    const y = 700 - k * gap;
+    const t0 = 6 + k * 9;
+    const cx = x + size / 2;
+    tops.push([cx, y - size]);
+    const n = type(String(k + 1), { size: 38 });
+    layers.push(typeLayer(`number ${k + 1}`, String(k + 1), { x: cx - n.width / 2, y: y - size / 2 + 13, size: 38, color: hex("#13262b"), start: t0 + 10, op, motion: "pop" }).layer);
+    layers.push(
+      layer(`step ${k + 1}`, [group("block", [{ ty: "rc", d: 1, p: fixed([0, -size / 2]), s: fixed([size, size]), r: fixed(20) }, fill(inks[k]), stroke(C.white, 8)])], {
+        op,
+        ks: { p: [cx, y, 0], s: anim([[t0, [0, 0, 100], EASE.pop], [t0 + 14, [110, 110, 100], EASE.settle], [t0 + 24, [100, 100, 100]]]), r: k % 2 ? 3 : -3 },
+      }),
+    );
+    layers.push(typeLayer(`label ${k + 1}`, text, { x: x + size + 26, y: y - size / 2 + 12, size: 34, weight: 700, color: ink, start: t0 + 14, stagger: 1, dur: 16, op }).layer);
+  });
+  const hopStart = 84;
+  const hop = [];
+  tops.forEach(([x, y], k) => {
+    const t = hopStart + k * 14;
+    if (k > 0) hop.push([t - 7, [(tops[k - 1][0] + x) / 2 - 40, y - 30], EASE.settle]);
+    hop.push([t, [x - 58, y + 8], EASE.exit]);
+  });
+  const lantern = layer(
+    "lantern",
+    [group("glow", [el([0, 0], [52, 52]), fill(C.sun, 30)]), group("light", [el([0, 0], [24, 24]), fill(C.sun), stroke(C.white, 5)])],
+    { op, ks: { p: anim([[0, [tops[0][0] - 58, tops[0][1] + 8], EASE.travel], ...hop]), o: anim([[hopStart - 8, 0, EASE.settle], [hopStart, 100]]) } },
+  );
+  return doc("The courage ladder, tall", 600, 740, op, [lantern, ...layers]);
+}
+
 const out = [join(process.cwd(), "public/lottie")];
 const player = process.argv[2];
 mkdirSync(out[0], { recursive: true });
@@ -365,8 +571,15 @@ writeFileSync(join(out[0], "firefly.json"), JSON.stringify(firefly()));
 writeFileSync(join(out[0], "step-done.json"), JSON.stringify(stepDone()));
 writeFileSync(join(out[0], "kit.json"), JSON.stringify(kit()));
 writeFileSync(join(out[0], "badges.json"), JSON.stringify(badges()));
+for (const theme of ["light", "dark"]) {
+  const suffix = theme === "dark" ? "-dark" : "";
+  writeFileSync(join(out[0], `welcome${suffix}.json`), JSON.stringify(welcome(theme)));
+  writeFileSync(join(out[0], `courage${suffix}.json`), JSON.stringify(courage(theme)));
+  writeFileSync(join(out[0], `ladder${suffix}.json`), JSON.stringify(ladder(theme)));
+  writeFileSync(join(out[0], `ladder-tall${suffix}.json`), JSON.stringify(ladderTall(theme)));
+}
 if (player) {
-  for (const [scene, make] of [["scene-1", firefly], ["scene-2", stepDone], ["scene-3", kit], ["scene-4", badges]]) {
+  for (const [scene, make] of [["scene-1", firefly], ["scene-2", stepDone], ["scene-3", kit], ["scene-4", badges], ["scene-5", () => welcome("light")], ["scene-6", () => courage("light")], ["scene-7", () => ladder("light")], ["scene-8", () => ladderTall("light")]]) {
     const dir = join(player, "public/projects/courage", scene);
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "lottie.json"), JSON.stringify(make(), null, 1));

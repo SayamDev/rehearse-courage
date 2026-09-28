@@ -45,11 +45,18 @@ Top bar on every page: teal sticker wordmark, section links from 768px, Need a p
 - `ProgressTrack`: the six steps of a situation as numbered dots joined by a line (done = teal sticker, current = teal ring, later = grey, step 6 = a flag). Buttons on the room screen.
 - `Companion`: the painted firefly still in a round die-cut frame, with a soft sun glow that grows with courage.
 - `ArtHeader`: page title, short line, optional Lottie beside it.
+- Need a pause: a soft blue pill with the pause mark (a dot in two rings, the shape of the breathing circle it opens). The pause screen is tinted blue, with the breathing circle (rings, a growing fill and a gentle count) and three next options.
+- Body kit: two groups ("Calm your body", "Find your words"), each tool a tile with a sticker icon and how long it takes. Tools are hands-on: grounding counts what you notice, rescue phrases can be starred and heard back, sentence frames have inline gaps, speech tools have a practice word, a pacer or a gentle-start bar. `SayAndListen` records to memory only, to listen back.
 - `Lottie`: plays `public/lottie/*.json`, built by `scripts/lottie/build.mjs` and checked in the Skottie player.
 
 ## Motion
 
-- Lottie, built in code: `step-done` (teal check with a sticker burst, once), `kit` (a calm disc breathing, 8s loop), `badges` (a swaying medal with sparkles, 4s loop), `firefly` (a vector firefly, spare).
+- Lottie, built in code by `scripts/lottie/build.mjs`, verified in the Skottie player. Type in Lottie is real Bricolage Grotesque turned into vector paths at build time (`scripts/lottie/type.mjs`, fontkit), so every letter can move on its own and no font loads at runtime. Pieces with type have a `-dark.json` twin.
+  - `welcome`: first visit, "Speak up, / one small step / at a time." rising in, a sun sweep behind "small".
+  - `courage`: step done, a teal check pops, then "That took courage." stamps in letter by letter with a sun underline.
+  - `ladder` / `ladder-tall`: Map, the six steps as rising blocks (a diagonal staircase on phones), with a lantern hopping to the top.
+  - `badges`: Badges header, a swaying medal with sparkles. `firefly`, `step-done`, `kit`: spare.
+- Lottie starts when half of it is on screen, plays once (loops only where noted).
 - UI: 180 to 240ms ease-out; hover lifts a sticker by a pixel.
 - Reduced motion (device or Me): every Lottie shows its last frame and nothing loops.
 

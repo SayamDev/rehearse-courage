@@ -9,6 +9,7 @@ export const RETURNING = {
   name: null,
   nameAsked: true,
   voiceOffered: true,
+  savedPhrases: [],
   records: [],
   customSteps: [],
   events: [],

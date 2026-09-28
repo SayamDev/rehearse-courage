@@ -1,5 +1,5 @@
-import { describe, expect, test } from "vitest";
-import { braveDaysThisWeek, missionsDone, pointsFor, totalPoints } from "./courage";
+import { describe, expect, it, test } from "vitest";
+import { braveDaysThisWeek, braveWeek, missionsDone, pointsFor, totalPoints } from "./courage";
 import type { Level, StepRecord } from "./types";
 
 const rec = (level: Level, at: string, extra: Partial<StepRecord> = {}): StepRecord => ({
@@ -66,5 +66,18 @@ describe("brave days", () => {
     const records = [rec(1, new Date(2026, 8, 28, 9).toISOString())];
     expect(braveDaysThisWeek(records, new Date(2026, 9, 5, 9))).toBe(0);
     expect(totalPoints(records)).toBe(15);
+  });
+});
+
+describe("braveWeek", () => {
+  it("marks this week's brave days, Monday first, and knows today and the future", () => {
+    const now = new Date(2026, 8, 30, 12); // Wednesday
+    const rec = (d: Date) => ({ situationId: "class-answer", level: 1 as const, at: d.toISOString(), seconds: null, typed: false, roughDay: false });
+    const week = braveWeek([rec(new Date(2026, 8, 28, 9)), rec(new Date(2026, 8, 30, 8)), rec(new Date(2026, 8, 20, 9))], now);
+    expect(week.map((d) => d.label).join("")).toBe("MTWTFSS");
+    expect(week.map((d) => d.brave)).toEqual([true, false, true, false, false, false, false]);
+    expect(week[2].today).toBe(true);
+    expect(week[3].future).toBe(true);
+    expect(week[1].future).toBe(false);
   });
 });

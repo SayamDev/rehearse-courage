@@ -9,6 +9,7 @@ import { furthestInRoom, furthestLine, ROOM_LABEL } from "@/lib/rooms";
 import { useCourage } from "@/lib/store";
 import { ROOM_IDS, type RoomId } from "@/lib/types";
 import { ButtonLink } from "@/components/ui/button";
+import { Lottie } from "@/components/ui/lottie";
 import { PaperCard } from "@/components/ui/paper-card";
 import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
@@ -62,6 +63,22 @@ export function MapView() {
             <Island key={room} room={room} line={store.hydrated ? furthestLine(furthestInRoom(store.records, room)) : null} />
           ))}
         </ul>
+
+        <section aria-labelledby="ladder-heading" className="mt-10">
+          <h2 id="ladder-heading" className="text-2xl text-ink">
+            How every step works
+          </h2>
+          <p className="mt-1 max-w-[56ch] text-muted">Each situation climbs the same six steps, from thinking it to doing it for real. Go back down any time.</p>
+          <div className="mt-4 overflow-hidden rounded-card border-[1.5px] border-line bg-surface p-4 shadow-card sm:p-6">
+            <Lottie src="/lottie/ladder-tall.json" themed className="mx-auto aspect-[600/740] w-full max-w-[380px] sm:hidden" />
+            <Lottie src="/lottie/ladder.json" themed className="hidden aspect-[960/420] w-full sm:block" />
+            <ol className="sr-only">
+              {LEVELS.map((l) => (
+                <li key={l.level}>{l.name}</li>
+              ))}
+            </ol>
+          </div>
+        </section>
 
         {store.hydrated ? (
           <PaperCard className="mt-8 max-w-[640px] md:mt-10">
