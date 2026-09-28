@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { ArrowRight } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
 import { KIT_TOOLS } from "@/lib/content/body";
 import { useCourage } from "@/lib/store";
@@ -34,6 +36,16 @@ export function KitView() {
             </ul>
           </section>
         ))}
+        <Link
+          href="/games"
+          className="flex items-center justify-between gap-4 rounded-card border-2 border-dashed border-line p-5 transition-colors duration-[var(--dur-ui)] hover:border-stone-dim"
+        >
+          <span>
+            <span className="block font-display text-lg font-bold text-ink">Warm-up games</span>
+            <span className="block text-muted">Five quick games to warm up your voice before a step.</span>
+          </span>
+          <ArrowRight size={20} weight="bold" aria-hidden className="shrink-0 text-muted" />
+        </Link>
       </div>
     </div>
   );

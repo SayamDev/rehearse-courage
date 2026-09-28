@@ -347,3 +347,21 @@ a {
   transform-origin: left center;
   animation: swell 2.4s cubic-bezier(0.6, 0, 0.4, 1) both;
 }
+
+/* Story dice: each die tumbles in once. */
+@keyframes dice-roll {
+  0% {
+    transform: translateY(-18px) rotate(-160deg) scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: translateY(2px) rotate(8deg) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+  }
+}
+.dice-roll {
+  animation: dice-roll 520ms var(--ease-out) both;
+}

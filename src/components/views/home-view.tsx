@@ -6,11 +6,13 @@ import { stageFor, type Stage } from "@/lib/companion";
 import { braveWeek, missionsDone } from "@/lib/courage";
 import { dayKey } from "@/lib/dates";
 import { homeModel } from "@/lib/home";
+import { GAMES } from "@/lib/games";
 import { dailyQuests, questProgress } from "@/lib/quests";
 import { furthestInRoom, furthestLine, ROOM_LABEL } from "@/lib/rooms";
 import { situationById } from "@/lib/content/situations";
 import { useCourage } from "@/lib/store";
 import { ROOM_IDS, type RoomId } from "@/lib/types";
+import { GAME_META } from "@/components/games/game-meta";
 import { Companion } from "@/components/scene/companion";
 import { ProgressTrack } from "@/components/scene/progress-track";
 import { ButtonLink } from "@/components/ui/button";
@@ -118,6 +120,35 @@ export function HomeView() {
                   </Link>
                 </li>
               ))}
+            </ul>
+          </section>
+
+          <section aria-labelledby="games-heading">
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 id="games-heading" className="text-xl text-ink">
+                Warm up with a game
+              </h2>
+              <Link href="/games" className="font-semibold text-accent-text hover:underline">
+                All games
+              </Link>
+            </div>
+            <ul role="list" className="-mx-4 mt-3 flex list-none gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
+              {GAMES.map((g) => {
+                const { icon: GameIcon, ink } = GAME_META[g.id];
+                return (
+                  <li key={g.id} className="w-32 shrink-0 sm:w-auto">
+                    <Link
+                      href={`/games/${g.id}`}
+                      className="group flex h-full flex-col items-center gap-2 rounded-card border-[1.5px] border-line bg-surface px-2 py-4 text-center shadow-card transition-[transform,border-color] duration-[var(--dur-ui)] hover:-translate-y-0.5 hover:border-stone-dim"
+                    >
+                      <span aria-hidden className={`${DISC} size-12 rotate-6 transition-transform group-hover:rotate-0 ${ink}`}>
+                        <GameIcon size={24} weight="bold" />
+                      </span>
+                      <span className="text-sm font-semibold leading-tight text-ink">{g.title}</span>
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </section>
 
