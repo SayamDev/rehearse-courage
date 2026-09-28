@@ -16,6 +16,7 @@ import { ProgressTrack } from "@/components/scene/progress-track";
 import { ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { pointsLabel } from "@/components/ui/stats-pill";
+import { Greeting } from "./greeting";
 import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
 /** Each island's sticker colour, used for its label wherever the room is named. */
@@ -64,10 +65,8 @@ export function HomeView() {
         <div className="shrink-0 lg:hidden">
           <Companion species={store.companion.species} stage={stage} size={72} />
         </div>
-        <div>
-          <h1 className="text-[clamp(1.75rem,1.2rem+2.4vw,3rem)] text-ink">
-            {store.name ? <>Hi {store.name}, today&apos;s one step</> : <>Today&apos;s one step</>}
-          </h1>
+        <div className="min-w-0 flex-1">
+          <Greeting name={store.name} />
           <p className="mt-1 text-muted">One small step is enough. Go at your own pace.</p>
         </div>
       </div>

@@ -1,0 +1,9 @@
+# Cloudflare serves these static files directly, without the app's own headers (next.config.ts).
+# Keep in sync with next.config.ts: the page is cross-origin isolated for on-device voices.
+/*
+  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Embedder-Policy: credentialless
+
+# The offline service worker must always be checked for updates.
+/sw.js
+  Cache-Control: no-cache

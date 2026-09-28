@@ -13,6 +13,7 @@ import { MAX_NAME, setAge, setHardThings, setName, updateSettings, type Settings
 import { saveBackupFile } from "@/lib/save-backup";
 import { act, clearEverything, useCourage } from "@/lib/store";
 import { Companion } from "@/components/scene/companion";
+import { InstallApp } from "@/components/shell/install-app";
 import { Button } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { StatsPill } from "@/components/ui/stats-pill";
@@ -270,6 +271,7 @@ export function MeView() {
               </Button>
             </div>
             <input ref={fileRef} type="file" accept="application/json,.json" onChange={restore} className="sr-only" tabIndex={-1} aria-hidden />
+            <InstallApp className="mt-4" />
             <p role="status" className="mt-3 min-h-[1.55em] text-ink">
               {message}
             </p>

@@ -67,3 +67,13 @@ test("/help shows fallback lines without a country header", async ({ page }) => 
   await expect(page.getByText("If you are in danger now, call your local emergency number.")).toBeVisible();
   await expect(page.getByText("Rehearse Courage is practice, not therapy.")).toBeVisible();
 });
+
+test("the app can be installed: a manifest with icons, and an offline page", async ({ page, request }) => {
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest.short_name).toBe("Courage");
+  expect(manifest.icons.length).toBeGreaterThan(1);
+  expect((await request.get("/icons/icon-512.png")).ok()).toBe(true);
+  expect((await request.get("/sw.js")).ok()).toBe(true);
+  await page.goto("/offline");
+  await expect(page.getByRole("heading", { name: "You are offline" })).toBeVisible();
+});

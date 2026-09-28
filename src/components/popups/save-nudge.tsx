@@ -7,6 +7,7 @@ import { saveBackupFile } from "@/lib/save-backup";
 import { updateSettings } from "@/lib/state";
 import { act, useCourage } from "@/lib/store";
 import { Companion } from "@/components/scene/companion";
+import { InstallApp } from "@/components/shell/install-app";
 import { Button } from "@/components/ui/button";
 import { openPopup, PopupBanner, PopupDialog } from "./popup-dialog";
 
@@ -115,6 +116,7 @@ export function SaveNudge({ quiet }: { quiet: boolean }) {
         )}
         <p className="mt-2 text-muted">A backup is one small file. Restore it in Me, on any device, to carry on where you left off.</p>
       </div>
+      <InstallApp />
 
       <form method="dialog" className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
         <label htmlFor={stopId} className="flex min-h-11 cursor-pointer items-center gap-3 text-ink">

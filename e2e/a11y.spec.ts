@@ -23,6 +23,7 @@ const ROUTES = [
   "/help?crisis=1&from=/map",
   "/privacy",
   "/about",
+  "/offline",
   "/?calm=1",
   "/no-such-page",
 ];
