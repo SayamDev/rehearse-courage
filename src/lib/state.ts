@@ -41,6 +41,8 @@ export type Settings = {
   playCoach: boolean;
   /** Off by default: read lines a little slower (kids already hear them about 10% slower). */
   slowerVoice: boolean;
+  /** Off by default: the companion sits beside you and practises too while you do a step (body doubling). */
+  bodyDouble: boolean;
 };
 
 export type CourageState = {
@@ -101,6 +103,7 @@ export const DEFAULT_STATE: CourageState = {
     saveNudgeOff: false,
     playCoach: true,
     slowerVoice: false,
+    bodyDouble: false,
   },
 };
 
@@ -180,6 +183,7 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = 
   "saveNudgeOff",
   "playCoach",
   "slowerVoice",
+  "bodyDouble",
 ];
 
 const THEMES: Theme[] = ["system", "light", "dark"];

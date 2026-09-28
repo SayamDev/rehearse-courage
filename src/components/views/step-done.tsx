@@ -68,7 +68,7 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
             <Companion species={store.companion.species} stage={result.stageAfter} size={64} />
           </div>
         ) : null}
-        <Lottie src="/lottie/courage.json" themed className="-ml-2 aspect-[640/260] w-full max-w-[440px]" />
+        <Lottie src="/lottie/courage.json" themed still={!store.settings.confetti} className="-ml-2 aspect-[640/260] w-full max-w-[440px]" />
         <ProgressTrack situationId={result.situationId} className="mx-auto mt-4 max-w-[420px]" />
         <div className="mt-6 flex items-center gap-4">
           {result.newBadges.length > 0 ? (
