@@ -571,6 +571,17 @@ writeFileSync(join(out[0], "firefly.json"), JSON.stringify(firefly()));
 writeFileSync(join(out[0], "step-done.json"), JSON.stringify(stepDone()));
 writeFileSync(join(out[0], "kit.json"), JSON.stringify(kit()));
 writeFileSync(join(out[0], "badges.json"), JSON.stringify(badges()));
+// Glyph atlas for type built in the browser (the Home greeting with the person's name).
+{
+  const chars = [...Array.from({ length: 95 }, (_, i) => String.fromCharCode(32 + i)), "’", "é", "è", "á", "à", "í", "ó", "ú", "ñ", "ç", "ö", "ü", "ä", "ë", "ï", "ş", "ğ", "ı"];
+  const atlas = { size: 100, capHeight: 0, glyphs: {} };
+  for (const c of chars) {
+    const t = type(c, { size: 100 });
+    atlas.capHeight = t.capHeight;
+    atlas.glyphs[c] = { w: +t.width.toFixed(2), s: t.glyphs[0]?.shapes ?? [] };
+  }
+  writeFileSync(join(out[0], "glyphs.json"), JSON.stringify(atlas));
+}
 for (const theme of ["light", "dark"]) {
   const suffix = theme === "dark" ? "-dark" : "";
   writeFileSync(join(out[0], `welcome${suffix}.json`), JSON.stringify(welcome(theme)));

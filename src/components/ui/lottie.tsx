@@ -13,18 +13,26 @@ function prefersReducedMotion(): boolean {
  * Always decorative: the text beside it says what happened.
  */
 /** Dark colours in use: picked in Me, or the device is dark and Me does not force light. */
-function isDark(): boolean {
+export function isDark(): boolean {
   const theme = document.documentElement.dataset.theme;
   return theme === "dark" || (theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 }
 
 export function Lottie({
   src,
+  data: given,
+  still = false,
   loop = false,
   themed = false,
   className = "",
+  style,
 }: {
-  src: string;
+  src?: string;
+  /** A document built in the browser, instead of a file (the Home greeting). */
+  data?: object;
+  /** Show the final frame without playing (e.g. already seen today). */
+  still?: boolean;
+  style?: React.CSSProperties;
   loop?: boolean;
   /** The animation has a "-dark.json" twin (type in light ink) for dark colours. */
   themed?: boolean;
@@ -38,10 +46,10 @@ export function Lottie({
     void (async () => {
       const [{ default: lottie }, data] = await Promise.all([
         import("lottie-web/build/player/lottie_light"),
-        fetch(themed && isDark() ? src.replace(/\.json$/, "-dark.json") : src).then((r) => r.json()),
+        given ?? fetch(themed && isDark() ? src!.replace(/\.json$/, "-dark.json") : src!).then((r) => r.json()),
       ]);
       if (!live || !ref.current) return;
-      const reduce = prefersReducedMotion();
+      const reduce = still || prefersReducedMotion();
       const anim = lottie.loadAnimation({
         container: ref.current,
         renderer: "svg",
@@ -74,7 +82,7 @@ export function Lottie({
       live = false;
       destroy?.();
     };
-  }, [src, loop, themed]);
+  }, [src, given, still, loop, themed]);
 
-  return <div ref={ref} aria-hidden className={className} />;
+  return <div ref={ref} aria-hidden className={className} style={style} />;
 }
