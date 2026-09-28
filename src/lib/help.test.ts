@@ -38,6 +38,10 @@ describe("contactHref", () => {
     expect(contactHref("Call or text 988")).toBe("tel:988");
     expect(contactHref("Call or text 1737")).toBe("tel:1737");
     expect(contactHref("Text SHOUT to 85258")).toBe("sms:85258?&body=SHOUT");
+    expect(contactHref("Text CONNECT to 686868")).toBe("sms:686868?&body=CONNECT");
+    expect(contactHref("Text 234")).toBe("sms:234");
+    expect(contactHref("Text 0477 13 11 14")).toBe("sms:0477131114");
+    expect(contactHref("Call or text 1-800-422-4453")).toBe("tel:18004224453");
   });
 
   test("anything else stays as text", () => {

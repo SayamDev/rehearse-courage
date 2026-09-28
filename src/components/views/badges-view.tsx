@@ -1,6 +1,7 @@
 "use client";
 
-import { Check, Circle } from "@phosphor-icons/react";
+import Link from "next/link";
+import { ArrowRight, Check, Circle } from "@phosphor-icons/react";
 import { BADGES } from "@/lib/achievements";
 import { BADGE_HINTS } from "@/lib/content/badge-hints";
 import { dayKey } from "@/lib/dates";
@@ -8,11 +9,12 @@ import { dailyQuests, questProgress } from "@/lib/quests";
 import { useCourage } from "@/lib/store";
 import { ArtHeader } from "@/components/scene/art-header";
 import { PaperCard } from "@/components/ui/paper-card";
-import { Sticker } from "@/components/ui/sticker";
+import { ShareButton } from "@/components/share/share-button";
+import { badgeShareArt, Sticker } from "@/components/ui/sticker";
 
 /**
  * Badges ("/badges"): today's optional quests with gentle progress text
- * (no bars), then all twelve badges as stickers. Earned ones are in colour
+ * (no bars), then every badge as a sticker. Earned ones are in colour
  * with what you did; the rest are soft outlines with how to find them.
  * Nothing is ever locked, lost or counted down.
  */
@@ -67,6 +69,10 @@ export function BadgesView() {
           <p className="tabular text-muted">
             {earned.size} of {BADGES.length} found so far. Badges are yours to keep.
           </p>
+          <Link href="/journey" className="mt-1 inline-flex min-h-11 items-center gap-1.5 font-semibold text-accent-text hover:underline">
+            See your journey
+            <ArrowRight size={18} weight="bold" aria-hidden />
+          </Link>
           <ul role="list" className="mt-4 grid list-none grid-cols-2 gap-3 p-0 md:grid-cols-3 md:gap-5 lg:grid-cols-4">
             {BADGES.map((b) => {
               const has = earned.has(b.id);
@@ -75,7 +81,18 @@ export function BadgesView() {
                   <PaperCard className="flex h-full flex-col items-center !p-4 text-center sm:!p-5">
                     <Sticker badgeId={b.id} earned={has} size={88} />
                     <h3 className="mt-3 text-lg text-ink">{b.title}</h3>
-                    <p className="mt-1 text-muted">{has ? b.description : BADGE_HINTS[b.id]}</p>
+                    <p className={`mt-1 text-muted ${has ? "mb-4" : ""}`}>{has ? b.description : BADGE_HINTS[b.id]}</p>
+                    {has ? (
+                      <ShareButton
+                        className="mt-auto"
+                        label={
+                          <>
+                            Share<span className="sr-only"> {b.title}</span>
+                          </>
+                        }
+                        card={{ kicker: "I earned a badge", title: b.title, line: b.description, art: badgeShareArt(b.id) }}
+                      />
+                    ) : null}
                   </PaperCard>
                 </li>
               );

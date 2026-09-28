@@ -4,7 +4,7 @@ import { isRoomId, ROOM_LABEL } from "@/lib/rooms";
 import { ROOM_IDS } from "@/lib/types";
 import { RoomView } from "@/components/views/room-view";
 
-// Only the three rooms exist; anything else is a 404.
+// Only the four rooms exist; anything else is a 404.
 export const dynamicParams = false;
 
 export function generateStaticParams() {

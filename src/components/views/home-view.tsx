@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, ChatCircleDots, Mountains, Star, Wind, type Icon } from "@phosphor-icons/react";
+import { ArrowRight, Check, ChatCircleDots, Mountains, Rocket, Star, Wind, type Icon } from "@phosphor-icons/react";
 import { stageFor, type Stage } from "@/lib/companion";
 import { braveWeek, missionsDone } from "@/lib/courage";
 import { dayKey } from "@/lib/dates";
@@ -18,11 +18,14 @@ import { ProgressTrack } from "@/components/scene/progress-track";
 import { ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { pointsLabel } from "@/components/ui/stats-pill";
+import { LevelMeter, LevelSticker } from "@/components/ui/level-card";
+import { rankFor, rankLabel } from "@/lib/rank";
+import { DareCard } from "./dare-card";
 import { Greeting } from "./greeting";
 import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
 /** Each island's sticker colour, used for its label wherever the room is named. */
-export const ROOM_STICKER: Record<RoomId, string> = { class: "sticker-sky", friends: "sticker-grape", presenting: "sticker-coral" };
+export const ROOM_STICKER: Record<RoomId, string> = { class: "sticker-sky", friends: "sticker-grape", presenting: "sticker-coral", out: "sticker-lime" };
 
 /** What the companion is doing, growing with courage points. */
 const STAGE_LINE: Record<Stage, string> = {
@@ -33,6 +36,7 @@ const STAGE_LINE: Record<Stage, string> = {
 };
 
 const QUICK: { href: string; label: string; icon: Icon; ink: string }[] = [
+  { href: "/ready", label: "Right before", icon: Rocket, ink: "bg-coral" },
   { href: "/kit/breathing", label: "Breathe", icon: Wind, ink: "bg-sky" },
   { href: "/kit/grounding", label: "Ground", icon: Mountains, ink: "bg-lime" },
   { href: "/kit/rescue", label: "Rescue phrases", icon: ChatCircleDots, ink: "bg-sun" },
@@ -43,7 +47,7 @@ const DISC = "flex shrink-0 items-center justify-center rounded-full border-[3px
 
 /**
  * Home ("/"): a greeting, today's one step (with its six-step track and one
- * Start button) and the three islands; beside them the companion, this
+ * Start button) and the four islands; beside them the companion, this
  * week's brave days, today's optional quests and quick calm tools. Renders
  * nothing until the store has hydrated and a companion exists (RedirectIfNew
  * sends first-time visitors to /start).
@@ -58,7 +62,8 @@ export function HomeView() {
   const model = homeModel(store, now);
   const stage = stageFor(model.points, missionsDone(store.records));
   const room: RoomId | null = model.done ? null : (situationById(model.situationId)?.room ?? "class");
-  const week = braveWeek(store.records, now);
+  const week = braveWeek(store.records, now, store.events);
+  const rank = rankFor(model.points);
   const quests = dailyQuests(today).map((q) => ({ q, done: questProgress(q, store.records, store.events, today) }));
 
   return (
@@ -70,6 +75,11 @@ export function HomeView() {
         <div className="min-w-0 flex-1">
           <Greeting name={store.name} />
           <p className="mt-1 text-muted">One small step is enough. Go at your own pace.</p>
+          {/* Phones: the level is a tap away (the full meter sits further down). */}
+          <Link href="/journey" className="mt-2 inline-flex min-h-11 items-center gap-2 font-semibold text-ink lg:hidden">
+            <LevelSticker level={rank.level} size={32} />
+            <span className="underline decoration-accent decoration-2 underline-offset-4">{rankLabel(rank)}</span>
+          </Link>
         </div>
       </div>
 
@@ -102,11 +112,13 @@ export function HomeView() {
             )}
           </PaperCard>
 
+          <DareCard />
+
           <section aria-labelledby="quick-heading">
             <h2 id="quick-heading" className="text-xl text-ink">
               Nervous right now?
             </h2>
-            <ul role="list" className="mt-3 grid list-none grid-cols-3 gap-3 p-0">
+            <ul role="list" className="mt-3 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-4">
               {QUICK.map((t) => (
                 <li key={t.href}>
                   <Link
@@ -132,7 +144,7 @@ export function HomeView() {
                 All games
               </Link>
             </div>
-            <ul role="list" className="-mx-4 mt-3 flex list-none gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-5 sm:overflow-visible sm:px-0">
+            <ul role="list" className="-mx-4 mt-3 flex list-none gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-4 sm:overflow-visible sm:px-0">
               {GAMES.map((g) => {
                 const { icon: GameIcon, ink } = GAME_META[g.id];
                 return (
@@ -161,7 +173,7 @@ export function HomeView() {
                 Open the map
               </Link>
             </div>
-            <ul role="list" className="mt-3 grid list-none gap-3 p-0 sm:grid-cols-3">
+            <ul role="list" className="mt-3 grid list-none gap-3 p-0 sm:grid-cols-2">
               {ROOM_IDS.map((r) => {
                 const far = furthestInRoom(store.records, r);
                 const RoomIcon = ROOM_ICON[r];
@@ -198,6 +210,10 @@ export function HomeView() {
             </p>
           </div>
 
+          <section aria-label="Courage level" className={SIDE_CARD}>
+            <LevelMeter rank={rank} points={model.points} link />
+          </section>
+
           <section aria-labelledby="week-heading" className={SIDE_CARD}>
             <div className="flex items-baseline justify-between gap-3">
               <h2 id="week-heading" className="text-xl text-ink">
@@ -226,7 +242,7 @@ export function HomeView() {
               ))}
             </ol>
             <p className="tabular mt-3 text-muted">
-              {model.braveDays} brave day{model.braveDays === 1 ? "" : "s"} so far. Any step counts.
+              {model.braveDays} brave day{model.braveDays === 1 ? "" : "s"} so far. Anything brave counts.
             </p>
           </section>
 

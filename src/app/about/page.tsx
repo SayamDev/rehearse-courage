@@ -14,8 +14,8 @@ export default function AboutPage() {
       <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-8">
         <div className="max-w-[60ch] space-y-3 text-ink">
           <p>
-            Rehearse Courage is a free, private place to practise speaking up: in class, with friends, and in front of a
-            group. One small step at a time, at your own pace.
+            Rehearse Courage is a free, private place to practise speaking up: in class, with friends, in front of a group,
+            and out and about. One small step at a time, at your own pace.
           </p>
           <p>
             It rewards trying, never how smoothly you speak. It never counts pauses, fillers or stutters, and it never

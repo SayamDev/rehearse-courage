@@ -5,6 +5,7 @@ import { ChalkboardTeacher, HandHeart, Lock, Prohibit, ShieldCheck, UserCircleMi
 import { LEVELS } from "@/lib/ladder";
 import { ArtHeader } from "@/components/scene/art-header";
 import { Lottie } from "@/components/ui/lottie";
+import { PrintButton } from "@/components/ui/print-button";
 
 export const metadata: Metadata = {
   title: "For parents and teachers - Rehearse Courage",
@@ -35,25 +36,32 @@ export default function ForAdultsPage() {
     <>
       <ArtHeader title="For parents and teachers" line="What Rehearse Courage does, how it keeps children safe, and how to help." reading />
       <div className="mx-auto max-w-[720px] px-4 pt-4">
+        {/* On paper the top bar is gone, so say where this came from. */}
+        <p className="hidden font-display font-bold text-ink print:block">Rehearse Courage · rehearse-courage.sayamdev.workers.dev</p>
         <p className="max-w-[62ch] text-ink">
-          Rehearse Courage is a free, private place to practise speaking up: answering in class, joining friends, and talking in front of a group. It is
+          Rehearse Courage is a free, private place to practise speaking up: answering in class, joining friends, talking in front of a group, and everyday moments like ordering food or making a phone call. It is
           built for anyone who finds that hard, including anxiety, shyness, ADHD, stuttering and losing your words.
         </p>
+        <div className="mt-5 flex flex-wrap items-center gap-3" data-no-print>
+          <PrintButton />
+          <p className="text-muted">Print it or save it as a PDF to hand out. It fits on two pages.</p>
+        </div>
 
         <section aria-labelledby="how" className="mt-10">
           <h2 id="how" className="text-2xl text-ink">
             How it works
           </h2>
           <p className="mt-1 text-muted">Every situation climbs the same six small steps, from thinking it to doing it for real.</p>
-          <div className="mt-4 overflow-hidden rounded-card border-[1.5px] border-line bg-surface p-4 shadow-card">
+          <div className="mt-4 overflow-hidden rounded-card border-[1.5px] border-line bg-surface p-4 shadow-card print:hidden">
             <Lottie src="/lottie/ladder-tall.json" themed className="mx-auto aspect-[600/740] w-full max-w-[340px] sm:hidden" />
             <Lottie src="/lottie/ladder.json" themed className="hidden aspect-[960/420] w-full sm:block" />
-            <ol className="sr-only">
-              {LEVELS.map((l) => (
-                <li key={l.level}>{l.name}</li>
-              ))}
-            </ol>
           </div>
+          {/* The animation cannot print, so the six steps print as a list (and are read out by screen readers). */}
+          <ol className="sr-only print:not-sr-only print:mt-3 print:grid print:list-decimal print:gap-1 print:pl-6 print:text-ink">
+            {LEVELS.map((l) => (
+              <li key={l.level}>{l.name}</li>
+            ))}
+          </ol>
         </section>
 
         <section aria-labelledby="safe" className="mt-10">

@@ -1,6 +1,18 @@
 import { describe, expect, it, test } from "vitest";
-import { braveDaysThisWeek, braveWeek, missionsDone, pointsFor, totalPoints } from "./courage";
-import type { Level, StepRecord } from "./types";
+import {
+  allPoints,
+  braveDaysThisWeek,
+  braveDaysTotal,
+  braveWeek,
+  eventPoints,
+  missionsDone,
+  pointsFor,
+  questDays,
+  QUEST_DAY_BONUS,
+  totalPoints,
+} from "./courage";
+import { dailyQuests } from "./quests";
+import type { AppEvent, Level, StepRecord } from "./types";
 
 const rec = (level: Level, at: string, extra: Partial<StepRecord> = {}): StepRecord => ({
   situationId: "class-answer",
@@ -79,5 +91,46 @@ describe("braveWeek", () => {
     expect(week[2].today).toBe(true);
     expect(week[3].future).toBe(true);
     expect(week[1].future).toBe(false);
+  });
+});
+
+describe("points outside steps", () => {
+  const e = (kind: AppEvent["kind"], at: string): AppEvent => ({ kind, at });
+
+  test("dares, games, Right before and Not yet earn points, calm tools never need to", () => {
+    expect(eventPoints([e("dare", "2026-09-28T10:00:00")])).toBe(10);
+    expect(eventPoints([e("game", "2026-09-28T10:00:00"), e("ready", "2026-09-28T11:00:00"), e("notYet", "2026-09-28T12:00:00")])).toBe(15);
+    expect(eventPoints([e("panic", "2026-09-28T10:00:00"), e("kit", "2026-09-28T10:00:00"), e("thenNow", "2026-09-28T10:00:00")])).toBe(0);
+  });
+
+  test("each has a daily limit, so opening a page again does not add up", () => {
+    const games = Array.from({ length: 6 }, (_, i) => e("game", `2026-09-28T1${i}:00:00`));
+    expect(eventPoints(games)).toBe(15);
+    expect(eventPoints([e("dare", "2026-09-28T10:00:00"), e("dare", "2026-09-28T11:00:00"), e("dare", "2026-09-29T10:00:00")])).toBe(20);
+  });
+
+  test("a day with all its small ideas done earns a bonus", () => {
+    const day = "2026-09-28";
+    const events: AppEvent[] = [];
+    const records: StepRecord[] = [];
+    for (const q of dailyQuests(day)) {
+      for (let i = 0; i < q.target; i++) {
+        const at = `${day}T1${i}:00:00`;
+        if (q.kind === "speak") records.push(rec(3, at));
+        else if (q.kind === "type") records.push(rec(2, at, { typed: true, seconds: null }));
+        else events.push(e(q.kind, at));
+      }
+    }
+    expect(questDays(records, events)).toEqual([day]);
+    expect(allPoints({ records, events })).toBe(totalPoints(records) + eventPoints(events) + QUEST_DAY_BONUS);
+    expect(questDays(records.slice(1), events.slice(1)).length).toBeLessThanOrEqual(1);
+  });
+
+  test("brave days count steps and brave things, never Need a pause", () => {
+    const records = [rec(1, "2026-09-28T10:00:00")];
+    const events = [e("dare", "2026-09-29T10:00:00"), e("panic", "2026-09-30T10:00:00"), e("game", "2026-09-28T18:00:00")];
+    expect(braveDaysTotal(records, events)).toBe(2);
+    expect(braveDaysThisWeek(records, new Date("2026-10-01T12:00:00"), events)).toBe(2);
+    expect(braveWeek(records, new Date("2026-10-01T12:00:00"), events).filter((d) => d.brave)).toHaveLength(2);
   });
 });

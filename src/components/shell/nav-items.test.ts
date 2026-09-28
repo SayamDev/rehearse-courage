@@ -9,6 +9,7 @@ describe("activeNav", () => {
     ["/step/class-answer", "/map"],
     ["/kit", "/kit"],
     ["/badges", "/badges"],
+    ["/journey", "/badges"],
     ["/me", "/me"],
     ["/help", ""],
   ])("%s -> %s", (pathname, expected) => {

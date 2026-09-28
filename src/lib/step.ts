@@ -1,8 +1,9 @@
 import { stageFor, type Stage } from "./companion";
-import { missionsDone, pointsFor, totalPoints } from "./courage";
+import { allPoints, missionsDone, pointsFor } from "./courage";
 import { skyTint } from "./home";
 import { highestLevel, nextLevel } from "./ladder";
-import type { Level, StepRecord } from "./types";
+import { rankFor } from "./rank";
+import type { AppEvent, Level, StepRecord } from "./types";
 
 /** The level a step page opens on: a valid ?level=1..6, else the next level for that step. */
 export function resolveLevel(param: string | string[] | undefined, records: StepRecord[], situationId: string): Level {
@@ -36,10 +37,17 @@ export type StepResult = {
   skyAfter: number;
   /** Where "One more step" goes: the next level of this step (stays at 6 once there). */
   nextLevel: Level;
+  /** Courage level before and after, so reaching a new one can be celebrated. */
+  levelBefore: number;
+  levelAfter: number;
+  /** The time saved on the record, so a proud moment can point at this try. */
+  at: string;
 };
 
-export function stepResult(before: StepRecord[], record: StepRecord, newBadges: string[]): StepResult {
+export function stepResult(before: StepRecord[], record: StepRecord, newBadges: string[], events: AppEvent[] = []): StepResult {
   const after = [...before, record];
+  const pointsBefore = allPoints({ records: before, events });
+  const pointsAfter = allPoints({ records: after, events });
   return {
     situationId: record.situationId,
     level: record.level,
@@ -47,11 +55,14 @@ export function stepResult(before: StepRecord[], record: StepRecord, newBadges: 
     lastSeconds: lastSpokenSeconds(before, record.situationId),
     points: pointsFor(record, highestLevel(before, record.situationId)),
     newBadges,
-    stageBefore: stageFor(totalPoints(before), missionsDone(before)),
-    stageAfter: stageFor(totalPoints(after), missionsDone(after)),
+    stageBefore: stageFor(pointsBefore, missionsDone(before)),
+    stageAfter: stageFor(pointsAfter, missionsDone(after)),
     skyBefore: skyTint(before),
     skyAfter: skyTint(after),
     nextLevel: nextLevel(after, record.situationId),
+    levelBefore: rankFor(pointsBefore).level,
+    levelAfter: rankFor(pointsAfter).level,
+    at: record.at,
   };
 }
 

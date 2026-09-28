@@ -14,6 +14,8 @@ import {
   cleanPersonName,
   MAX_NAME,
   setName,
+  saveProud,
+  MAX_PROUD_NOTE,
 } from "./state";
 import { exportBackup, importBackup } from "./backup";
 import type { StepRecord } from "./types";
@@ -238,5 +240,48 @@ describe("toggleSavedPhrase", () => {
     expect(on.savedPhrases).toEqual(["come-back"]);
     expect(toggleSavedPhrase(on, "come-back").savedPhrases).toEqual([]);
     expect(normalize({ savedPhrases: ["a", "a", 3] }).savedPhrases).toEqual(["a"]);
+  });
+});
+
+describe("proud moments and event details", () => {
+  const at = "2026-09-28T10:00:00.000Z";
+
+  test("saveProud keeps one per try, tidies the note and earns Proud moment", () => {
+    const first = saveProud(DEFAULT_STATE, { situationId: "out-order", at, outcome: "tried" });
+    expect(first.state.proud).toEqual([{ situationId: "out-order", at, outcome: "tried", feel: null, note: null }]);
+    expect(first.newlyEarned).toContain("proud-moment");
+    const again = saveProud(first.state, { situationId: "out-order", at, outcome: "did", feel: "easier", note: "  I asked \n for a  hot chocolate  " });
+    expect(again.state.proud).toHaveLength(1);
+    expect(again.state.proud[0]).toMatchObject({ outcome: "did", feel: "easier", note: "I asked for a hot chocolate" });
+    expect(again.newlyEarned).toEqual([]);
+    const long = saveProud(DEFAULT_STATE, { situationId: "x", at, outcome: "did", note: "a".repeat(500) });
+    expect(long.state.proud[0].note).toHaveLength(MAX_PROUD_NOTE);
+  });
+
+  test("normalize drops broken proud moments and keeps only short event details", () => {
+    const s = normalize({
+      proud: [
+        { situationId: "class-answer", at, outcome: "did", feel: "hard", note: "" },
+        { situationId: "class-answer", at: "nope", outcome: "did" },
+        { situationId: "class-answer", at, outcome: "maybe" },
+        { situationId: "class-answer", at, outcome: "tried", feel: "wobbly" },
+      ],
+      events: [
+        { kind: "game", at, detail: "hot-seat" },
+        { kind: "dare", at, detail: "x".repeat(100) },
+        { kind: "ready", at, detail: 3 },
+      ],
+    });
+    expect(s.proud).toEqual([
+      { situationId: "class-answer", at, outcome: "did", feel: "hard", note: null },
+      { situationId: "class-answer", at, outcome: "tried", feel: null, note: null },
+    ]);
+    expect(s.events).toEqual([{ kind: "game", at, detail: "hot-seat" }, { kind: "dare", at }, { kind: "ready", at }]);
+  });
+
+  test("logEvent can say which game or dare", () => {
+    const out = logEvent(DEFAULT_STATE, "dare", new Date(at), "thank-why");
+    expect(out.state.events).toEqual([{ kind: "dare", at, detail: "thank-why" }]);
+    expect(out.newlyEarned).toContain("tiny-dare");
   });
 });

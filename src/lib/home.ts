@@ -1,6 +1,6 @@
 import { words } from "./age";
 import { SITUATIONS, situationById } from "./content/situations";
-import { braveDaysThisWeek, totalPoints } from "./courage";
+import { allPoints, braveDaysThisWeek } from "./courage";
 import { LEVELS, mapLight, suggestNext } from "./ladder";
 import type { CourageState } from "./state";
 import type { Level } from "./types";
@@ -32,8 +32,8 @@ export function skyTint(records: CourageState["records"]): number {
  * be unit tested without rendering anything.
  */
 export function homeModel(state: CourageState, now: Date): HomeModel {
-  const braveDays = braveDaysThisWeek(state.records, now);
-  const points = totalPoints(state.records);
+  const braveDays = braveDaysThisWeek(state.records, now, state.events);
+  const points = allPoints(state);
   const next = suggestNext(state.records, SITUATIONS, state.hardThings);
 
   if (!next) {

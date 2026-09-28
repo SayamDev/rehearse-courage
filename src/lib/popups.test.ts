@@ -41,7 +41,7 @@ describe("keep your progress safe", () => {
 });
 
 test("quiet pages get no pop-ups", () => {
-  for (const p of ["/start", "/step/class-answer", "/help", "/privacy"]) expect(quietPage(p, "")).toBe(true);
+  for (const p of ["/start", "/step/class-answer", "/help", "/privacy", "/ready"]) expect(quietPage(p, "")).toBe(true);
   expect(quietPage("/", "calm=1")).toBe(true);
   expect(quietPage("/", "")).toBe(false);
   expect(quietPage("/map", "")).toBe(false);

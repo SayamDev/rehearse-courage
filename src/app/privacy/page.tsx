@@ -15,7 +15,8 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
   {
     title: "What is saved, and where",
     body: [
-      "Your companion and its name, your age group if you chose one, what feels hard, the steps you have done, any steps you wrote yourself, which tools you used and when, the day you last visited, your badges and your settings.",
+      "Your companion and its name, your age group if you chose one, what feels hard, the steps you have done, any steps you wrote yourself, which tools, games and tiny dares you used and when, the day you last visited, your badges and your settings.",
+      "Your proud moments: each time you tried something for real, how it felt if you said, and a line about it only if you wrote one.",
       "All of it is kept in this browser's storage on this device. If you clear your browser data, it is gone, unless you saved a backup.",
     ],
   },
@@ -31,6 +32,7 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
     title: "What never leaves this device",
     body: [
       "Your steps, your badges, your companion and your settings. For anyone under 13, and anyone with online AI help off, your words and voice never leave it either.",
+      "Share pictures are made on this device. They only go somewhere if you send them yourself, and your name is left off unless you add it.",
       "Things you type are checked for signs that you might need support. That check happens on this device, before anything is sent. Things you say are checked the same way as soon as they are written down as text.",
     ],
   },

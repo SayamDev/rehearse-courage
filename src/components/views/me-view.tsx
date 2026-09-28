@@ -7,7 +7,9 @@ import { CalendarCheck, DownloadSimple, Star, Trash, UploadSimple } from "@phosp
 import { removeModel } from "@/lib/ai/device";
 import { importBackup } from "@/lib/backup";
 import { stageFor, type Stage } from "@/lib/companion";
-import { braveDaysThisWeek, missionsDone, totalPoints } from "@/lib/courage";
+import { allPoints, braveDaysThisWeek, missionsDone } from "@/lib/courage";
+import { rankFor, rankLabel } from "@/lib/rank";
+import { LevelSticker } from "@/components/ui/level-card";
 import { AGE_OPTIONS, hardThingOptions, toggleHardThing } from "@/lib/onboarding";
 import { MAX_NAME, setAge, setHardThings, setName, updateSettings, type Settings, type TextSize, type Theme } from "@/lib/state";
 import { saveBackupFile } from "@/lib/save-backup";
@@ -144,7 +146,7 @@ export function MeView() {
 
   if (!store.hydrated) return null;
 
-  const points = totalPoints(store.records);
+  const points = allPoints(store);
   const stage = stageFor(points, missionsDone(store.records));
   const set = (patch: Partial<Settings>) => act((s) => updateSettings(s, patch));
 
@@ -223,13 +225,19 @@ export function MeView() {
             <span aria-hidden className="flex size-7 items-center justify-center rounded-full border-2 border-die bg-sun text-[#13262b]">
               <CalendarCheck size={15} weight="bold" />
             </span>
-            <span className="tabular">{braveDaysLabel(braveDaysThisWeek(store.records, new Date()))}</span>
+            <span className="tabular">{braveDaysLabel(braveDaysThisWeek(store.records, new Date(), store.events))}</span>
           </li>
           <li className="inline-flex items-center gap-2 rounded-full bg-surface-2 py-1.5 pl-1.5 pr-3.5 font-semibold text-ink">
             <span aria-hidden className="flex size-7 items-center justify-center rounded-full border-2 border-die bg-accent text-[#13262b]">
               <Star size={15} weight="bold" />
             </span>
             <span className="tabular">{pointsLabel(points)}</span>
+          </li>
+          <li>
+            <Link href="/journey" className="inline-flex min-h-11 items-center gap-2 rounded-full font-semibold text-ink underline decoration-accent decoration-2 underline-offset-4">
+              <LevelSticker level={rankFor(points).level} size={30} />
+              {rankLabel(rankFor(points))}
+            </Link>
           </li>
         </ul>
       </div>

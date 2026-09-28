@@ -27,6 +27,11 @@ export const COACH_REPLIES: Record<RoomId, Words[]> = {
     w("Thanks for telling us that.", "Thanks for sharing that with us."),
     w("Thank you. I would like to hear more another time.", "Thanks. I'd happily hear more about that."),
   ],
+  out: [
+    w("No problem at all. Let me help you with that.", "No problem. Let me sort that out for you."),
+    w("Of course. It's just over here.", "Of course. I can help with that."),
+    w("Thank you for asking. Here you go.", "Sure thing. Thanks for asking."),
+  ],
 };
 
 /** A small stable hash, so the same moment gets the same reply but different moments vary. */

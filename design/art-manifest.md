@@ -3,13 +3,34 @@
 Status: **DONE** (2026-09-28 batch below fills every gap the app uses). The
 history below is kept for provenance; the older status text follows.
 
+## Still needed: ten newer badges (added 2026-09-28, after the batch below)
+
+These badges show a bold Phosphor icon on a sticker ink until they are
+painted (`BADGE_ICON` in `src/components/ui/sticker.tsx`; add the id to
+`ART_IDS` there once `public/art/badges/<id>.webp` exists). Same coin style
+as the others, no baked tick, no text or numbers (the brave-day counts are
+in the title, never on the coin), circular mask, 320px WebP.
+
+| Badge id | Title | Idea for the coin |
+|---|---|---|
+| `tiny-dare` | Tiny dare | A small lightning spark |
+| `dare-collector` | Dare collector | A handful of sparks or stars |
+| `ready-steady` | Ready, steady | A paper rocket on a launch pad |
+| `not-yet` | Not yet counts | A seedling sprouting |
+| `proud-moment` | Proud moment | A heart with a small flag |
+| `game-explorer` | Game explorer | A game controller or dice |
+| `brave-3` | Three brave days | Three small lanterns |
+| `brave-7` | Seven brave days | A string of lanterns |
+| `brave-30` | Thirty brave days | A lantern-lit path |
+| `brave-100` | A hundred brave days | A sunrise over lanterns |
+
 ## 2026-09-28 batch (12ui free allowance, $0 charged)
 
 Seven `12ui draft` runs, 15 candidates in total, all on the daily free allowance
 (`12ui spend` shows $0.00). Every candidate was inspected at full size against the
 hard checks (no text, numbers, UI or stones baked in; plain empty dirt path; no
 firefly or creatures in scene art; calm lower third). Run dirs are temp
-(`/var/folders/.../T/12ui-*`) and not kept.
+(a local temp folder) and not kept.
 
 | File | Run concept / reference | Pick | Why | Notes |
 |---|---|---|---|---|
@@ -37,7 +58,7 @@ Status then: **DONE_WITH_CONCERNS**. 12ui hosted generation is still blocked on 
 wallet balance (free allowance resets 2026-09-28T00:00Z; do not retry generation or
 top up before then). Coverage was extended in the meantime by harvesting unused
 layers already extracted from earlier 12ui page conversions in the scratchpad
-(`/private/tmp/claude-501/-Users-chaimaenfif/91fc7fa4-b1a8-4da3-8f9b-7812873ebe47/scratchpad/assets/`).
+(a local scratch folder).
 Several assets from the original file list are still missing; see "Still needed
 after reset" at the end.
 
@@ -45,7 +66,7 @@ after reset" at the end.
 
 | File | 12ui run dir | Candidate chosen | Why | Size |
 |---|---|---|---|---|
-| `public/art/home-class.webp` | `/var/folders/3j/0l959hg92195wz97qd1k10rm0000gn/T/12ui-class-island-floating-papercraft-BCI8nV` (run `crt-16384fe4eba241a69a4decb2ad94be72bdd0ec17`) | B | Cleaner, more centred composition than A (school roughly centred over the island, path reads clearly from bottom edge to the door, waterfall and island silhouette match `design/comps/home.jpg` framing more closely). Both candidates passed the hard checks: no text, no numbers used as UI, no UI chrome, no stones, no creatures, empty dirt path ending at the school door, dusk (moon, left) to dawn (sun, right) sky, lower third left as calm cloud/paper space. The school building has a small clock face on its gable, matching the same detail present in the approved `home.jpg` comp itself, so it was treated as part of the comp's own style rather than a baked-in UI number. | 296 KB (under the 400 KB scene budget) |
+| `public/art/home-class.webp` | a local 12ui run folder (run `crt-16384fe4eba241a69a4decb2ad94be72bdd0ec17`) | B | Cleaner, more centred composition than A (school roughly centred over the island, path reads clearly from bottom edge to the door, waterfall and island silhouette match `design/comps/home.jpg` framing more closely). Both candidates passed the hard checks: no text, no numbers used as UI, no UI chrome, no stones, no creatures, empty dirt path ending at the school door, dusk (moon, left) to dawn (sun, right) sky, lower third left as calm cloud/paper space. The school building has a small clock face on its gable, matching the same detail present in the approved `home.jpg` comp itself, so it was treated as part of the comp's own style rather than a baked-in UI number. | 296 KB (under the 400 KB scene budget) |
 
 Rejected candidate: **A** (same run) — kept as a viable backup but not chosen; composition pushes the school slightly right of centre and the path curve is less legible at small sizes than B. Not deleted from the run's temp candidates dir, but not copied into the repo.
 
@@ -55,7 +76,7 @@ Conversion: `npx -y sharp-cli -i <candidate>.png -o public/art/home-class.webp -
 
 ## Harvested from earlier 12ui page-conversion layers (no new generation)
 
-Source directory: `/private/tmp/claude-501/-Users-chaimaenfif/91fc7fa4-b1a8-4da3-8f9b-7812873ebe47/scratchpad/assets/` (PNG layers extracted from earlier 12ui `convert` runs of the comp pages; `thumbs/` holds downscaled previews). Every file below was inspected at full resolution (or up to 1400px) before acceptance; only layers with no text, no numbers, no UI chrome, and (for scene/sky art) no firefly or other creature were kept. Converted with `npx -y sharp-cli -i <src>.png -o <dest>.webp --format webp --quality 78 resize 2400` (scenes/sky/islands/panic) or `--quality 82 resize 320` (kit tiles, badges).
+Source directory: a local scratch folder (PNG layers extracted from earlier 12ui `convert` runs of the comp pages; `thumbs/` holds downscaled previews). Every file below was inspected at full resolution (or up to 1400px) before acceptance; only layers with no text, no numbers, no UI chrome, and (for scene/sky art) no firefly or other creature were kept. Converted with `npx -y sharp-cli -i <src>.png -o <dest>.webp --format webp --quality 78 resize 2400` (scenes/sky/islands/panic) or `--quality 82 resize 320` (kit tiles, badges).
 
 | File | Source | Notes |
 |---|---|---|

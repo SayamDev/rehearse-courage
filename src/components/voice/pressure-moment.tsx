@@ -9,10 +9,10 @@ import { speak } from "@/lib/voice/speak";
 import { SpokenLine, useVoiceSet } from "./spoken-line";
 
 const WHO: Record<string, Record<RoomId, string>> = {
-  teacher: { class: "Your teacher", friends: "A friend", presenting: "The host" },
-  friend: { class: "A classmate", friends: "A friend", presenting: "Someone" },
-  host: { class: "Your teacher", friends: "A friend", presenting: "The host" },
-  classmate: { class: "A classmate", friends: "Another friend", presenting: "Someone in the audience" },
+  teacher: { class: "Your teacher", friends: "A friend", presenting: "The host", out: "The person serving" },
+  friend: { class: "A classmate", friends: "A friend", presenting: "Someone", out: "Someone nearby" },
+  host: { class: "Your teacher", friends: "A friend", presenting: "The host", out: "The person serving" },
+  classmate: { class: "A classmate", friends: "Another friend", presenting: "Someone in the audience", out: "Someone in the queue" },
 };
 
 /**

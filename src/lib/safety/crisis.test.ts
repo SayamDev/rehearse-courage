@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+import { contactHref } from "@/lib/help";
 import { checkCrisis, supportLines } from "./crisis";
 
 describe("crisis check", () => {
@@ -185,13 +186,22 @@ describe("support lines", () => {
 
   test("US includes Childhelp", () => {
     const us = supportLines("US");
-    expect(us.lines.some((l) => l.name === "Childhelp" && l.contact === "1-800-422-4453")).toBe(true);
+    expect(us.lines.some((l) => l.name === "Childhelp" && l.contact === "Call or text 1-800-422-4453")).toBe(true);
   });
 
   test("NZ", () => {
     const nz = supportLines("NZ");
     expect(nz.emergency).toBe("111");
     expect(nz.lines.map((l) => l.name)).toEqual(["Need to talk?", "Youthline"]);
+  });
+
+  test("every line and text option can be tapped", () => {
+    for (const country of ["GB", "IE", "US", "NZ", "CA", "AU", null]) {
+      for (const l of supportLines(country).lines) {
+        expect(contactHref(l.contact)).not.toBeNull();
+        if (l.text) expect(contactHref(l.text)).toMatch(/^sms:\d+/);
+      }
+    }
   });
 
   test("unknown country still gets help", () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowsClockwise, Check } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
 import { HOT_SEAT, freshRand } from "@/lib/games";
@@ -10,17 +10,38 @@ import { Button } from "@/components/ui/button";
 import { SayAndListen } from "@/components/voice/say-and-listen";
 import { SpokenLine } from "@/components/voice/spoken-line";
 
+const TICKS = 14;
+
 /** Hot seat: spin through the questions until one lands, then answer it out loud, or in your head. */
 export function HotSeat() {
   const { age } = useCourage();
   const reduce = useReducedMotion();
   const [i, setI] = useState<number | null>(null);
-  const [spinning, setSpinning] = useState(false);
+  // While spinning: where it will land and how many ticks so far.
+  const [wheel, setWheel] = useState<{ land: number; n: number } | null>(null);
+  const spinning = wheel !== null;
   const [answered, setAnswered] = useState(0);
   const [done, setDone] = useState(false);
-  const timer = useRef<number | null>(null);
   const [rand] = useState(() => ({ current: freshRand() }));
-  useEffect(() => () => void (timer.current && window.clearTimeout(timer.current)), []);
+
+  // Each tick is its own timeout, driven by state: if React pauses and
+  // resumes this page's effects mid-spin, the wheel simply carries on.
+  useEffect(() => {
+    if (!wheel) return;
+    const t = window.setTimeout(
+      () => {
+        if (wheel.n >= TICKS) {
+          setI(wheel.land);
+          setWheel(null);
+          return;
+        }
+        setI((prev) => ((prev ?? 0) + 1) % HOT_SEAT.length);
+        setWheel({ land: wheel.land, n: wheel.n + 1 });
+      },
+      wheel.n === 0 ? 0 : 50 + wheel.n * wheel.n * 1.6,
+    );
+    return () => window.clearTimeout(t);
+  }, [wheel]);
 
   const spin = () => {
     setDone(false);
@@ -29,20 +50,8 @@ export function HotSeat() {
       setI(land);
       return;
     }
-    setSpinning(true);
     // Ticks slow down like a wheel, then land.
-    let n = 0;
-    const ticks = 14;
-    const step = () => {
-      n++;
-      setI((prev) => ((prev ?? 0) + 1) % HOT_SEAT.length);
-      if (n < ticks) timer.current = window.setTimeout(step, 50 + n * n * 1.6);
-      else {
-        setI(land);
-        setSpinning(false);
-      }
-    };
-    step();
+    setWheel({ land, n: 0 });
   };
 
   const q = i === null ? null : words(HOT_SEAT[i], age);

@@ -17,7 +17,7 @@ const atkinson = Atkinson_Hyperlegible_Next({
 
 export const metadata: Metadata = {
   title: "Rehearse Courage",
-  description: "Free, private practice for speaking up in class, with friends and in front of a group.",
+  description: "Free, private practice for speaking up in class, with friends, in front of a group and out and about.",
 };
 
 export const viewport: Viewport = {

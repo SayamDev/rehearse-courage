@@ -18,6 +18,7 @@ export const ROOMS: { id: RoomId; name: Words }[] = [
   { id: "class", name: w("In class") },
   { id: "friends", name: w("With friends") },
   { id: "presenting", name: w("Talking to a group", "Presenting") },
+  { id: "out", name: w("Out and about") },
 ];
 
 export const SITUATIONS: Situation[] = [
@@ -82,6 +83,17 @@ export const SITUATIONS: Situation[] = [
     mission: w("Share one idea in a group.", "Share one idea in a real group discussion."),
   },
   {
+    id: "class-register",
+    room: "class",
+    title: w("Answer the register", "Answer when your name is called"),
+    scene: w(
+      "The teacher is taking the register. Your name is next.",
+      "Names are being called one by one, in a class, a club or a meeting. Yours is next.",
+    ),
+    ideas: [w("Here."), w("Yes, here."), w("Here, thank you.", "Yes, I'm here.")],
+    mission: w("Answer the register out loud, even quietly.", "Answer out loud when your name is called."),
+  },
+  {
     id: "friends-join",
     room: "friends",
     title: w("Join in a chat", "Join a conversation"),
@@ -138,6 +150,34 @@ export const SITUATIONS: Situation[] = [
     mission: w("Tell a friend a short story about your day.", "Tell someone a short story from your week."),
   },
   {
+    id: "friends-invite",
+    room: "friends",
+    title: w("Ask someone to join you", "Suggest a plan"),
+    scene: w(
+      "You want to ask someone to play with you at break.",
+      "You would like to do something with a friend, or someone you would like to know better.",
+    ),
+    ideas: [
+      w("Do you want to play with me?", "Do you fancy doing something this week?"),
+      w("We are playing a game. Want to join?", "A few of us are going to ... Want to come?"),
+    ],
+    mission: w("Ask someone to play or sit with you.", "Suggest a plan to someone for real."),
+  },
+  {
+    id: "friends-no",
+    room: "friends",
+    title: w("Say no kindly", "Say no kindly"),
+    scene: w(
+      "A friend asks you to do something you do not want to do.",
+      "Someone asks you for something you would rather not do. You are allowed to say no.",
+    ),
+    ideas: [
+      w("No thanks, not today.", "Thanks for asking, but I'll pass this time."),
+      w("I do not want to, but we could ... instead.", "I'd rather not, but how about ... instead?"),
+    ],
+    mission: w("Say no kindly to something you do not want to do.", "Say a kind, clear no in real life."),
+  },
+  {
     id: "present-intro",
     room: "presenting",
     title: w("Say who you are", "Introduce yourself"),
@@ -164,6 +204,76 @@ export const SITUATIONS: Situation[] = [
       w("The best thing about it is ...", "First ..., then ..., and finally ..."),
     ],
     mission: w("Talk for one minute to someone about a thing you love.", "Give a short talk to at least one person."),
+  },
+  {
+    id: "present-questions",
+    room: "presenting",
+    title: w("Answer a question after", "Take a question after your talk"),
+    scene: w(
+      "You finished your talk. Someone puts their hand up with a question.",
+      "Your talk is done and someone asks a question. You can take a moment before you answer.",
+    ),
+    ideas: [
+      w("Good question. I think ...", "That's a good question. I think ..."),
+      w("I am not sure, but I can find out.", "I don't know yet, but I'll find out and let you know."),
+    ],
+    mission: w("Answer one question after you share something.", "Answer one real question after you speak."),
+  },
+  {
+    id: "out-order",
+    room: "out",
+    title: w("Order food or a drink", "Order at a counter"),
+    scene: w(
+      "You are at the front of the queue in a cafe. It is your turn to order.",
+      "You reach the front of the queue at a cafe or counter. The person serving is ready for you.",
+    ),
+    ideas: [
+      w("Can I have ..., please?", "Could I get ..., please?"),
+      w("I would like ..., please. Thank you.", "Hi, can I have ... to take away, please?"),
+    ],
+    mission: w("Order something for yourself at a counter.", "Order something yourself, out loud, at a real counter."),
+  },
+  {
+    id: "out-shop",
+    room: "out",
+    title: w("Ask for help in a shop", "Ask for help in a shop"),
+    scene: w(
+      "You cannot find something in a shop. There is someone who works there nearby.",
+      "You are looking for something in a shop and cannot find it. A member of staff is close by.",
+    ),
+    ideas: [
+      w("Excuse me, where can I find ...?", "Excuse me, do you have any ...?"),
+      w("Sorry, can you help me find ...?", "Hi, could you point me towards ...?"),
+    ],
+    mission: w("Ask someone in a shop to help you find something.", "Ask a member of staff for help in a real shop."),
+  },
+  {
+    id: "out-phone",
+    room: "out",
+    title: w("Make a phone call", "Make a phone call"),
+    scene: w(
+      "You call someone you know, like a grandparent, to ask them something.",
+      "You need to phone somewhere to ask a question or book something. Someone answers.",
+    ),
+    ideas: [
+      w("Hi, it is ... I wanted to ask ...", "Hi, I'm calling to ask about ..."),
+      w("Can I talk to ..., please?", "Hi, could I book ... for ..., please?"),
+    ],
+    mission: w("Make a short phone call to someone you know.", "Make one real phone call you have been putting off."),
+  },
+  {
+    id: "out-directions",
+    room: "out",
+    title: w("Ask the way", "Ask for directions"),
+    scene: w(
+      "You are with a grown-up and you are not sure where to go. You ask someone the way.",
+      "You are not sure where you are going. Someone nearby looks friendly.",
+    ),
+    ideas: [
+      w("Excuse me, where is the ...?", "Excuse me, do you know the way to ...?"),
+      w("Is the ... this way?", "Sorry, is this the right way for ...?"),
+    ],
+    mission: w("With a grown-up nearby, ask someone the way.", "Ask someone for directions for real."),
   },
 ];
 

@@ -3,7 +3,7 @@ import type { CourageState } from "./state";
 /**
  * Pop-ups take turns: at most one per visit, so people read it instead of
  * closing everything, and never on pages where it would get in the way
- * (first visit, a practice step, support, or while Panic now is open).
+ * (first visit, a practice step, Right before, support, or while Panic now is open).
  */
 const KEY = "courage:popup";
 
@@ -12,7 +12,7 @@ export const SAVE_AFTER_STEPS = 3;
 /** A backup newer than this counts as safe enough. */
 export const BACKUP_FRESH_DAYS = 30;
 
-const QUIET_PAGES = ["/start", "/step/", "/help", "/privacy"];
+const QUIET_PAGES = ["/start", "/step/", "/help", "/privacy", "/ready"];
 
 export function quietPage(pathname: string, search: string): boolean {
   return QUIET_PAGES.some((p) => pathname.startsWith(p)) || new URLSearchParams(search).has("calm");

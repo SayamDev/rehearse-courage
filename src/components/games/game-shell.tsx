@@ -18,8 +18,8 @@ export function GameShell({ id, children }: { id: GameId; children: ReactNode })
   useEffect(() => {
     if (!hydrated || logged.current) return;
     logged.current = true;
-    act((s) => logEvent(s, "game", new Date()));
-  }, [hydrated]);
+    act((s) => logEvent(s, "game", new Date(), id));
+  }, [hydrated, id]);
 
   return (
     <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-10">

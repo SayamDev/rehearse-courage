@@ -41,7 +41,7 @@ function Island({ room, line }: { room: RoomId; line: string | null }) {
 }
 
 /**
- * Courage map ("/map"): the three islands with how far each has come, and
+ * Courage map ("/map"): the four islands with how far each has come, and
  * a card to continue the suggested step. Progress text waits for the store
  * to hydrate so a returning person never sees "Not started yet" flash.
  */
@@ -55,10 +55,10 @@ export function MapView() {
       <div>
         <header>
           <h1 className={`${TITLE} text-ink`}>Courage map</h1>
-          <p className="mt-1 text-muted">Three islands. One small step at a time.</p>
+          <p className="mt-1 text-muted">Four islands. One small step at a time.</p>
         </header>
 
-        <ul role="list" className="mt-6 grid list-none gap-3 p-0 md:mt-8 md:grid-cols-3 md:gap-6">
+        <ul role="list" className="mt-6 grid list-none gap-3 p-0 md:mt-8 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {ROOM_IDS.map((room) => (
             <Island key={room} room={room} line={store.hydrated ? furthestLine(furthestInRoom(store.records, room)) : null} />
           ))}

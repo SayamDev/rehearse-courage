@@ -34,4 +34,13 @@ describe("voice lines", () => {
     expect(lines.some((l) => l.text === "Breathe in slowly.")).toBe(true);
     expect(lines.every((l) => l.voice.engine === "qwen")).toBe(true);
   });
+
+  test("new lines are in the script: situations, dares, Right before and the new games", () => {
+    const texts = new Set(allLines().map((l) => l.text));
+    expect(texts.has("Hi, what can I get for you?")).toBe(true);
+    expect(texts.has("Thank someone and tell them why.")).toBe(true);
+    expect(texts.has("You are ready enough. Go and give it a try.")).toBe(true);
+    expect(texts.has("I went to the beach at the weekend.")).toBe(true);
+    expect(allLines().some((l) => l.role === "friend" && l.text === "I made pancakes this morning.")).toBe(true);
+  });
 });

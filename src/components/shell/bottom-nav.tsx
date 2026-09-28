@@ -33,7 +33,7 @@ export function activeNav(pathname: string): string {
     return "/map";
   }
   if (pathname.startsWith("/kit")) return "/kit";
-  if (pathname.startsWith("/badges")) return "/badges";
+  if (pathname.startsWith("/badges") || pathname.startsWith("/journey")) return "/badges";
   if (pathname.startsWith("/me")) return "/me";
   return "";
 }
@@ -53,6 +53,7 @@ export function BottomNav() {
 
   return (
     <nav
+      data-no-print
       aria-label="Main"
       className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
     >
