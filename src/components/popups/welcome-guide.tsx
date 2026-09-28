@@ -67,7 +67,7 @@ export function WelcomeGuide({ pathname, quiet }: { pathname: string; quiet: boo
         <Point icon={Star} title="Every go counts">
           {name} grows braver each time you try. Points are for trying, never for how you sound.
         </Point>
-        <Point icon={Lifebuoy} title="Panic now is always here">
+        <Point icon={Lifebuoy} title="Need a pause? It is always here">
           In the corner of every page: slow breathing, grounding, and people you can talk to.
         </Point>
         <Point icon={DeviceMobile} title="It stays on this device">

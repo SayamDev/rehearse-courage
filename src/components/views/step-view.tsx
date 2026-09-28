@@ -18,6 +18,7 @@ import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId, StepRecord } from "@/lib/types";
 import { SceneArt } from "@/components/scene/scene-art";
+import { SceneBand } from "@/components/scene/scene-band";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { IdeaList } from "@/components/ui/idea-list";
 import { PaperCard } from "@/components/ui/paper-card";
@@ -281,246 +282,254 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
   const speaking = LEVELS[level - 1].speaking;
 
   return (
-    <div className="mx-auto max-w-[1100px] px-4 pt-6 md:pt-10">
-      <Link href={roomPath} className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-ink hover:underline">
-        <ArrowLeft size={22} weight="regular" aria-hidden />
-        {ROOM_LABEL[step.room]}
-      </Link>
-      <h1 className={`mt-2 ${TITLE} text-ink`}>Practice step</h1>
-      <p className="text-muted">
-        {ROOM_LABEL[step.room]} step <span className="tabular">{level}</span>: {LEVELS[level - 1].name}
-      </p>
-
-      <div className="relative mx-auto mt-5 h-[24dvh] min-h-[150px] max-w-[720px] overflow-hidden rounded-card md:h-[260px]">
-        <SceneArt room={step.room} crop="step" priority className="object-top" />
-      </div>
-
-      <PaperCard className="relative mx-auto -mt-8 max-w-[640px]">
-        {TASK[level] ? (
+    <div>
+      <SceneBand
+        header={
           <>
-            {/* Steps 2 to 5: the moment is a reminder; the new task is the heading. */}
-            <p className="text-muted">The moment</p>
-            <p className="mt-1 text-ink">{step.scene}</p>
-            <h2 className="mt-4 text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{TASK[level]}</h2>
-            <p className="mt-1 text-ink">{taskHint(level, step.room)}</p>
-          </>
-        ) : (
-          <h2 className="text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{step.scene}</h2>
-        )}
-
-        {level === 6 ? (
-          <>
-            <p className="mt-4 text-muted">Your mission</p>
-            <p className="mt-1 text-lg font-semibold text-ink">{step.mission}</p>
-          </>
-        ) : step.ideas.length > 0 && level === 1 ? (
-          <div className="mt-5">
-            <IdeaList ideas={step.ideas} value={idea} onChange={setIdea} />
-          </div>
-        ) : step.ideas.length > 0 ? (
-          <details className="group mt-4 rounded-2xl bg-surface-2 px-4">
-            <summary className="flex min-h-11 cursor-pointer items-center font-semibold text-ink">Need a start? Show ideas</summary>
-            <ul className="grid list-disc gap-1 pb-3 pl-6 text-ink marker:text-muted">
-              {step.ideas.map((i) => (
-                <li key={i}>{i}</li>
-              ))}
-            </ul>
-          </details>
-        ) : null}
-
-        {level === 4 ? (
-          <figure className="mt-5 rounded-2xl bg-surface-2 px-4 py-3">
-            <figcaption className="text-muted">{COACH_NAME}</figcaption>
-            <blockquote className="mt-1 text-ink">{words(coachLine(step.id), store.age)}</blockquote>
-          </figure>
-        ) : null}
-        {level === 4 && online ? (
-          <p className="mt-2 text-muted">
-            Cobi&apos;s reply comes from an online AI. What you say is not saved.{" "}
-            <Link href="/privacy#ai" className="underline">
-              How this works
+            <Link href={roomPath} className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 hover:underline">
+              <ArrowLeft size={22} weight="regular" aria-hidden />
+              {ROOM_LABEL[step.room]}
             </Link>
-          </p>
-        ) : null}
-
-        {level === 5 ? (
-          <div className="mt-5 rounded-2xl bg-surface-2 px-4 py-3 text-ink">
-            <p>{words(PRESSURE_LINES[step.room], store.age)}</p>
-            {showTimer ? (
-              <p className="tabular mt-1 text-muted" aria-hidden>
-                {elapsed} seconds
-              </p>
-            ) : null}
-          </div>
-        ) : null}
-
-        <div className="mt-4 border-t border-line pt-2">
-          <Switch checked={roughDay} onChange={setRoughDay} label="I'm having a rough day" />
+            <h1 className={`mt-1 ${TITLE}`}>Practice step</h1>
+            <p>
+              {ROOM_LABEL[step.room]} step <span className="tabular">{level}</span>: {LEVELS[level - 1].name}
+            </p>
+          </>
+        }
+      >
+        <div className="relative h-[clamp(240px,38dvh,440px)]">
+          <SceneArt room={step.room} crop="step" priority className="object-[50%_45%]" />
         </div>
+      </SceneBand>
 
-        {/* Level 1: think it. */}
-        {level === 1 ? (
-          <>
-            <TextField
-              label={step.ideas.length > 0 ? "Or write your own (optional)" : "Write it down (optional)"}
-              value={text}
-              onChange={setText}
-              rows={2}
-            />
-            <Button className="mt-6" icon={Check} onClick={() => finish({ seconds: null, typed: text.trim() !== "" })}>
-              I&apos;ve thought of it
-            </Button>
-          </>
-        ) : null}
+      <div className="px-4">
+        <PaperCard className="relative mx-auto -mt-16 max-w-[640px] md:-mt-24">
+          {TASK[level] ? (
+            <>
+              {/* Steps 2 to 5: the moment is a reminder; the new task is the heading. */}
+              <p className="text-muted">The moment</p>
+              <p className="mt-1 text-ink">{step.scene}</p>
+              <h2 className="mt-4 text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{TASK[level]}</h2>
+              <p className="mt-1 text-ink">{taskHint(level, step.room)}</p>
+            </>
+          ) : (
+            <h2 className="text-[clamp(1.4rem,1.1rem+1vw,1.85rem)] text-ink">{step.scene}</h2>
+          )}
 
-        {/* Level 2: type or whisper it. */}
-        {level === 2 ? (
-          <>
-            <TextField
-              label="Type it here"
-              hint="Only you can see this, and it is not saved."
-              value={text}
-              onChange={setText}
-            />
-            <Button className="mt-6" icon={Check} onClick={() => finish({ seconds: null, typed: text.trim() !== "" })}>
-              Done
-            </Button>
-          </>
-        ) : null}
+          {level === 6 ? (
+            <>
+              <p className="mt-4 text-muted">Your mission</p>
+              <p className="mt-1 text-lg font-semibold text-ink">{step.mission}</p>
+            </>
+          ) : step.ideas.length > 0 && level === 1 ? (
+            <div className="mt-5">
+              <IdeaList ideas={step.ideas} value={idea} onChange={setIdea} />
+            </div>
+          ) : step.ideas.length > 0 ? (
+            <details className="group mt-4 rounded-2xl bg-surface-2 px-4">
+              <summary className="flex min-h-11 cursor-pointer items-center font-semibold text-ink">Need a start? Show ideas</summary>
+              <ul className="grid list-disc gap-1 pb-3 pl-6 text-ink marker:text-muted">
+                {step.ideas.map((i) => (
+                  <li key={i}>{i}</li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
 
-        {/* Levels 3 to 5: speak, or type instead. */}
-        {speaking && !typing && !reply ? (
-          <div className="mt-6">
-            {speak.state === "done" ? (
-              <>
-                <p className="text-ink" role="status">
-                  {speak.seconds > 0
-                    ? `You spoke for ${speak.seconds} second${speak.seconds === 1 ? "" : "s"}.`
-                    : "All done. You can finish here or try again."}
+          {level === 4 ? (
+            <figure className="mt-5 rounded-2xl bg-surface-2 px-4 py-3">
+              <figcaption className="text-muted">{COACH_NAME}</figcaption>
+              <blockquote className="mt-1 text-ink">{words(coachLine(step.id), store.age)}</blockquote>
+            </figure>
+          ) : null}
+          {level === 4 && online ? (
+            <p className="mt-2 text-muted">
+              Cobi&apos;s reply comes from an online AI. What you say is not saved.{" "}
+              <Link href="/privacy#ai" className="underline">
+                How this works
+              </Link>
+            </p>
+          ) : null}
+
+          {level === 5 ? (
+            <div className="mt-5 rounded-2xl bg-surface-2 px-4 py-3 text-ink">
+              <p>{words(PRESSURE_LINES[step.room], store.age)}</p>
+              {showTimer ? (
+                <p className="tabular mt-1 text-muted" aria-hidden>
+                  {elapsed} seconds
                 </p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {level === 4 ? (
-                    <Button icon={ChatCircle} onClick={() => askCobi("speak")} aria-disabled={thinking}>
-                      Hear Cobi&apos;s reply
+              ) : null}
+            </div>
+          ) : null}
+
+          <div className="mt-4 border-t border-line pt-2">
+            <Switch checked={roughDay} onChange={setRoughDay} label="I'm having a rough day" />
+          </div>
+
+          {/* Level 1: think it. */}
+          {level === 1 ? (
+            <>
+              <TextField
+                label={step.ideas.length > 0 ? "Or write your own (optional)" : "Write it down (optional)"}
+                value={text}
+                onChange={setText}
+                rows={2}
+              />
+              <Button className="mt-6" icon={Check} onClick={() => finish({ seconds: null, typed: text.trim() !== "" })}>
+                I&apos;ve thought of it
+              </Button>
+            </>
+          ) : null}
+
+          {/* Level 2: type or whisper it. */}
+          {level === 2 ? (
+            <>
+              <TextField
+                label="Type it here"
+                hint="Only you can see this, and it is not saved."
+                value={text}
+                onChange={setText}
+              />
+              <Button className="mt-6" icon={Check} onClick={() => finish({ seconds: null, typed: text.trim() !== "" })}>
+                Done
+              </Button>
+            </>
+          ) : null}
+
+          {/* Levels 3 to 5: speak, or type instead. */}
+          {speaking && !typing && !reply ? (
+            <div className="mt-6">
+              {speak.state === "done" ? (
+                <>
+                  <p className="text-ink" role="status">
+                    {speak.seconds > 0
+                      ? `You spoke for ${speak.seconds} second${speak.seconds === 1 ? "" : "s"}.`
+                      : "All done. You can finish here or try again."}
+                  </p>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    {level === 4 ? (
+                      <Button icon={ChatCircle} onClick={() => askCobi("speak")} aria-disabled={thinking}>
+                        Hear Cobi&apos;s reply
+                      </Button>
+                    ) : (
+                      <Button icon={Check} onClick={() => finish({ seconds: spokenSeconds(), typed: false })}>
+                        Finish
+                      </Button>
+                    )}
+                    <Button variant="secondary" icon={Microphone} onClick={speak.reset} disabled={thinking}>
+                      Try again
                     </Button>
-                  ) : (
-                    <Button icon={Check} onClick={() => finish({ seconds: spokenSeconds(), typed: false })}>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <SpeakButton ref={speakRef} state={speak.state} onStart={speak.start} onStop={speak.stop} />
+                    <Button variant="secondary" icon={Keyboard} onClick={typeInstead}>
+                      Type instead
+                    </Button>
+                  </div>
+                  <p className="mt-3 text-muted">
+                    {speak.state === "listening" ? (
+                      <span className="tabular" aria-hidden>
+                        {speak.seconds} seconds so far
+                      </span>
+                    ) : (
+                      "Hold the button while you speak, or tap once to start and again to stop."
+                    )}
+                  </p>
+                </>
+              )}
+            </div>
+          ) : null}
+
+          {speaking && typing && !reply ? (
+            <>
+              {speak.state === "blocked" ? (
+                <p id="mic-off" className="mt-5 text-ink" role="status">
+                  The microphone is off. You can type instead.
+                </p>
+              ) : null}
+              <TextField
+                label="Type what you would say"
+                value={text}
+                onChange={setText}
+                fieldRef={typeRef}
+                describedBy={speak.state === "blocked" ? "mic-off" : undefined}
+              />
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {level === 4 ? (
+                  <Button icon={ChatCircle} onClick={() => askCobi("type")} aria-disabled={thinking}>
+                    Hear Cobi&apos;s reply
+                  </Button>
+                ) : (
+                  <Button icon={Check} onClick={() => finish({ seconds: null, typed: true })}>
+                    Done
+                  </Button>
+                )}
+                <Button
+                  variant="secondary"
+                  icon={Microphone}
+                  disabled={thinking}
+                  onClick={() => {
+                    speak.reset();
+                    setMode("speak");
+                  }}
+                >
+                  Speak instead
+                </Button>
+              </div>
+            </>
+          ) : null}
+
+          {/* Step 4: Cobi's reply, announced when it arrives. */}
+          {level === 4 ? (
+            <div className="mt-5">
+              <p role="status" className="min-h-0 text-ink">
+                {thinking ? "Cobi is thinking." : ""}
+              </p>
+              {reply ? (
+                <>
+                  <figure ref={replyRef} tabIndex={-1} className="rounded-2xl bg-surface-2 px-4 py-3 outline-none">
+                    <figcaption className="text-muted">{COACH_NAME}</figcaption>
+                    <blockquote className="mt-1 text-ink">{reply.text}</blockquote>
+                  </figure>
+                  {reply.source === "device" ? <p className="mt-2 text-muted">This reply came from the AI on this device.</p> : null}
+                  <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                    <Button
+                      icon={Check}
+                      onClick={() =>
+                        finish({ seconds: reply.by === "speak" ? spokenSeconds() : null, typed: reply.by === "type" })
+                      }
+                    >
                       Finish
                     </Button>
-                  )}
-                  <Button variant="secondary" icon={Microphone} onClick={speak.reset} disabled={thinking}>
-                    Try again
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <SpeakButton ref={speakRef} state={speak.state} onStart={speak.start} onStop={speak.stop} />
-                  <Button variant="secondary" icon={Keyboard} onClick={typeInstead}>
-                    Type instead
-                  </Button>
-                </div>
-                <p className="mt-3 text-muted">
-                  {speak.state === "listening" ? (
-                    <span className="tabular" aria-hidden>
-                      {speak.seconds} seconds so far
-                    </span>
-                  ) : (
-                    "Hold the button while you speak, or tap once to start and again to stop."
-                  )}
-                </p>
-              </>
-            )}
-          </div>
-        ) : null}
-
-        {speaking && typing && !reply ? (
-          <>
-            {speak.state === "blocked" ? (
-              <p id="mic-off" className="mt-5 text-ink" role="status">
-                The microphone is off. You can type instead.
-              </p>
-            ) : null}
-            <TextField
-              label="Type what you would say"
-              value={text}
-              onChange={setText}
-              fieldRef={typeRef}
-              describedBy={speak.state === "blocked" ? "mic-off" : undefined}
-            />
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              {level === 4 ? (
-                <Button icon={ChatCircle} onClick={() => askCobi("type")} aria-disabled={thinking}>
-                  Hear Cobi&apos;s reply
-                </Button>
-              ) : (
-                <Button icon={Check} onClick={() => finish({ seconds: null, typed: true })}>
-                  Done
-                </Button>
-              )}
-              <Button
-                variant="secondary"
-                icon={Microphone}
-                disabled={thinking}
-                onClick={() => {
-                  speak.reset();
-                  setMode("speak");
-                }}
-              >
-                Speak instead
-              </Button>
+                    <Button variant="secondary" icon={ArrowCounterClockwise} onClick={againFromReply}>
+                      Try again
+                    </Button>
+                  </div>
+                </>
+              ) : null}
             </div>
-          </>
-        ) : null}
+          ) : null}
 
-        {/* Step 4: Cobi's reply, announced when it arrives. */}
-        {level === 4 ? (
-          <div className="mt-5">
-            <p role="status" className="min-h-0 text-ink">
-              {thinking ? "Cobi is thinking." : ""}
-            </p>
-            {reply ? (
-              <>
-                <figure ref={replyRef} tabIndex={-1} className="rounded-2xl bg-surface-2 px-4 py-3 outline-none">
-                  <figcaption className="text-muted">{COACH_NAME}</figcaption>
-                  <blockquote className="mt-1 text-ink">{reply.text}</blockquote>
-                </figure>
-                {reply.source === "device" ? <p className="mt-2 text-muted">This reply came from the AI on this device.</p> : null}
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <Button
-                    icon={Check}
-                    onClick={() =>
-                      finish({ seconds: reply.by === "speak" ? spokenSeconds() : null, typed: reply.by === "type" })
-                    }
-                  >
-                    Finish
-                  </Button>
-                  <Button variant="secondary" icon={ArrowCounterClockwise} onClick={againFromReply}>
-                    Try again
-                  </Button>
-                </div>
-              </>
-            ) : null}
-          </div>
-        ) : null}
-
-        {/* Level 6: try it for real. */}
-        {level === 6 ? (
-          <>
-            <TextField label="A note for yourself (optional)" value={note} onChange={setNote} rows={2} />
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <Button icon={Check} onClick={() => finish({ seconds: null, typed: false })}>
-                I did it
-              </Button>
-              <ButtonLink href={roomPath} variant="secondary" icon={X}>
-                Not yet
-              </ButtonLink>
-            </div>
-            <p className="mt-3 text-muted">Not yet is fine. The mission will be here whenever you want it.</p>
-          </>
-        ) : null}
-      </PaperCard>
+          {/* Level 6: try it for real. */}
+          {level === 6 ? (
+            <>
+              <TextField label="A note for yourself (optional)" value={note} onChange={setNote} rows={2} />
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <Button icon={Check} onClick={() => finish({ seconds: null, typed: false })}>
+                  I did it
+                </Button>
+                <ButtonLink href={roomPath} variant="secondary" icon={X}>
+                  Not yet
+                </ButtonLink>
+              </div>
+              <p className="mt-3 text-muted">Not yet is fine. The mission will be here whenever you want it.</p>
+            </>
+          ) : null}
+        </PaperCard>
+      </div>
     </div>
   );
 }

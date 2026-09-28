@@ -64,6 +64,7 @@ export function PathStones({
   priority = false,
   previewRecords,
   overlay,
+  rounded = true,
 }: {
   room: RoomId;
   situationId: string;
@@ -74,6 +75,8 @@ export function PathStones({
   previewRecords?: StepRecord[];
   /** Drawn over the art but under the stones (e.g. Home's night tint), so it never dims the UI. */
   overlay?: ReactNode;
+  /** False inside a full-bleed SceneBand, where the art has no card corners. */
+  rounded?: boolean;
 }) {
   const store = useCourage();
   const records = previewRecords ?? store.records;
@@ -103,7 +106,7 @@ export function PathStones({
 
   return (
     <div
-      className="relative w-full overflow-hidden rounded-card"
+      className={`relative w-full overflow-hidden ${rounded ? "rounded-card" : ""}`}
       style={{ aspectRatio: cropAspect(scene, box), containerType: "inline-size" }}
       {...(interactive ? {} : { role: "img", "aria-label": `Path: ${summary}.` })}
     >

@@ -129,12 +129,12 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
             <Lifebuoy size={36} weight="regular" aria-hidden className="mt-1 shrink-0" />
             <div>
               <h1 id="panic-title" ref={headingRef} tabIndex={-1} className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] outline-none">
-                Panic now
+                Need a pause
               </h1>
               <p className="mt-1">Take a breath. There is no rush.</p>
             </div>
           </div>
-          <Button variant="chrome" size="md" icon={X} onClick={onClose} aria-label="Close Panic now">
+          <Button variant="chrome" size="md" icon={X} onClick={onClose} aria-label="Close Need a pause">
             Close
           </Button>
         </header>

@@ -22,7 +22,7 @@ One accent: lantern amber. One neutral family: warm paper plus deep night ink. N
 | `ink` | `#113C4B` night ink | `#F9EAD3` | Headings and body |
 | `muted` | `#6B5A4C` | `#B9C6CF` | Secondary text (AA on surface) |
 | `line` | `#E0C9A9` | `#2C5068` | Hairlines, card edges |
-| `chrome` | `#10364B` | `#0A1B27` | Bottom nav, stats pill, Panic now |
+| `chrome` | `#10364B` | `#0A1B27` | Bottom nav, stats pill, Need a pause |
 | `on-chrome` | `#F9EAD3` | `#F9EAD3` | Text and icons on chrome |
 | `amber` (accent) | `#FFAB0B` | `#FFB42E` | Primary buttons, lit stones, current nav item, glow |
 | `on-amber` | `#113C4B` | `#0E2231` | Text on amber (never white) |
@@ -49,11 +49,11 @@ Rules: amber is the only button colour and the only glow. Unlit stones and unear
 
 ## Layout
 
-- **Phone (below 768px):** scene art on top (about 45% of the viewport), card overlapping the art's lower edge, stats pill under the card, bottom nav fixed. Panic now floats above the nav, bottom right.
+- **Phone (below 768px):** scene art on top (about 45% of the viewport), card overlapping the art's lower edge, stats pill under the card, bottom nav fixed. Need a pause floats above the nav, bottom right.
 - **Laptop (768px and up):** the same stack, centred, max width 1100px, with the island art wider. There's no side-by-side split: one focus per screen on every size.
 - Bottom nav: Home, Map, Kit, Badges, Me. The current item is amber with an underline, not colour alone.
 - Header: "Rehearse Courage" plus "a Rehearse project, by Sayam Ajmal" on Home only; other screens get a back arrow and the screen title.
-- Panic now is reachable on every screen, including first visit, and never covers the primary button.
+- Need a pause is reachable on every screen, including first visit, and never covers the primary button.
 
 ## Components
 
@@ -61,7 +61,7 @@ Rules: amber is the only button colour and the only glow. Unlit stones and unear
 - `PaperCard`: torn-edge card, one title, optional muted line, one primary action.
 - `PathStones`: 5 stones plus the destination building as step 6 (school, park bench, stage). Stones are HTML buttons over the art, drawn from ladder progress, never baked into images. The destination lights up when step 6 is done.
 - `StatsPill`: brave days this week and courage points, on chrome.
-- `PanicButton`: chrome pill, shield icon, "Panic now".
+- `PanicButton`: chrome pill, shield icon, "Need a pause".
 - `SpeakButton`: large round amber button "Hold to speak" (tap to start and stop too, for motor needs), with "Type instead" as an equal-size secondary button.
 - `RoughDaySwitch`: a real switch labelled "I'm having a rough day", separate from the answer options.
 - `IdeaList`: things you could say, as selectable rows (they are ideas, not a quiz).
@@ -74,7 +74,7 @@ Breath-paced and calm. MOTION dial 4.
 
 - Durations: 180ms for feedback, 320ms for UI, 600 to 900ms for scene changes. Ease `cubic-bezier(0.16, 1, 0.3, 1)`.
 - Signature moment: when a step completes, the companion's lantern brightens, the new stone lights up, and the sky warms a step towards dawn (map light from `mapLight()`).
-- Panic now: the lantern grows over 4s (in) and shrinks over 6s (out), and nothing else moves.
+- Need a pause: the lantern grows over 4s (in) and shrinks over 6s (out), and nothing else moves.
 - Current stone: a slow 3s pulse ring.
 - Reduced motion (system or setting): every animation shows its end frame. No loops, no parallax.
 - Lottie assets (Plan 6): firefly stages (hiding, peeking, waving, speaking), idle, cheer, sit-with-me, breathing lantern, badge press.

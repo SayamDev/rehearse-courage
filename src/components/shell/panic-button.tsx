@@ -33,7 +33,7 @@ function PanicLink({ search }: { search: string }) {
   return (
     <Link href={calmHref(pathname, search)} className={className}>
       <Lifebuoy size={22} weight="regular" aria-hidden />
-      Panic now
+      Need a pause
     </Link>
   );
 }

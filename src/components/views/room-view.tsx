@@ -5,11 +5,11 @@ import Link from "next/link";
 import { ArrowLeft, ArrowRight, Plus } from "@phosphor-icons/react";
 import { LEVELS, MAX_CUSTOM } from "@/lib/ladder";
 import { defaultStepId, furthestLine, nextLine, ROOM_LABEL, roomSteps, type RoomStep } from "@/lib/rooms";
-import { cropAspect, sceneCrop, SCENES } from "@/lib/scenes";
 import { addCustomStep } from "@/lib/state";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId } from "@/lib/types";
 import { PathStones } from "@/components/scene/path-stones";
+import { SceneBand } from "@/components/scene/scene-band";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 
@@ -92,108 +92,126 @@ export function RoomView({ room }: { room: RoomId }) {
     setMessage("Added to your own steps.");
   };
 
-  const builtIn = steps.filter((s) => !s.custom);
-  const own = steps.filter((s) => s.custom);
-
-  return (
-    <div className="mx-auto max-w-[1100px] px-4 pt-6 md:pt-10">
+  const heading = (onChrome: boolean) => (
+    <>
       <Link
         href="/map"
-        className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-ink hover:underline"
+        className={`-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 hover:underline ${onChrome ? "" : "text-ink"}`}
       >
         <ArrowLeft size={22} weight="regular" aria-hidden />
         Map
       </Link>
-      <h1 className={`mt-2 ${TITLE} text-ink`}>{ROOM_LABEL[room]}</h1>
+      <h1 className={`mt-2 ${TITLE} ${onChrome ? "" : "text-ink"}`}>{ROOM_LABEL[room]}</h1>
+    </>
+  );
 
+  const builtIn = steps.filter((s) => !s.custom);
+  const own = steps.filter((s) => s.custom);
+
+  return (
+    <div>
       {store.hydrated && current ? (
         <>
-          {/* Capped by height, keeping the crop's aspect so stones line up. */}
-          <div
-            ref={sceneRef}
-            className="mx-auto mt-5 max-w-[720px] scroll-mt-4"
-            style={{ width: `min(100%, calc(${cropAspect(SCENES[room], sceneCrop(SCENES[room], "island"))} * max(40dvh, 260px)))` }}
-          >
-            <PathStones room={room} situationId={current.id} onPick={setChosenLevel} priority />
+          {/* Phone: title on the canvas, then the island crop edge to edge.
+              Tablet and laptop: the full-width scene band with the title over
+              its night sky (tablets get the whole art, laptops the trimmed band). */}
+          <div ref={sceneRef} className="scroll-mt-4">
+            <div className="px-4 pt-6 md:hidden">{heading(false)}</div>
+            <div className="mt-4 md:hidden">
+              <PathStones room={room} situationId={current.id} onPick={setChosenLevel} rounded={false} priority />
+            </div>
+            <SceneBand className="hidden md:block lg:hidden" header={heading(true)}>
+              <PathStones room={room} situationId={current.id} onPick={setChosenLevel} crop="wide" rounded={false} priority />
+            </SceneBand>
+            <SceneBand className="hidden lg:block" header={heading(true)}>
+              <PathStones room={room} situationId={current.id} onPick={setChosenLevel} crop="band" rounded={false} priority />
+            </SceneBand>
           </div>
 
-          <PaperCard className="relative mx-auto -mt-6 max-w-[560px] md:-mt-10">
-            {/* Announced when a row or stone changes what the card shows. */}
-            <div aria-live="polite">
-              <p className="text-muted">
-                Step <span className="tabular">{level}</span> of 6
-              </p>
-              <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{current.title}</h2>
-              <p className="mt-2 text-ink">{LEVELS[level - 1].name}</p>
-            </div>
-            <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6" icon={ArrowRight} iconEnd>
-              {level === current.next ? "Continue" : `Practise step ${level}`}
-            </ButtonLink>
-            <p className="mt-4 text-muted">Choose a stone to practise a different step.</p>
-          </PaperCard>
-
-          <section aria-labelledby="steps-heading" className="mx-auto mt-10 max-w-[720px]">
-            <h2 id="steps-heading" className="text-2xl text-ink">
-              Steps on this island
-            </h2>
-            <ul role="list" className="mt-4 grid list-none gap-3 p-0">
-              {builtIn.map((s) => (
-                <StepRow key={s.id} step={s} selected={s.id === current.id} onSelect={() => choose(s.id)} />
-              ))}
-            </ul>
-          </section>
-
-          <section
-            id="add"
-            ref={addRef}
-            aria-labelledby="own-heading"
-            className="mx-auto mt-10 max-w-[720px] scroll-mt-6"
-          >
-            <h2 id="own-heading" className="text-2xl text-ink">
-              Your own steps
-            </h2>
-            {own.length > 0 ? (
-              <ul role="list" className="mt-4 grid list-none gap-3 p-0">
-                {own.map((s) => (
-                  <StepRow key={s.id} step={s} selected={s.id === current.id} onSelect={() => choose(s.id)} />
-                ))}
-              </ul>
-            ) : (
-              <p className="mt-2 text-muted">Something from your own life you want to practise.</p>
-            )}
-
-            <form onSubmit={add} className="mt-5" noValidate>
-              <label htmlFor={inputId} className="block font-semibold text-ink">
-                Add your own step
-              </label>
-              <p id={`${inputId}-hint`} className="text-muted">
-                For example: ask the librarian for a book. Up to {MAX_CUSTOM} characters.
-              </p>
-              <div className="mt-2 flex flex-col gap-3 sm:flex-row">
-                <input
-                  id={inputId}
-                  ref={inputRef}
-                  aria-invalid={message === EMPTY}
-                  value={draft}
-                  maxLength={MAX_CUSTOM}
-                  onChange={(e) => {
-                    setDraft(e.target.value);
-                    if (message) setMessage("");
-                  }}
-                  aria-describedby={`${inputId}-hint ${messageId}`}
-                  className="min-h-[52px] flex-1 rounded-2xl border border-line bg-surface px-4 text-ink placeholder:text-muted focus-visible:border-ink"
-                />
-                <Button type="submit" variant="secondary" icon={Plus}>
-                  Add step
-                </Button>
+          <div className="mx-auto max-w-[1100px] px-4 md:px-8">
+            <PaperCard className="relative mx-auto -mt-6 max-w-[560px] md:-mt-[clamp(7rem,13vw,13rem)]">
+              {/* Announced when a row or stone changes what the card shows. */}
+              <div aria-live="polite">
+                <p className="text-muted">
+                  Step <span className="tabular">{level}</span> of 6
+                </p>
+                <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{current.title}</h2>
+                <p className="mt-2 text-ink">{LEVELS[level - 1].name}</p>
               </div>
-              <p id={messageId} role="status" className="mt-2 min-h-[1.55em] text-ink">
-                {message}
-              </p>
-            </form>
-          </section>
+              <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6" icon={ArrowRight} iconEnd>
+                {level === current.next ? "Continue" : `Practise step ${level}`}
+              </ButtonLink>
+              <p className="mt-4 text-muted">Choose a stone to practise a different step.</p>
+            </PaperCard>
+
+            {/* Laptop: the two lists sit side by side instead of one long column. */}
+            <div className="mx-auto mt-10 grid max-w-[720px] gap-10 lg:max-w-none lg:grid-cols-2 lg:gap-12">
+              <section aria-labelledby="steps-heading">
+                <h2 id="steps-heading" className="text-2xl text-ink">
+                  Steps on this island
+                </h2>
+                <ul role="list" className="mt-4 grid list-none gap-3 p-0">
+                  {builtIn.map((s) => (
+                    <StepRow key={s.id} step={s} selected={s.id === current.id} onSelect={() => choose(s.id)} />
+                  ))}
+                </ul>
+              </section>
+
+              <section
+                id="add"
+                ref={addRef}
+                aria-labelledby="own-heading"
+                className="scroll-mt-6"
+              >
+                <h2 id="own-heading" className="text-2xl text-ink">
+                  Your own steps
+                </h2>
+                {own.length > 0 ? (
+                  <ul role="list" className="mt-4 grid list-none gap-3 p-0">
+                    {own.map((s) => (
+                      <StepRow key={s.id} step={s} selected={s.id === current.id} onSelect={() => choose(s.id)} />
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-muted">Something from your own life you want to practise.</p>
+                )}
+
+                <form onSubmit={add} className="mt-5" noValidate>
+                  <label htmlFor={inputId} className="block font-semibold text-ink">
+                    Add your own step
+                  </label>
+                  <p id={`${inputId}-hint`} className="text-muted">
+                    For example: ask the librarian for a book. Up to {MAX_CUSTOM} characters.
+                  </p>
+                  <div className="mt-2 flex flex-col gap-3 sm:flex-row">
+                    <input
+                      id={inputId}
+                      ref={inputRef}
+                      aria-invalid={message === EMPTY}
+                      value={draft}
+                      maxLength={MAX_CUSTOM}
+                      onChange={(e) => {
+                        setDraft(e.target.value);
+                        if (message) setMessage("");
+                      }}
+                      aria-describedby={`${inputId}-hint ${messageId}`}
+                      className="min-h-[52px] flex-1 rounded-2xl border border-line bg-surface px-4 text-ink placeholder:text-muted focus-visible:border-ink"
+                    />
+                    <Button type="submit" variant="secondary" icon={Plus}>
+                      Add step
+                    </Button>
+                  </div>
+                  <p id={messageId} role="status" className="mt-2 min-h-[1.55em] text-ink">
+                    {message}
+                  </p>
+                </form>
+              </section>
+            </div>
+          </div>
         </>
-      ) : null}
+      ) : (
+        <div className="mx-auto max-w-[1100px] px-4 pt-6 md:px-8 md:pt-10">{heading(false)}</div>
+      )}
     </div>
   );
 }

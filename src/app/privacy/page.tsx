@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
+import { ArtHeader } from "@/components/scene/art-header";
 
 export const metadata: Metadata = {
   title: "Privacy - Rehearse Courage",
@@ -68,24 +67,22 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
 /** Privacy in plain English, for children and for parents. */
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-10">
-      <Link href="/me" className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 text-ink hover:underline">
-        <ArrowLeft size={22} weight="regular" aria-hidden />
-        Me
-      </Link>
-      <h1 className="mt-2 text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-ink">Privacy</h1>
-      <div className="mt-4 max-w-[60ch]">
-        {SECTIONS.map((s) => (
-          <section key={s.title} id={s.id} className="mt-6 scroll-mt-6">
-            <h2 className="text-2xl text-ink">{s.title}</h2>
-            {s.body.map((p) => (
-              <p key={p} className="mt-2 text-ink">
-                {p}
-              </p>
-            ))}
-          </section>
-        ))}
+    <>
+      <ArtHeader title="Privacy" line="What stays on your device, in plain English." art="/art/sky-home.webp" back={{ href: "/me", label: "Me" }} reading />
+      <div className="mx-auto max-w-[720px] px-4 pt-2 md:pt-4">
+        <div className="max-w-[60ch]">
+          {SECTIONS.map((s) => (
+            <section key={s.title} id={s.id} className="mt-6 scroll-mt-6">
+              <h2 className="text-2xl text-ink">{s.title}</h2>
+              {s.body.map((p) => (
+                <p key={p} className="mt-2 text-ink">
+                  {p}
+                </p>
+              ))}
+            </section>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }

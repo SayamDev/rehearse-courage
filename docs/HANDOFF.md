@@ -22,7 +22,7 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 | Plan 2: design system (`DESIGN.md`, tokens, fonts, comps) | Merged with Plan 3 |
 | Plan 3: every v1 screen | Merged (PR #2) |
 | Plan 4: AI coach, sentence tidy, speech to text, safety pipeline | Merged (PR #3) |
-| Fixes: each step its own task, calmer Panic now, dark-mode edges, firefly only | Merged (PR #4) |
+| Fixes: each step its own task, calmer Need a pause, dark-mode edges, firefly only | Merged (PR #4) |
 | Pop-ups: welcome guide, keep your progress safe | Merged (PR #5) |
 
 Tests on `main`: 430 unit tests, 132 Playwright tests (journeys, AI, pop-ups, axe on 22 routes in light and dark at 390 and 1280). Typecheck, lint and build clean. Worker is about 1.5 MB compressed (free plan limit 3 MB).
@@ -55,12 +55,12 @@ Tests on `main`: 430 unit tests, 132 Playwright tests (journeys, AI, pop-ups, ax
 ## How the app works (map of the code)
 
 - **State:** `src/lib/state.ts` (pure actions; `normalize` upgrades old saves), `src/lib/store.ts` (`useCourage()`, `act()`, localStorage key `courage:v1`, `hydrated` flag). Nothing leaves the device except AI for 13+.
-- **Screens:** views in `src/components/views/*`; pages in `src/app/*` are thin. Shell in `src/components/shell/*` (nav, Panic now button, pre-paint settings script in `layout.tsx`).
+- **Screens:** views in `src/components/views/*`; pages in `src/app/*` are thin. Shell in `src/components/shell/*` (nav, Need a pause button, pre-paint settings script in `layout.tsx`).
 - **Steps:** `src/components/views/step-view.tsx`. Step 1 shows the scene and ideas; steps 2 to 5 show "The moment" plus their own task heading (`TASK` map), with ideas under "Need a start?"; step 4 asks Cobi; step 6 is the real-life mission.
 - **Companion:** firefly only for now (`SPECIES_NOW` in `first-visit.tsx`; first visit is 3 screens). Hedgehog and fox stay in the code for old saves and future art.
-- **Panic now:** `?calm=1` on any route; `src/components/calm/panic-view.tsx`. Uses the `--help` token (calm teal) and a lifebuoy icon, never amber (amber means progress and rewards).
+- **Need a pause:** `?calm=1` on any route; `src/components/calm/panic-view.tsx`. Uses the `--help` token (calm teal) and a lifebuoy icon, never amber (amber means progress and rewards).
 - **AI (13+ only):** `/api/coach`, `/api/tidy`, `/api/transcribe` over `src/lib/ai/handlers.ts`: same origin, body size (413), age band (only `teen`/`adult`), crisis check, per-visitor daily share, then Groq `openai/gpt-oss-20b` / `whisper-large-v3-turbo`, then Workers AI (`AI` binding). Every reply passes `src/lib/safety/output.ts` (local filter, then Llama Guard). Browser side `src/lib/ai/client.ts` never sends for under 13, a skipped age, or with "Online AI help" off, and falls back to the on-device model (WebLLM, opt-in in Me) then pre-written replies (`src/lib/content/coach-replies.ts`).
-- **Pop-ups:** `src/components/popups/*`, rules in `src/lib/popups.ts` (one per visit; never on `/start`, steps, `/help`, `/privacy` or with Panic now open). Welcome guide once after naming the firefly; save nudge after 3 steps with no backup in 30 days.
+- **Pop-ups:** `src/components/popups/*`, rules in `src/lib/popups.ts` (one per visit; never on `/start`, steps, `/help`, `/privacy` or with Need a pause open). Welcome guide once after naming the firefly; save nudge after 3 steps with no backup in 30 days.
 
 ## Rules that must not be broken
 
