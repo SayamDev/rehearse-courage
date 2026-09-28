@@ -48,7 +48,7 @@ Also live (PR #22, 2026-09-28):
 Next:
 1. **Try on a real phone:** the recording button, the microphone check, on-device listening for under 13, installing the app.
 2. **Real-user testing** (teacher, teen, someone who stutters, someone with ADHD; STAMMA review of the stuttering copy and the speech tools).
-3. **Before launch:** re-check every helpline number in `src/lib/safety/crisis.ts` against official sites.
+3. **Helplines (checked 2026-09-28):** every number in `src/lib/safety/crisis.ts` matched each service's published details. Fixed Childline Ireland's age (18 or under, not under 18) and Childhelp (call or text), and added text options (`text` on a line, shown as a second link on `/help`): Childline Ireland 50101, Youthline 234, Kids Help Phone CONNECT to 686868, Lifeline 0477 13 11 14. The cloud container could not open the services' own sites (network policy), so the check used search results quoting them; **the maker should click through each official site once before launch.** Re-check yearly.
 4. **Companion Lottie set (optional):** the maker likes the painted firefly stills; a vector firefly exists (`public/lottie/firefly.json`, used by body double).
 
 Lottie: edit `scripts/lottie/build.mjs` (and `type.mjs` for type), run `node scripts/lottie/build.mjs ~/Projects/bondling-lottie-player` and check frames in the Skottie player on port 3130 (project "courage").

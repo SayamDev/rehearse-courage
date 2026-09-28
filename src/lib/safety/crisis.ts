@@ -44,13 +44,15 @@ export function checkCrisis(text: string): { crisis: boolean } {
   return { crisis: PATTERNS.some((p) => p.test(t)) };
 }
 
-export type SupportLine = { name: string; contact: string; note: string };
+/** `text` is an extra way to reach the same service by message, for people who would rather not speak. */
+export type SupportLine = { name: string; contact: string; text?: string; note: string };
 
+/** Numbers and notes checked against each service's published details on 2026-09-28. */
 const LINES: Record<string, { lines: SupportLine[]; emergency: string }> = {
   GB: {
     emergency: "999",
     lines: [
-      { name: "Childline", contact: "0800 1111", note: "Free, for anyone under 19." },
+      { name: "Childline", contact: "0800 1111", note: "Free, any time, for anyone under 19." },
       { name: "Samaritans", contact: "116 123", note: "Free, any time, for anyone." },
       { name: "Shout", contact: "Text SHOUT to 85258", note: "Free text support, any time." },
     ],
@@ -58,7 +60,7 @@ const LINES: Record<string, { lines: SupportLine[]; emergency: string }> = {
   IE: {
     emergency: "112 or 999",
     lines: [
-      { name: "Childline", contact: "1800 66 66 66", note: "Free, for anyone under 18." },
+      { name: "Childline", contact: "1800 66 66 66", text: "Text 50101", note: "Free, any time, for anyone 18 or under." },
       { name: "Samaritans", contact: "116 123", note: "Free, any time." },
     ],
   },
@@ -66,28 +68,28 @@ const LINES: Record<string, { lines: SupportLine[]; emergency: string }> = {
     emergency: "911",
     lines: [
       { name: "988 Suicide and Crisis Lifeline", contact: "Call or text 988", note: "Free, any time." },
-      { name: "Childhelp", contact: "1-800-422-4453", note: "Free, for children and teens facing abuse." },
+      { name: "Childhelp", contact: "Call or text 1-800-422-4453", note: "Free, any time, for children and teens facing abuse." },
     ],
   },
   NZ: {
     emergency: "111",
     lines: [
       { name: "Need to talk?", contact: "Call or text 1737", note: "Free, any time." },
-      { name: "Youthline", contact: "0800 376 633", note: "Free, for young people." },
+      { name: "Youthline", contact: "0800 376 633", text: "Text 234", note: "Free, any time, for young people." },
     ],
   },
   CA: {
     emergency: "911",
     lines: [
-      { name: "Kids Help Phone", contact: "1-800-668-6868", note: "Free, for young people." },
+      { name: "Kids Help Phone", contact: "1-800-668-6868", text: "Text CONNECT to 686868", note: "Free, any time, for young people." },
       { name: "Suicide Crisis Helpline", contact: "Call or text 988", note: "Free, any time." },
     ],
   },
   AU: {
     emergency: "000",
     lines: [
-      { name: "Kids Helpline", contact: "1800 55 1800", note: "Free, for ages 5 to 25." },
-      { name: "Lifeline", contact: "13 11 14", note: "Free, any time." },
+      { name: "Kids Helpline", contact: "1800 55 1800", note: "Free, any time, for ages 5 to 25." },
+      { name: "Lifeline", contact: "13 11 14", text: "Text 0477 13 11 14", note: "Free, any time." },
     ],
   },
 };
