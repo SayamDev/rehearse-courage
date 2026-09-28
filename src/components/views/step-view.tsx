@@ -598,6 +598,13 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
           {level === 6 ? (
             <>
               <p className="mt-5 text-ink">When you have had a go, come back and say how it went.</p>
+              <Link
+                href={`/ready?s=${encodeURIComponent(step.id)}`}
+                className="mt-2 inline-flex min-h-11 items-center gap-1.5 font-semibold text-accent-text hover:underline"
+              >
+                About to go? Get ready first
+                <ArrowRight size={18} weight="bold" aria-hidden />
+              </Link>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <Button icon={Check} onClick={() => finish({ seconds: null, typed: false, tried: "did" })}>
                   I did it

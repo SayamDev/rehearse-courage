@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, ChatCircleDots, Mountains, Star, Wind, type Icon } from "@phosphor-icons/react";
+import { ArrowRight, Check, ChatCircleDots, Mountains, Rocket, Star, Wind, type Icon } from "@phosphor-icons/react";
 import { stageFor, type Stage } from "@/lib/companion";
 import { braveWeek, missionsDone } from "@/lib/courage";
 import { dayKey } from "@/lib/dates";
@@ -36,6 +36,7 @@ const STAGE_LINE: Record<Stage, string> = {
 };
 
 const QUICK: { href: string; label: string; icon: Icon; ink: string }[] = [
+  { href: "/ready", label: "Right before", icon: Rocket, ink: "bg-coral" },
   { href: "/kit/breathing", label: "Breathe", icon: Wind, ink: "bg-sky" },
   { href: "/kit/grounding", label: "Ground", icon: Mountains, ink: "bg-lime" },
   { href: "/kit/rescue", label: "Rescue phrases", icon: ChatCircleDots, ink: "bg-sun" },
@@ -117,7 +118,7 @@ export function HomeView() {
             <h2 id="quick-heading" className="text-xl text-ink">
               Nervous right now?
             </h2>
-            <ul role="list" className="mt-3 grid list-none grid-cols-3 gap-3 p-0">
+            <ul role="list" className="mt-3 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-4">
               {QUICK.map((t) => (
                 <li key={t.href}>
                   <Link
