@@ -138,7 +138,7 @@ export function RoomView({ room }: { room: RoomId }) {
 
           <div className="mx-auto max-w-[1100px] px-4 md:px-8">
             {/* Laptop: the two lists sit side by side instead of one long column. */}
-            <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-12">
+            <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
               <section aria-labelledby="steps-heading">
                 <h2 id="steps-heading" className="text-2xl text-ink">
                   Steps on this island
@@ -188,7 +188,7 @@ export function RoomView({ room }: { room: RoomId }) {
                         if (message) setMessage("");
                       }}
                       aria-describedby={`${inputId}-hint ${messageId}`}
-                      className="min-h-[52px] flex-1 rounded-2xl border border-line bg-surface px-4 text-ink placeholder:text-muted focus-visible:border-ink"
+                      className="min-h-[52px] min-w-0 flex-1 rounded-2xl border border-line bg-surface px-4 text-ink placeholder:text-muted focus-visible:border-ink"
                     />
                     <Button type="submit" variant="secondary" icon={Plus}>
                       Add step
