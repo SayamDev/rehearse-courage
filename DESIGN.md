@@ -24,7 +24,7 @@ Tokens live in `src/app/globals.css` (light, and dark via system or `data-theme`
 | `--die` | #ffffff | #f7fbfb | Sticker die-cut borders |
 | Sticker inks | sun #ffc83d, sky #7cc4ff, grape #b8a4ff, coral #ff8a6b, lime #b8e62e | same | Room labels, icon discs; always ink text |
 
-Rooms: class = sky, friends = grape, presenting = coral.
+Rooms: class = sky, friends = grape, presenting = coral, out and about = lime.
 
 ## Typography
 
@@ -48,6 +48,13 @@ Top bar on every page: teal sticker wordmark, section links from 768px, Need a p
 - Need a pause: a soft blue pill with the pause mark (a dot in two rings, the shape of the breathing circle it opens). The pause screen is tinted blue, with the breathing circle (rings, a growing fill and a gentle count) and three next options.
 - Body kit: two groups ("Calm your body", "Find your words"), each tool a tile with a sticker icon and how long it takes. Tools are hands-on: grounding counts what you notice, rescue phrases can be starred and heard back, sentence frames have inline gaps, speech tools have a practice word, a pacer or a gentle-start bar. `SayAndListen` records to memory only, to listen back.
 - `Lottie`: plays `public/lottie/*.json`, built by `scripts/lottie/build.mjs` and checked in the Skottie player.
+- `LevelMeter` / `LevelSticker`: the courage level as a number in a teal die-cut sticker, "Level 4: Lantern", and a bar that only fills. Home (side card, and under the greeting on phones), Me, the journey page and the step-done card when a new level is reached.
+- `DareCard`: today's tiny dare on Home, a sun sticker with a lightning icon, secondary buttons only (the step card keeps the one teal button).
+- `ShareButton`: opens "Share it", a square picture drawn on a canvas on the device (always the light palette: white card, teal wordmark sticker, the badge, level number or icon in a round die-cut, title in Bricolage). Add my name is off by default.
+- Badges without painted art yet: a bold Phosphor icon on a sticker ink, in the same round die-cut (`BADGE_ICON` in `sticker.tsx`).
+- Journey (`/journey`): level card, four stat stickers, proud moments, a lantern calendar (brave days are teal stickers; other days are plain, never marked as missed), newest badges.
+- Right before (`/ready`): one screen at a time with a four-part progress bar, like a step.
+- Print: `@media print` in `globals.css` prints light on white with no top bar or tabs (`data-no-print` hides chrome); `/for-adults` has a Print button.
 
 ## Motion
 

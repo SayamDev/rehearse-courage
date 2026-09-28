@@ -1,6 +1,6 @@
 # Handoff: Rehearse Courage
 
-Last updated: 2026-09-28 (UK time). **Read this first in a new session**, then `PRODUCT.md`, `DESIGN.md` and the spec. Everything below is on `main`.
+Last updated: 2026-09-28 evening (UK time). **Read this first in a new session**, then `PRODUCT.md`, `DESIGN.md` and the spec. Everything below is on `main`.
 
 ## Start here (paste into a new session)
 
@@ -25,7 +25,7 @@ Rehearse Courage is a free, private, no-login web app that helps people of any a
 | Fixes: each step its own task, calmer Need a pause, dark-mode edges, firefly only | Merged (PR #4) |
 | Pop-ups: welcome guide, keep your progress safe | Merged (PR #5) |
 
-Tests on `main`: 430 unit tests, 132 Playwright tests (journeys, AI, pop-ups, axe on 22 routes in light and dark at 390 and 1280). Typecheck, lint and build clean. Worker is about 1.5 MB compressed (free plan limit 3 MB).
+Tests on `main` (before the 2026-09-28 evening batch below): 430 unit tests, 132 Playwright tests (journeys, AI, pop-ups, axe on 22 routes in light and dark at 390 and 1280). Typecheck, lint and build clean. Worker is about 1.5 MB compressed (free plan limit 3 MB).
 
 **Not yet confirmed live:** that the Groq key works. Check at step 4 as an adult (Me, age Adult): a reply that answers what you typed means AI is on; a general line means it fell back. Or:
 `curl -s -X POST https://rehearse-courage.sayamdev.workers.dev/api/coach -H "Origin: https://rehearse-courage.sayamdev.workers.dev" -H "Content-Type: application/json" -d '{"age":"adult","situationId":"class-answer","room":"class","answer":"I think the answer is ten"}'`
@@ -43,13 +43,27 @@ Also live (PR #22, 2026-09-28):
 - **Re-recording** after changing any line: open VoiceStudio, choose the MLX-Audio engine with the Qwen3-TTS VoiceDesign model (`POST /engines/select {"family":"tts","backend_id":"mlx-audio","model_id":"mlx-community/Qwen3-TTS-12Hz-1.7B-VoiceDesign-4bit"}`), then `npm run voices:record` (about 2 s a clip; skips existing clips, deletes stale ones). Always let the maker hear samples before changing a voice (`afplay` a generated wav).
 - Step 6 celebration: `for-real` Lottie ("You did it for real." with rays, flag and burst), its own card and spoken line.
 - On-device listening for under 13 (`src/lib/voice/listen.ts` + `listen.worker.ts`, Whisper tiny via `@huggingface/transformers`, opt-in download in Me > Voices & AI, setting `deviceListen`): at step 4 Cobi shows "Cobi heard: ..." and the words get the on-device crisis check. **Not yet tested on a real phone.**
-- Tidy: `src/lib/scenes.ts` replaced by `src/lib/progress.ts`; unused paintings and OmniVoice reference clips deleted.
+- Tidy: `src/lib/scenes.ts` replaced by `src/lib/progress.ts`; unused paintiBuilt on 2026-09-28 (evening), on `claude/clever-lamport-mlnueu` (PR #23, with the helpline check):
+- **Two tabs:** `store.ts` re-reads storage before each save if another tab saved since, and listens for `storage` events, so an older tab never saves over newer progress.
+- **Printable guide:** `/for-adults` has Print this guide; `@media print` in `globals.css` (light on white, `data-no-print` hides chrome). Two A4 pages.
+- **Out and about** (fourth island, lime, `RoomId` `out`): order at a counter, ask in a shop, a phone call, ask the way. New steps elsewhere: answer the register, suggest a plan, say no kindly, take a question after a talk. 18 situations. Room explorer now needs all four islands.
+- **Progress that adds up:** courage levels (`src/lib/rank.ts`: Spark to Daybreak, then Star levels); tiny dares (`src/lib/content/dares.ts`, one a day on Home; kids never get a stranger dare without a grown-up); brave days count any brave thing and a lifetime total never resets (`braveDayKeys` in `courage.ts`); `allPoints` adds dares 10, games 5, Right before 5, Not yet 5 (daily limits) and 10 for a day with all quests done. Ten new badges (22 in all), shown as icon stickers until painted (see `design/art-manifest.md`).
+- **Your journey** (`/journey`): level, totals, proud moments, lantern calendar, newest badges. **Share cards** (`src/lib/share-card.ts`, `components/share/share-button.tsx`): a picture drawn on the device, Web Share where the device supports files, Save picture everywhere.
+- **Step 6:** I did it / I tried / Not yet. Trying saves a proud moment (`state.proud`); then "How did it feel?" and an optional note (crisis-checked, kept on the device). Not yet has its own kind screen and counts.
+- **Right before** (`/ready`): pick the moment, one breath, your words, a rescue phrase, go. From Home, step 6 and Not yet.
+- **Games:** Say it like, Describe it, Keep it going (8 in all). Fixed Hot seat sticking on "spinning" (the old "flake") and hydration errors in Rescue snap and Word builder.
+- **Voices:** the new lines are in the recording script. Until the next `npm run voices:record` on the Mac they play with the on-device voice.
+
+ngs and OmniVoice reference clips deleted.
 
 Next:
 1. **Try on a real phone:** the recording button, the microphone check, on-device listening for under 13, installing the app.
 2. **Real-user testing** (teacher, teen, someone who stutters, someone with ADHD; STAMMA review of the stuttering copy and the speech tools).
 3. **Helplines (checked 2026-09-28):** every number in `src/lib/safety/crisis.ts` matched each service's published details. Fixed Childline Ireland's age (18 or under, not under 18) and Childhelp (call or text), and added text options (`text` on a line, shown as a second link on `/help`): Childline Ireland 50101, Youthline 234, Kids Help Phone CONNECT to 686868, Lifeline 0477 13 11 14. The cloud container could not open the services' own sites (network policy), so the check used search results quoting them; **the maker should click through each official site once before launch.** Re-check yearly.
 4. **Companion Lottie set (optional):** the maker likes the painted firefly stills; a vector firefly exists (`public/lottie/firefly.json`, used by body double).
+5. **Record the new voice lines** (`npm run voices:record` with Qwen3-TTS as above): new situations, coach lines, dares, Right before and the three new games. Let the maker hear the new friend lines in Keep it going first.
+6. **Paint the ten newer badges** (list in `design/art-manifest.md`), then add their ids to `ART_IDS` in `sticker.tsx`.
+7. **Try sharing on a real phone** (the share sheet with a picture), and check a lantern calendar after a few real days.
 
 Lottie: edit `scripts/lottie/build.mjs` (and `type.mjs` for type), run `node scripts/lottie/build.mjs ~/Projects/bondling-lottie-player` and check frames in the Skottie player on port 3130 (project "courage").
 
@@ -72,7 +86,8 @@ Lottie: edit `scripts/lottie/build.mjs` (and `type.mjs` for type), run `node scr
 - **Companion:** firefly only for now (`SPECIES_NOW` in `first-visit.tsx`; first visit is 3 screens). Hedgehog and fox stay in the code for old saves and future art.
 - **Need a pause:** `?calm=1` on any route; `src/components/calm/panic-view.tsx`. Uses the `--help` token (calm teal) and a lifebuoy icon, never amber (amber means progress and rewards).
 - **AI (13+ only):** `/api/coach`, `/api/tidy`, `/api/transcribe` over `src/lib/ai/handlers.ts`: same origin, body size (413), age band (only `teen`/`adult`), crisis check, per-visitor daily share, then Groq `openai/gpt-oss-20b` / `whisper-large-v3-turbo`, then Workers AI (`AI` binding). Every reply passes `src/lib/safety/output.ts` (local filter, then Llama Guard). Browser side `src/lib/ai/client.ts` never sends for under 13, a skipped age, or with "Online AI help" off, and falls back to the on-device model (WebLLM, opt-in in Me) then pre-written replies (`src/lib/content/coach-replies.ts`).
-- **Pop-ups:** `src/components/popups/*`, rules in `src/lib/popups.ts` (one per visit; never on `/start`, steps, `/help`, `/privacy` or with Need a pause open). Welcome guide once after naming the firefly; save nudge after 3 steps with no backup in 30 days.
+- **Progress:** points in `src/lib/courage.ts` (`allPoints`, `braveDayKeys`), levels in `src/lib/rank.ts`, dares in `src/lib/content/dares.ts`, journey data in `src/lib/journey.ts`, share pictures in `src/lib/share-card.ts`.
+- **Pop-ups:** `src/components/popups/*`, rules in `src/lib/popups.ts` (one per visit; never on `/start`, steps, `/ready`, `/help`, `/privacy` or with Need a pause open). Welcome guide once after naming the firefly; save nudge after 3 steps with no backup in 30 days.
 
 ## Rules that must not be broken
 

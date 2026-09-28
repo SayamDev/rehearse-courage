@@ -21,8 +21,8 @@ Rewards courage, not performance. It never scores fluency, fillers, pauses or st
 ## Operating Context
 
 - Courage ladder per situation: think it, type or whisper it, say it alone, say it to the coach, a little pressure (optional), try it for real.
-- Rooms in v1: Class, Friends, Presenting. Tools reachable from every screen: Need a pause, body kit, rescue phrases, sentence builder.
-- Game layer: courage map, a companion creature the user picks (firefly, hedgehog, paper fox) that grows braver, courage points, weekly brave days, badges, daily quests, mini-games.
+- Rooms (islands): Class, Friends, Presenting, Out and about (ordering, shops, phone calls, asking the way). Tools reachable from every screen: Need a pause, body kit, rescue phrases, sentence builder. Right before: a one-minute warm-up for just before the real moment.
+- Game layer: courage map, a companion creature the user picks (firefly, hedgehog, paper fox) that grows braver, courage points and courage levels (they only go up), brave days (weekly and lifetime, never a streak), a tiny real-life dare each day, badges, daily quests, eight warm-up games, and a journey page of proud moments that can be shared as a picture made on the device.
 - Sessions are short (about 60 seconds is enough). Voice on device (Kokoro); "Type instead" everywhere.
 
 ## Capabilities and Constraints

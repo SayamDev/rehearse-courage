@@ -3,6 +3,27 @@
 Status: **DONE** (2026-09-28 batch below fills every gap the app uses). The
 history below is kept for provenance; the older status text follows.
 
+## Still needed: ten newer badges (added 2026-09-28, after the batch below)
+
+These badges show a bold Phosphor icon on a sticker ink until they are
+painted (`BADGE_ICON` in `src/components/ui/sticker.tsx`; add the id to
+`ART_IDS` there once `public/art/badges/<id>.webp` exists). Same coin style
+as the others, no baked tick, no text or numbers (the brave-day counts are
+in the title, never on the coin), circular mask, 320px WebP.
+
+| Badge id | Title | Idea for the coin |
+|---|---|---|
+| `tiny-dare` | Tiny dare | A small lightning spark |
+| `dare-collector` | Dare collector | A handful of sparks or stars |
+| `ready-steady` | Ready, steady | A paper rocket on a launch pad |
+| `not-yet` | Not yet counts | A seedling sprouting |
+| `proud-moment` | Proud moment | A heart with a small flag |
+| `game-explorer` | Game explorer | A game controller or dice |
+| `brave-3` | Three brave days | Three small lanterns |
+| `brave-7` | Seven brave days | A string of lanterns |
+| `brave-30` | Thirty brave days | A lantern-lit path |
+| `brave-100` | A hundred brave days | A sunrise over lanterns |
+
 ## 2026-09-28 batch (12ui free allowance, $0 charged)
 
 Seven `12ui draft` runs, 15 candidates in total, all on the daily free allowance

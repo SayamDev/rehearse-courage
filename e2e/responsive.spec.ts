@@ -19,6 +19,12 @@ const ROUTES = [
   "/about",
   "/for-adults",
   "/help",
+  "/journey",
+  "/ready",
+  "/ready?s=friends-join",
+  "/room/out",
+  "/games/say-it-like",
+  "/games/keep-it-going",
 ];
 
 // The narrowest phones and a portrait tablet: nothing may scroll sideways.
