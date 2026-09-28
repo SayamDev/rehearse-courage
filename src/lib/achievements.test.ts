@@ -41,7 +41,8 @@ describe("achievements", () => {
     expect(earnedBadges({ ...empty, records: [rec("friends-join", 5)] })).not.toContain("hand-up");
     expect(earnedBadges({ ...empty, records: [rec("friends-join", 6)] })).toContain("out-in-the-wild");
     const rooms = [rec("class-answer", 1), rec("friends-join", 1), rec("present-intro", 1)];
-    expect(earnedBadges({ ...empty, records: rooms })).toContain("room-explorer");
+    expect(earnedBadges({ ...empty, records: rooms })).not.toContain("room-explorer");
+    expect(earnedBadges({ ...empty, records: [...rooms, rec("out-order", 1)] })).toContain("room-explorer");
   });
 
   test("event-based badges", () => {

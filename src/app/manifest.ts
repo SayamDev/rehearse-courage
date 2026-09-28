@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Rehearse Courage: practise speaking up",
     short_name: "Courage",
-    description: "Free, private practice for speaking up in class, with friends and in front of a group.",
+    description: "Free, private practice for speaking up in class, with friends, in front of a group and out and about.",
     start_url: "/",
     scope: "/",
     display: "standalone",

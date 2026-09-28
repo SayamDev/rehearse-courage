@@ -22,7 +22,7 @@ import { Greeting } from "./greeting";
 import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
 /** Each island's sticker colour, used for its label wherever the room is named. */
-export const ROOM_STICKER: Record<RoomId, string> = { class: "sticker-sky", friends: "sticker-grape", presenting: "sticker-coral" };
+export const ROOM_STICKER: Record<RoomId, string> = { class: "sticker-sky", friends: "sticker-grape", presenting: "sticker-coral", out: "sticker-lime" };
 
 /** What the companion is doing, growing with courage points. */
 const STAGE_LINE: Record<Stage, string> = {
@@ -43,7 +43,7 @@ const DISC = "flex shrink-0 items-center justify-center rounded-full border-[3px
 
 /**
  * Home ("/"): a greeting, today's one step (with its six-step track and one
- * Start button) and the three islands; beside them the companion, this
+ * Start button) and the four islands; beside them the companion, this
  * week's brave days, today's optional quests and quick calm tools. Renders
  * nothing until the store has hydrated and a companion exists (RedirectIfNew
  * sends first-time visitors to /start).
@@ -161,7 +161,7 @@ export function HomeView() {
                 Open the map
               </Link>
             </div>
-            <ul role="list" className="mt-3 grid list-none gap-3 p-0 sm:grid-cols-3">
+            <ul role="list" className="mt-3 grid list-none gap-3 p-0 sm:grid-cols-2">
               {ROOM_IDS.map((r) => {
                 const far = furthestInRoom(store.records, r);
                 const RoomIcon = ROOM_ICON[r];

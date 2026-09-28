@@ -11,9 +11,10 @@ const allText = (): string[] => [
 
 describe("content", () => {
   test("every room has its situations from the spec", () => {
-    expect(SITUATIONS.filter((s) => s.room === "class")).toHaveLength(4);
-    expect(SITUATIONS.filter((s) => s.room === "friends")).toHaveLength(4);
-    expect(SITUATIONS.filter((s) => s.room === "presenting")).toHaveLength(2);
+    expect(SITUATIONS.filter((s) => s.room === "class")).toHaveLength(5);
+    expect(SITUATIONS.filter((s) => s.room === "friends")).toHaveLength(6);
+    expect(SITUATIONS.filter((s) => s.room === "presenting")).toHaveLength(3);
+    expect(SITUATIONS.filter((s) => s.room === "out")).toHaveLength(4);
   });
 
   test("ids are unique and lookup works", () => {

@@ -53,6 +53,7 @@ describe("HARD_THING_LABELS / hardThingOptions", () => {
       class: "Talking in class",
       friends: "With friends",
       presenting: "Presenting",
+      out: "Ordering, shops or phone calls",
       panic: "Panic",
       blushing: "Blushing or sweating",
       stuttering: "Stuttering",

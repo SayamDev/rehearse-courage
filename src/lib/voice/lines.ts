@@ -63,7 +63,7 @@ export function voiceFor(role: Role, set: VoiceSet, accent: Accent = "uk"): Voic
 /** Kids hear pre-recorded lines about 10% slower (pitch kept). */
 export const KIDS_RATE = 0.9;
 
-export const ROOM_ROLE: Record<RoomId, Role> = { class: "teacher", friends: "friend", presenting: "host" };
+export const ROOM_ROLE: Record<RoomId, Role> = { class: "teacher", friends: "friend", presenting: "host", out: "host" };
 
 /** FNV-1a, 32-bit: a short, stable id for a clip. */
 function hash(s: string): string {

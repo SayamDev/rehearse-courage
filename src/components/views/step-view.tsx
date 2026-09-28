@@ -48,6 +48,7 @@ const COBI_PLAYS: Record<RoomId, string> = {
   class: "Cobi plays your teacher and will answer you.",
   friends: "Cobi plays one of your friends and will answer you.",
   presenting: "Cobi plays someone in the audience and will answer you.",
+  out: "Cobi plays the person serving you and will answer you.",
 };
 
 function taskHint(level: Level, room: RoomId): string {

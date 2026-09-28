@@ -6,6 +6,7 @@ export const ROLE: Record<RoomId, string> = {
   class: "the teacher in a school class",
   friends: "a friend in a small, friendly group",
   presenting: "a kind listener in the audience",
+  out: "a friendly person serving at a counter, in a shop or on the phone",
 };
 
 const SHARED_RULES = `Rules you must always follow:

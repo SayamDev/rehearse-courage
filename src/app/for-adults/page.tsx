@@ -39,7 +39,7 @@ export default function ForAdultsPage() {
         {/* On paper the top bar is gone, so say where this came from. */}
         <p className="hidden font-display font-bold text-ink print:block">Rehearse Courage · rehearse-courage.sayamdev.workers.dev</p>
         <p className="max-w-[62ch] text-ink">
-          Rehearse Courage is a free, private place to practise speaking up: answering in class, joining friends, and talking in front of a group. It is
+          Rehearse Courage is a free, private place to practise speaking up: answering in class, joining friends, talking in front of a group, and everyday moments like ordering food or making a phone call. It is
           built for anyone who finds that hard, including anxiety, shyness, ADHD, stuttering and losing your words.
         </p>
         <div className="mt-5 flex flex-wrap items-center gap-3" data-no-print>

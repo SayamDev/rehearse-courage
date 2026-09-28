@@ -9,6 +9,7 @@ export const ROOM_LABEL: Record<RoomId, string> = {
   class: "Class",
   friends: "Friends",
   presenting: "Presenting",
+  out: "Out and about",
 };
 
 export function isRoomId(id: string): id is RoomId {

@@ -18,12 +18,20 @@ export const COACH_LINES: Record<string, Words> = {
   "class-ask": w("Does anyone have a question about today's lesson?", "Before we move on, any questions about that part?"),
   "class-read": w("Would you read the next few lines for us, please?", "Could you read the next paragraph aloud for us?"),
   "class-group": w("What ideas does your group have so far?", "Let's hear from everyone. What do you think we should do?"),
+  "class-register": w("Right, let's do the register. Who is here today?", "Let's check who's here. I'll read out the names."),
   "friends-join": w("We were just talking about the weekend. What did you do?", "We were just talking about the weekend. Any plans?"),
   "friends-opinion": w("Which one do you like best?", "What do you think about it?"),
   "friends-disagree": w("I think it is the best one ever. Do you agree?", "I reckon it is the best one out there. Agree?"),
   "friends-story": w("Did anything funny happen to you this week?", "Anything interesting happen to you lately?"),
+  "friends-invite": w("I'm not sure what to do at break today.", "I've got nothing planned this week, actually."),
+  "friends-no": w("Can I have your pudding? Please?", "Could you cover my turn again? Just this once?"),
   "present-intro": w("Could you tell the group a little about yourself?", "Would you introduce yourself to the group?"),
   "present-minute": w("You have one minute. Whenever you are ready.", "The floor is yours for a minute. Start when you are ready."),
+  "present-questions": w("Thank you for your talk. Can I ask a question about it?", "Thanks for that. I have a question, if that's all right."),
+  "out-order": w("Hi there. What can I get you?", "Hi, what can I get for you?"),
+  "out-shop": w("Hello. Are you finding everything all right?", "Hi there. Can I help you find anything?"),
+  "out-phone": w("Hello?", "Hello, how can I help?"),
+  "out-directions": w("Hello. Are you lost?", "Hi. You look like you're looking for something."),
 };
 
 /** Used for the person's own steps and any situation without its own line. */
@@ -34,6 +42,7 @@ export const PRESSURE_LINES: Record<RoomId, Words> = {
   class: w("The teacher looks at you and smiles."),
   friends: w("Your friends turn to you and wait."),
   presenting: w("The room goes quiet and looks at you."),
+  out: w("The person serving looks up, ready for you. Someone is waiting behind you."),
 };
 
 /**
@@ -52,6 +61,10 @@ export const PRESSURE_CUES: Record<RoomId, { role: "teacher" | "friend" | "host"
   presenting: [
     { role: "host", text: w("Whenever you're ready.") },
     { role: "classmate", text: w("We're all ears.") },
+  ],
+  out: [
+    { role: "host", text: w("Next, please. What would you like?") },
+    { role: "classmate", text: w("No rush.") },
   ],
 };
 

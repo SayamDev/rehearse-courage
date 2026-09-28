@@ -15,6 +15,7 @@ const HARD_TO_ROOM: Partial<Record<HardThing, RoomId>> = {
   class: "class",
   friends: "friends",
   presenting: "presenting",
+  out: "out",
 };
 
 export function highestLevel(records: StepRecord[], situationId: string): Level | 0 {

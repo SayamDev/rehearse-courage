@@ -11,7 +11,7 @@ export const BADGE_HINTS: Record<string, string> = {
   "out-in-the-wild": "Try a step for real, at step 6.",
   "calm-captain": "Use the body kit 10 times.",
   "rescue-ready": "Practise 5 rescue phrases.",
-  "room-explorer": "Try a step on all three islands.",
+  "room-explorer": "Try a step on every island.",
   "my-own-step": "Add a step of your own on any island.",
   "then-and-now": "Listen back to how far you have come (coming soon).",
   dawn: "Reach step 3 in every situation on the map.",

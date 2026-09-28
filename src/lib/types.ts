@@ -3,7 +3,7 @@ export type AgeBand = "under13" | "teen" | "adult";
 /** Text written twice: simpler for under 13, fuller for everyone else. */
 export type Words = { kid: string; grown: string };
 
-export type RoomId = "class" | "friends" | "presenting";
+export type RoomId = "class" | "friends" | "presenting" | "out";
 
 /** 1 think, 2 type or whisper, 3 say alone, 4 say to coach, 5 a little pressure, 6 real-life mission. */
 export type Level = 1 | 2 | 3 | 4 | 5 | 6;
@@ -12,6 +12,7 @@ export type HardThing =
   | "class"
   | "friends"
   | "presenting"
+  | "out"
   | "panic"
   | "blushing"
   | "stuttering"
@@ -22,6 +23,7 @@ export const HARD_THINGS: HardThing[] = [
   "class",
   "friends",
   "presenting",
+  "out",
   "panic",
   "blushing",
   "stuttering",
@@ -29,7 +31,7 @@ export const HARD_THINGS: HardThing[] = [
   "focus",
 ];
 
-export const ROOM_IDS: RoomId[] = ["class", "friends", "presenting"];
+export const ROOM_IDS: RoomId[] = ["class", "friends", "presenting", "out"];
 
 export type Species = "firefly" | "hedgehog" | "fox";
 
