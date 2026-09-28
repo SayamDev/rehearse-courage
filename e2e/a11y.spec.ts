@@ -29,6 +29,7 @@ const ROUTES = [
   "/games/word-builder",
   "/games/breath-balloon",
   "/about",
+  "/for-adults",
   "/offline",
   "/?calm=1",
   "/no-such-page",

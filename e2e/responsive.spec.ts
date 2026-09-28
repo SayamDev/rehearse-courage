@@ -17,6 +17,7 @@ const ROUTES = [
   "/games/word-builder",
   "/games/story-dice",
   "/about",
+  "/for-adults",
   "/help",
 ];
 

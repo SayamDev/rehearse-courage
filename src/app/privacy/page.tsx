@@ -59,7 +59,7 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
   {
     title: "For parents and carers",
     body: [
-      "Children under 13, and anyone who skips the age question, never use AI features, and their words and voice never leave the device. Cobi's replies for them are written in advance. Nothing here asks for a name, email or photo. Rehearse Courage is practice, not therapy.",
+      "Children under 13, and anyone who skips the age question, never use AI features, and their words and voice never leave the device. Cobi's replies for them are written in advance. The app asks for a first name only to greet you; it is optional and stays on the device. It never asks for an email, a photo or a full name. Rehearse Courage is practice, not therapy.",
     ],
   },
 ];

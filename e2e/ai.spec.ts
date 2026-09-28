@@ -116,14 +116,16 @@ test("tidy says so when it is not available", async ({ page }) => {
 
 test("Me: a teen can turn online help off; under 13 sees no AI switches", async ({ page }) => {
   await seed(page);
-  await page.goto("/me");
+  await page.goto("/me#voices");
   const online = page.getByRole("switch", { name: "Online AI help" });
   await expect(online).toHaveAttribute("aria-checked", "true");
   await online.click();
   await expect(online).toHaveAttribute("aria-checked", "false");
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem("courage:v1")!).settings.onlineHelp)).toBe(false);
 
+  await page.getByRole("tab", { name: "You", exact: true }).click();
   await page.getByRole("button", { name: "Under 13" }).click();
+  await page.getByRole("tab", { name: "Voices & AI" }).click();
   await expect(page.getByText("AI help is only for people aged 13 and over.")).toBeVisible();
   await expect(page.getByRole("switch", { name: "Online AI help" })).toHaveCount(0);
 });

@@ -83,7 +83,7 @@ export function SayAndListen({
 
   return (
     <div>
-      <SpeakButton state={speak.state} onStart={speak.start} onStop={stop} label={label} variant={variant} className="w-full" />
+      <SpeakButton state={speak.state} level={speak.level} seconds={speak.seconds} onStart={speak.start} onStop={stop} label={label} variant={variant} className="w-full" />
       {speak.state === "blocked" ? (
         <p className="mt-2 text-ink" role="status">
           The microphone is off. You can still say it quietly to yourself.

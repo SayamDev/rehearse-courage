@@ -332,6 +332,27 @@ a {
   }
 }
 
+/* Recording: a soft coral ring pulses out from the button, and the red dot blinks. */
+@keyframes rec-ring {
+  0% {
+    box-shadow: var(--sticker-shadow), 0 0 0 0 color-mix(in srgb, var(--coral) 55%, transparent);
+  }
+  100% {
+    box-shadow: var(--sticker-shadow), 0 0 0 16px transparent;
+  }
+}
+.rec-ring {
+  animation: rec-ring 1.4s var(--ease-out) infinite;
+}
+@keyframes rec-dot {
+  50% {
+    opacity: 0.25;
+  }
+}
+.rec-dot {
+  animation: rec-dot 1.1s ease-in-out infinite;
+}
+
 /* Speech tools, easy start: the sound grows gently from nothing, once per word. */
 @keyframes swell {
   from {

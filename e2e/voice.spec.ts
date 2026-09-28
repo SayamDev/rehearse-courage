@@ -46,6 +46,7 @@ test("the voice offer appears once after a first practice, and Not now counts as
 test("Me has the voice settings, with the coach playing by itself by default", async ({ page }) => {
   await seed(page);
   await page.goto("/me");
+  await page.getByRole("tab", { name: "Voices & AI" }).click();
   await expect(page.getByRole("heading", { name: "Voices" })).toBeVisible();
   await expect(page.getByRole("switch", { name: "Play the coach's lines automatically" })).toBeChecked();
 });

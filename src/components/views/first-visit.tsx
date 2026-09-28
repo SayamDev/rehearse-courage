@@ -11,6 +11,7 @@ import type { AgeBand, HardThing, Species } from "@/lib/types";
 
 import { Companion } from "@/components/scene/companion";
 import { Lottie } from "@/components/ui/lottie";
+import { MicCheck } from "@/components/voice/mic-check";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Button } from "@/components/ui/button";
 
@@ -294,6 +295,9 @@ function StepName({
         onChange={(e) => onNameChange(e.target.value)}
         className="h-12 w-full rounded-full border border-line bg-surface-2 px-5 text-ink placeholder:text-muted focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
       />
+      <div className="mt-6">
+        <MicCheck compact />
+      </div>
       <Button type="submit" variant="primary" className="mt-6 w-full sm:w-auto">
         Let&apos;s go
       </Button>

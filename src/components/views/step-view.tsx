@@ -460,19 +460,15 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
               ) : (
                 <>
                   <div className="grid gap-3 sm:grid-cols-2">
-                    <SpeakButton ref={speakRef} state={speak.state} onStart={speak.start} onStop={speak.stop} />
+                    <SpeakButton ref={speakRef} state={speak.state} level={speak.level} seconds={speak.seconds} onStart={speak.start} onStop={speak.stop} />
                     <Button variant="secondary" icon={Keyboard} onClick={typeInstead}>
                       Type instead
                     </Button>
                   </div>
                   <p className="mt-3 text-muted">
-                    {speak.state === "listening" ? (
-                      <span className="tabular" aria-hidden>
-                        {speak.seconds} seconds so far
-                      </span>
-                    ) : (
-                      "Hold the button while you speak, or tap once to start and again to stop."
-                    )}
+                    {speak.state === "listening"
+                      ? "Take your time. Pauses and stumbles are fine."
+                      : "Hold the button while you speak, or tap once to start and again to stop."}
                   </p>
                 </>
               )}
