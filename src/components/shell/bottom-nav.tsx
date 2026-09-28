@@ -33,7 +33,7 @@ export function activeNav(pathname: string): string {
     return "/map";
   }
   if (pathname.startsWith("/kit")) return "/kit";
-  if (pathname.startsWith("/badges")) return "/badges";
+  if (pathname.startsWith("/badges") || pathname.startsWith("/journey")) return "/badges";
   if (pathname.startsWith("/me")) return "/me";
   return "";
 }

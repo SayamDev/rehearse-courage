@@ -18,6 +18,9 @@ import { ProgressTrack } from "@/components/scene/progress-track";
 import { ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { pointsLabel } from "@/components/ui/stats-pill";
+import { LevelMeter, LevelSticker } from "@/components/ui/level-card";
+import { rankFor, rankLabel } from "@/lib/rank";
+import { DareCard } from "./dare-card";
 import { Greeting } from "./greeting";
 import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
@@ -59,6 +62,7 @@ export function HomeView() {
   const stage = stageFor(model.points, missionsDone(store.records));
   const room: RoomId | null = model.done ? null : (situationById(model.situationId)?.room ?? "class");
   const week = braveWeek(store.records, now, store.events);
+  const rank = rankFor(model.points);
   const quests = dailyQuests(today).map((q) => ({ q, done: questProgress(q, store.records, store.events, today) }));
 
   return (
@@ -70,6 +74,11 @@ export function HomeView() {
         <div className="min-w-0 flex-1">
           <Greeting name={store.name} />
           <p className="mt-1 text-muted">One small step is enough. Go at your own pace.</p>
+          {/* Phones: the level is a tap away (the full meter sits further down). */}
+          <Link href="/journey" className="mt-2 inline-flex min-h-11 items-center gap-2 font-semibold text-ink lg:hidden">
+            <LevelSticker level={rank.level} size={32} />
+            <span className="underline decoration-accent decoration-2 underline-offset-4">{rankLabel(rank)}</span>
+          </Link>
         </div>
       </div>
 
@@ -101,6 +110,8 @@ export function HomeView() {
               </>
             )}
           </PaperCard>
+
+          <DareCard />
 
           <section aria-labelledby="quick-heading">
             <h2 id="quick-heading" className="text-xl text-ink">
@@ -198,6 +209,10 @@ export function HomeView() {
             </p>
           </div>
 
+          <section aria-label="Courage level" className={SIDE_CARD}>
+            <LevelMeter rank={rank} points={model.points} link />
+          </section>
+
           <section aria-labelledby="week-heading" className={SIDE_CARD}>
             <div className="flex items-baseline justify-between gap-3">
               <h2 id="week-heading" className="text-xl text-ink">
@@ -226,7 +241,7 @@ export function HomeView() {
               ))}
             </ol>
             <p className="tabular mt-3 text-muted">
-              {model.braveDays} brave day{model.braveDays === 1 ? "" : "s"} so far. Any step counts.
+              {model.braveDays} brave day{model.braveDays === 1 ? "" : "s"} so far. Anything brave counts.
             </p>
           </section>
 

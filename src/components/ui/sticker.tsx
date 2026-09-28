@@ -45,6 +45,13 @@ export const BADGE_ICON: Record<string, { icon: Icon; ink: string }> = {
   "brave-100": { icon: Crown, ink: "bg-coral" },
 };
 
+/** What a badge looks like on a share card: its painting, or its icon sticker. */
+export function badgeShareArt(badgeId: string): { type: "image"; src: string } | { type: "icon"; icon: Icon; ink: string } {
+  if (ART_IDS.has(badgeId)) return { type: "image", src: `/art/badges/${badgeId}.webp` };
+  const i = BADGE_ICON[badgeId];
+  return { type: "icon", icon: i?.icon ?? Compass, ink: i?.ink ?? "bg-accent" };
+}
+
 const titleOf = (badgeId: string) => BADGES.find((b) => b.id === badgeId)?.title ?? badgeId;
 
 /**
