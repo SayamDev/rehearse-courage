@@ -18,8 +18,6 @@ import { recordStep } from "@/lib/state";
 import { resolveLevel, stepResult, type StepResult } from "@/lib/step";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId, StepRecord } from "@/lib/types";
-import { SceneArt } from "@/components/scene/scene-art";
-import { SceneBand } from "@/components/scene/scene-band";
 import { SpokenLine } from "@/components/voice/spoken-line";
 import { ROOM_ROLE } from "@/lib/voice/lines";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -305,27 +303,19 @@ export function StepView({ id, levelParam }: { id: string; levelParam?: string |
 
   return (
     <div>
-      <SceneBand
-        header={
-          <>
-            <Link href={roomPath} className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 hover:underline">
-              <ArrowLeft size={22} weight="regular" aria-hidden />
-              {ROOM_LABEL[step.room]}
-            </Link>
-            <h1 className={`mt-1 ${TITLE}`}>Practice step</h1>
-            <p>
-              {ROOM_LABEL[step.room]} step <span className="tabular">{level}</span>: {LEVELS[level - 1].name}
-            </p>
-          </>
-        }
-      >
-        <div className="relative h-[clamp(240px,38dvh,440px)]">
-          <SceneArt room={step.room} crop="step" priority className="object-[50%_45%]" />
-        </div>
-      </SceneBand>
+      <header className="mx-auto max-w-[640px] px-4 pt-6 md:pt-10">
+        <Link href={roomPath} className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 font-semibold text-muted hover:text-ink">
+          <ArrowLeft size={20} weight="bold" aria-hidden />
+          {ROOM_LABEL[step.room]}
+        </Link>
+        <h1 className={`mt-1 ${TITLE} text-ink`}>Practice step</h1>
+        <p className="mt-1 text-muted">
+          {ROOM_LABEL[step.room]} step <span className="tabular">{level}</span>: {LEVELS[level - 1].name}
+        </p>
+      </header>
 
       <div className="px-4">
-        <PaperCard className="relative mx-auto -mt-16 max-w-[640px] md:-mt-24">
+        <PaperCard className="relative mx-auto mt-5 max-w-[640px]">
           {TASK[level] ? (
             <>
               {/* Steps 2 to 5: the moment is a reminder; the new task is the heading. */}

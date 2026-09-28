@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Eye, Lifebuoy, UsersThree, X } from "@phosphor-icons/react";
@@ -111,35 +110,23 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
       aria-labelledby="panic-title"
       className="fixed inset-0 z-50 overflow-y-auto bg-canvas"
     >
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[70dvh] min-h-[420px]">
-        <Image src="/art/panic.webp" alt="" fill priority sizes="100vw" className="object-cover object-center" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              // Deep behind the header text (AA over the clouds in both themes), clearing towards the middle.
-              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 88%, transparent), color-mix(in srgb, var(--chrome) 70%, transparent) 16%, color-mix(in srgb, var(--chrome) 20%, transparent) 34%, transparent 55%, var(--canvas) 100%)",
-          }}
-        />
-      </div>
-
       <div className="relative mx-auto flex min-h-full max-w-[900px] flex-col px-4 pb-10 pt-6 md:pt-10">
-        <header className="flex items-start justify-between gap-4 text-on-chrome">
+        <header className="flex items-start justify-between gap-4 text-ink">
           <div className="flex items-start gap-3">
-            <Lifebuoy size={36} weight="regular" aria-hidden className="mt-1 shrink-0" />
+            <Lifebuoy size={36} weight="regular" aria-hidden className="mt-1 shrink-0 text-help" />
             <div>
               <h1 id="panic-title" ref={headingRef} tabIndex={-1} className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] outline-none">
                 Need a pause
               </h1>
-              <p className="mt-1">Take a breath. There is no rush.</p>
+              <p className="mt-1 text-muted">Take a breath. There is no rush.</p>
             </div>
           </div>
-          <Button variant="chrome" size="md" icon={X} onClick={onClose} aria-label="Close Need a pause">
+          <Button variant="secondary" size="md" icon={X} onClick={onClose} aria-label="Close Need a pause">
             Close
           </Button>
         </header>
 
-        <div className="mx-auto mt-[18dvh] w-full max-w-[560px] rounded-card bg-surface p-6 shadow-card sm:p-8">
+        <div className="mx-auto mt-8 w-full max-w-[560px] rounded-card border-[1.5px] border-line bg-surface p-6 shadow-card sm:p-8">
           {grounding ? (
             <Grounding onDone={leaveGrounding} />
           ) : (
@@ -156,7 +143,7 @@ function PanicDialog({ onClose }: { onClose: () => void }) {
               ref={groundingTile}
               type="button"
               onClick={() => setGrounding(true)}
-              className="flex min-h-11 items-center gap-4 rounded-card bg-surface p-4 text-left shadow-card transition-colors duration-[var(--dur-ui)] hover:bg-surface-2 active:bg-line/60"
+              className="flex min-h-11 items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-4 text-left shadow-card transition-colors duration-[var(--dur-ui)] hover:bg-surface-2 active:bg-line/60"
             >
               <span aria-hidden className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-calm text-surface">
                 <Eye size={30} weight="regular" />

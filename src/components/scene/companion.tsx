@@ -28,7 +28,7 @@ const GLOW_STRENGTH: Record<Stage, number> = { hiding: 0.12, peeking: 0.32, wavi
 const speciesName = (id: Species) => SPECIES.find((s) => s.id === id)?.name ?? id;
 
 /**
- * The companion portrait: a round frame with a lantern glow behind it whose
+ * The companion portrait: a round die-cut sticker with a lantern glow behind it whose
  * strength follows `stage`. Hedgehog and fox do not have their own art
  * until Plan 6, so they fall back to the firefly's still with a dev-only
  * note (never shown to real users).
@@ -44,13 +44,13 @@ export function Companion({ species, stage, size = 96 }: { species: Species; sta
         aria-hidden
         className="absolute inset-0 rounded-full"
         style={{
-          boxShadow: `0 0 ${Math.round(size * 0.6)}px ${Math.round(size * 0.2)}px color-mix(in srgb, var(--amber) ${Math.round(glow * 100)}%, transparent)`,
+          boxShadow: `0 0 ${Math.round(size * 0.6)}px ${Math.round(size * 0.2)}px color-mix(in srgb, var(--sun) ${Math.round(glow * 60)}%, transparent)`,
         }}
       />
       <div
         role="img"
         aria-label={`${speciesName(species)} companion, ${STAGE_WORD[stage]}`}
-        className="relative h-full w-full overflow-hidden rounded-full border-2 border-white bg-surface-2 shadow-card"
+        className="relative h-full w-full overflow-hidden rounded-full border-[3px] border-die bg-surface-2 shadow-sticker"
       >
         <Image
           src={src}

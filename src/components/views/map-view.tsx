@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "@phosphor-icons/react";
 import { words } from "@/lib/age";
@@ -11,17 +10,12 @@ import { useCourage } from "@/lib/store";
 import { ROOM_IDS, type RoomId } from "@/lib/types";
 import { ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
-import { ISLAND_ART, ROOM_ICON } from "./room-meta";
+import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
 const TITLE = "text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]";
 const CARD_TITLE = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)]";
 
-/**
- * One island: a link to its room. On phones it is a compact row (small
- * round island, label, progress) so all three fit without a long scroll;
- * from md up it becomes the comp's column with the chrome label overlapping
- * the island's lower edge.
- */
+/** One island: a card linking to its room, with its sticker icon and how far it has come. */
 function Island({ room, line }: { room: RoomId; line: string | null }) {
   const RoomIcon = ROOM_ICON[room];
   return (
@@ -29,25 +23,17 @@ function Island({ room, line }: { room: RoomId; line: string | null }) {
     <li className="min-w-0">
       <Link
         href={`/room/${room}`}
-        className="group flex items-center gap-4 rounded-card p-1 md:flex-col md:gap-0 md:p-0"
+        className="group flex h-full items-center gap-4 rounded-card border-[1.5px] border-line bg-surface p-5 shadow-card transition-[transform,border-color] duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:-translate-y-0.5 hover:border-stone-dim md:flex-col md:items-start md:p-6"
       >
-        <span className="relative block h-24 w-24 shrink-0 overflow-hidden rounded-full shadow-card md:aspect-square md:h-auto md:w-full md:rounded-card">
-          <Image
-            src={ISLAND_ART[room]}
-            alt=""
-            fill
-            sizes="(min-width: 768px) 340px, 96px"
-            className="object-cover object-[50%_35%] transition-[filter] duration-[var(--dur-ui)] group-hover:brightness-110"
-          />
+        <span aria-hidden className={`flex size-14 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker transition-transform duration-[var(--dur-ui)] group-hover:rotate-0 md:size-16 ${ROOM_DISC[room]}`}>
+          <RoomIcon size={30} weight="bold" />
         </span>
-        <span className="flex min-w-0 flex-1 items-center gap-3 rounded-full bg-chrome px-5 py-3 text-on-chrome md:relative md:-mt-10 md:flex-none md:px-6">
-          <RoomIcon size={28} weight="regular" aria-hidden className="shrink-0" />
-          <span className="min-w-0">
-            <span className="block font-display text-xl font-bold leading-tight">{ROOM_LABEL[room]}</span>
-            {/* Reserve the line's height before hydration so nothing jumps. */}
-            <span className="tabular block break-words text-base text-on-chrome/85">{line ?? " "}</span>
-          </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-display text-xl font-bold leading-tight text-ink">{ROOM_LABEL[room]}</span>
+          {/* Reserve the line's height before hydration so nothing jumps. */}
+          <span className="tabular mt-1 block break-words text-muted">{line ?? " "}</span>
         </span>
+        <ArrowRight size={22} weight="bold" aria-hidden className="shrink-0 text-muted transition-colors group-hover:text-ink md:hidden" />
       </Link>
     </li>
   );
@@ -64,35 +50,21 @@ export function MapView() {
   const situation = next ? situationById(next.situationId) : undefined;
 
   return (
-    <div className="relative">
-      {/* Sky backdrop: dark night sky at the top-left behind the title, fading into the canvas. */}
-      <div aria-hidden className="absolute inset-x-0 top-0 h-[340px] overflow-hidden md:h-[520px]">
-        <Image src="/art/sky-map.webp" alt="" fill priority sizes="100vw" className="object-cover object-top" />
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              // Deep enough behind the title and subtitle (over clouds on
-              // phones) for AA contrast in both themes, then fading to canvas.
-              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 88%, transparent), color-mix(in srgb, var(--chrome) 72%, transparent) 38%, color-mix(in srgb, var(--chrome) 20%, transparent) 70%, var(--canvas) 98%)",
-          }}
-        />
-      </div>
-
-      <div className="relative mx-auto max-w-[1100px] px-4 pt-8 md:pt-12">
-        <header className="text-on-chrome">
-          <h1 className={TITLE}>Courage map</h1>
-          <p className="mt-1">Three islands. One small step at a time.</p>
+    <div className="mx-auto max-w-[1100px] px-4 pt-6 md:px-8 md:pt-10">
+      <div>
+        <header>
+          <h1 className={`${TITLE} text-ink`}>Courage map</h1>
+          <p className="mt-1 text-muted">Three islands. One small step at a time.</p>
         </header>
 
-        <ul role="list" className="mt-6 grid list-none gap-3 p-0 md:mt-10 md:grid-cols-3 md:gap-8">
+        <ul role="list" className="mt-6 grid list-none gap-3 p-0 md:mt-8 md:grid-cols-3 md:gap-6">
           {ROOM_IDS.map((room) => (
             <Island key={room} room={room} line={store.hydrated ? furthestLine(furthestInRoom(store.records, room)) : null} />
           ))}
         </ul>
 
         {store.hydrated ? (
-          <PaperCard className="mx-auto mt-8 max-w-[560px] md:mt-10">
+          <PaperCard className="mt-8 max-w-[640px] md:mt-10">
             {next && situation ? (
               <>
                 <p className="text-muted">

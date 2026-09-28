@@ -9,7 +9,6 @@ import { AGE_OPTIONS, TOTAL_STEPS, hardThingOptions, nextStep, prevStep, toggleH
 import { SPECIES } from "@/lib/companion";
 import type { AgeBand, HardThing, Species } from "@/lib/types";
 
-import { SceneArt } from "@/components/scene/scene-art";
 import { Companion } from "@/components/scene/companion";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Button } from "@/components/ui/button";
@@ -74,27 +73,11 @@ export function FirstVisit() {
 
   return (
     <div className="relative mx-auto max-w-[720px] px-4 pb-16 pt-6 sm:pt-14">
-      {/* Shorter than other screens' hero art on phones: /start has no bottom
-          nav to absorb Panic now, so the tallest step
-          needs to fit above Panic's fixed corner without scrolling past it;
-          see the overlap check in the fix-1 screenshots/report. */}
-      <div className="relative h-[20vh] min-h-[140px] overflow-hidden rounded-card sm:h-[320px]">
-        {/* object-top: this frame is wider than the art's own aspect ratio, so
-            object-cover's default center crop cuts the school and flag off
-            the top at wide widths. Anchoring to the top keeps them in frame
-            at every width; only the waterfall/lower island is ever trimmed. */}
-        <SceneArt room="class" crop="wide" priority className="object-top" />
-        <div
-          aria-hidden
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to bottom, color-mix(in srgb, var(--chrome) 68%, transparent), color-mix(in srgb, var(--chrome) 30%, transparent) 65%, var(--canvas) 96%)",
-          }}
-        />
+      <div className="flex justify-center">
+        <Companion species="firefly" stage={step >= TOTAL_STEPS ? "waving" : "peeking"} size={120} />
       </div>
 
-      <PaperCard className="relative -mt-16 sm:-mt-24">
+      <PaperCard className="relative mt-5">
         <p aria-live="polite" className="mb-4 text-sm text-muted">
           {step} of {TOTAL_STEPS}
         </p>

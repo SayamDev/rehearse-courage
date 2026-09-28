@@ -8,8 +8,8 @@ import { defaultStepId, furthestLine, nextLine, ROOM_LABEL, roomSteps, type Room
 import { addCustomStep } from "@/lib/state";
 import { act, useCourage } from "@/lib/store";
 import type { Level, RoomId } from "@/lib/types";
-import { PathStones } from "@/components/scene/path-stones";
-import { SceneBand } from "@/components/scene/scene-band";
+import { ProgressTrack } from "@/components/scene/progress-track";
+import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 
@@ -41,7 +41,7 @@ function StepRow({ step, selected, onSelect }: { step: RoomStep; selected: boole
 }
 
 /**
- * A room ("/room/[id]"): its scene with the stones for the chosen step,
+ * A room ("/room/[id]"): the chosen step with its six-step track,
  * the list of steps in the room (tap to choose which one the stones show),
  * one primary button to practise it, and "Your own steps" with a form to
  * add one (id="add", linked from Home and the map when every path is done).
@@ -70,7 +70,7 @@ export function RoomView({ room }: { room: RoomId }) {
   const current = steps.find((s) => s.id === chosenId) ?? steps.find((s) => s.id === defaultStepId(steps));
   const level: Level = chosenLevel ?? current?.next ?? 1;
 
-  // Bring the stones and card into view so choosing a row visibly does
+  // Bring the card into view so choosing a row visibly does
   // something (they are off screen when the list is reached on a phone).
   const choose = (id: string) => {
     setChosenId(id);
@@ -92,16 +92,19 @@ export function RoomView({ room }: { room: RoomId }) {
     setMessage("Added to your own steps.");
   };
 
-  const heading = (onChrome: boolean) => (
+  const RoomIcon = ROOM_ICON[room];
+  const heading = (
     <>
-      <Link
-        href="/map"
-        className={`-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 hover:underline ${onChrome ? "" : "text-ink"}`}
-      >
-        <ArrowLeft size={22} weight="regular" aria-hidden />
+      <Link href="/map" className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 font-semibold text-muted hover:text-ink">
+        <ArrowLeft size={20} weight="bold" aria-hidden />
         Map
       </Link>
-      <h1 className={`mt-2 ${TITLE} ${onChrome ? "" : "text-ink"}`}>{ROOM_LABEL[room]}</h1>
+      <div className="mt-2 flex items-center gap-4">
+        <span aria-hidden className={`flex size-14 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker ${ROOM_DISC[room]}`}>
+          <RoomIcon size={28} weight="bold" />
+        </span>
+        <h1 className={`${TITLE} text-ink`}>{ROOM_LABEL[room]}</h1>
+      </div>
     </>
   );
 
@@ -112,40 +115,30 @@ export function RoomView({ room }: { room: RoomId }) {
     <div>
       {store.hydrated && current ? (
         <>
-          {/* Phone: title on the canvas, then the island crop edge to edge.
-              Tablet and laptop: the full-width scene band with the title over
-              its night sky (tablets get the whole art, laptops the trimmed band). */}
-          <div ref={sceneRef} className="scroll-mt-4">
-            <div className="px-4 pt-6 md:hidden">{heading(false)}</div>
-            <div className="mt-4 md:hidden">
-              <PathStones room={room} situationId={current.id} onPick={setChosenLevel} rounded={false} priority />
-            </div>
-            <SceneBand className="hidden md:block lg:hidden" header={heading(true)}>
-              <PathStones room={room} situationId={current.id} onPick={setChosenLevel} crop="wide" rounded={false} priority />
-            </SceneBand>
-            <SceneBand className="hidden lg:block" header={heading(true)}>
-              <PathStones room={room} situationId={current.id} onPick={setChosenLevel} crop="band" rounded={false} priority />
-            </SceneBand>
-          </div>
-
-          <div className="mx-auto max-w-[1100px] px-4 md:px-8">
-            <PaperCard className="relative mx-auto mt-4 max-w-[560px] md:-mt-[clamp(7rem,13vw,13rem)]">
-              {/* Announced when a row or stone changes what the card shows. */}
+          <div ref={sceneRef} className="mx-auto max-w-[1100px] scroll-mt-20 px-4 pt-6 md:px-8 md:pt-10">
+            {heading}
+            <PaperCard className="mt-6 max-w-[640px]">
+              {/* Announced when a row or step on the track changes what the card shows. */}
               <div aria-live="polite">
                 <p className="text-muted">
                   Step <span className="tabular">{level}</span> of 6
                 </p>
                 <h2 className={`mt-1 ${CARD_TITLE} text-ink`}>{current.title}</h2>
-                <p className="mt-2 text-ink">{LEVELS[level - 1].name}</p>
               </div>
-              <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6" icon={ArrowRight} iconEnd>
+              <ProgressTrack situationId={current.id} onPick={setChosenLevel} selected={level} className="mt-6" />
+              <p className="mt-4 text-ink">
+                <span className="font-semibold">Step {level}:</span> {LEVELS[level - 1].name}
+              </p>
+              <ButtonLink href={`/step/${current.id}?level=${level}`} className="mt-6 w-full sm:w-auto" icon={ArrowRight} iconEnd>
                 {level === current.next ? "Continue" : `Practise step ${level}`}
               </ButtonLink>
-              <p className="mt-4 text-muted">Choose a stone to practise a different step.</p>
+              <p className="mt-4 text-muted">Tap a number on the track to practise a different step.</p>
             </PaperCard>
+          </div>
 
+          <div className="mx-auto max-w-[1100px] px-4 md:px-8">
             {/* Laptop: the two lists sit side by side instead of one long column. */}
-            <div className="mx-auto mt-10 grid max-w-[720px] gap-10 lg:max-w-none lg:grid-cols-2 lg:gap-12">
+            <div className="mt-10 grid gap-10 lg:grid-cols-2 lg:gap-12">
               <section aria-labelledby="steps-heading">
                 <h2 id="steps-heading" className="text-2xl text-ink">
                   Steps on this island
@@ -210,7 +203,7 @@ export function RoomView({ room }: { room: RoomId }) {
           </div>
         </>
       ) : (
-        <div className="mx-auto max-w-[1100px] px-4 pt-6 md:px-8 md:pt-10">{heading(false)}</div>
+        <div className="mx-auto max-w-[1100px] px-4 pt-6 md:px-8 md:pt-10">{heading}</div>
       )}
     </div>
   );
