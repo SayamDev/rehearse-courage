@@ -386,3 +386,40 @@ a {
 .dice-roll {
   animation: dice-roll 520ms var(--ease-out) both;
 }
+
+/* Printing (the parents and teachers guide): light colours on white paper,
+   no app chrome, no shadows, and nothing split across a page break. */
+@media print {
+  :root,
+  :root:not([data-theme="light"]),
+  :root[data-theme="dark"] {
+    --canvas: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #eef4f3;
+    --ink: #13262b;
+    --muted: #3f5357;
+    --line: #c4d3d1;
+    --accent: #2ec4b6;
+    --accent-text: #0e7268;
+    --die: #ffffff;
+    --sticker-shadow: none;
+    --card-shadow: none;
+    color-scheme: light;
+  }
+  [data-no-print] {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+  }
+  li,
+  section > h2 {
+    break-inside: avoid;
+  }
+  section > h2 {
+    break-after: avoid;
+  }
+  a {
+    text-decoration: none;
+  }
+}

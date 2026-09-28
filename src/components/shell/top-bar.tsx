@@ -18,7 +18,7 @@ export function TopBar() {
   const noNav = hidesNav(pathname);
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur supports-[backdrop-filter]:bg-canvas/80">
+    <header data-no-print className="sticky top-0 z-30 border-b border-line bg-canvas/90 backdrop-blur supports-[backdrop-filter]:bg-canvas/80">
       <div className="mx-auto flex h-16 w-full max-w-[1100px] items-center gap-3 px-4 md:gap-6 md:px-8">
         <Link href="/" className="sticker sticker-teal shrink-0 text-[0.85rem] sm:text-base">
           Rehearse Courage
