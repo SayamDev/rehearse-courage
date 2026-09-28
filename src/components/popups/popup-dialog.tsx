@@ -5,7 +5,7 @@ import { X } from "@phosphor-icons/react";
 
 /**
  * The shared pop-up frame: a native modal <dialog> (focus trap, Escape and
- * the backdrop come with it), a picture banner from this app's own art,
+ * the backdrop come with it), a teal banner with the companion,
  * the title and a Close button. Closing in any way calls `onClose`.
  */
 export function PopupDialog({
@@ -36,7 +36,7 @@ export function PopupDialog({
           <button
             type="submit"
             aria-label="Close"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-chrome text-on-chrome transition-colors duration-[var(--dur-ui)] hover:bg-chrome/85"
+            className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-line bg-surface text-ink transition-colors duration-[var(--dur-ui)] hover:border-stone-dim"
           >
             <X size={20} weight="regular" aria-hidden />
           </button>
@@ -58,17 +58,11 @@ export function openPopup(d: HTMLDialogElement) {
   d.querySelector<HTMLElement>("h2")?.focus();
 }
 
-/** A short scene banner with the companion peeking in over its lower edge. */
-export function PopupBanner({ art, children }: { art: ReactNode; children?: ReactNode }) {
+/** A short teal band with the companion in it (the app's only pictures are the firefly, the Body kit and badges). */
+export function PopupBanner({ children }: { children?: ReactNode }) {
   return (
-    <div className="relative h-36 overflow-hidden sm:h-44">
-      {art}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{ background: "linear-gradient(to bottom, transparent 40%, var(--surface) 100%)" }}
-      />
-      {children ? <div className="absolute bottom-2 left-5 sm:left-7">{children}</div> : null}
+    <div className="relative flex h-28 items-end overflow-hidden bg-[color-mix(in_srgb,var(--accent)_22%,var(--surface))] px-5 pb-3 sm:h-32 sm:px-7">
+      {children}
     </div>
   );
 }

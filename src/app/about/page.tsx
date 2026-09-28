@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <>
-      <ArtHeader title="About Rehearse Courage" art="/art/sky-home.webp" back={{ href: "/me", label: "Me" }} reading />
+      <ArtHeader title="About Rehearse Courage" back={{ href: "/me", label: "Me" }} reading />
       <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-8">
         <div className="max-w-[60ch] space-y-3 text-ink">
           <p>

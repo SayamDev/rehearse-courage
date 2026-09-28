@@ -20,7 +20,7 @@ export function BreathingLantern({
   /** "calm" (soft teal) in Panic now, so help never looks like the amber of rewards and progress. */
   tone?: "lantern" | "calm";
 }) {
-  const colour = tone === "calm" ? "var(--calm)" : "var(--amber)";
+  const colour = tone === "calm" ? "var(--calm)" : "var(--accent)";
   // Starts small ("rest") and switches to "in" on the next frame, so the
   // very first breath visibly grows.
   const [phase, setPhase] = useState<"rest" | "in" | "out">("rest");
@@ -49,7 +49,7 @@ export function BreathingLantern({
             transition: reduce ? "none" : `transform ${phase === "out" ? OUT_MS : IN_MS}ms cubic-bezier(0.37, 0, 0.63, 1)`,
           }}
         />
-        <div className={`relative h-16 w-16 rounded-full md:h-20 md:w-20 ${tone === "calm" ? "bg-calm" : "bg-amber shadow-glow"}`} />
+        <div className={`relative h-16 w-16 rounded-full md:h-20 md:w-20 ${tone === "calm" ? "bg-calm" : "bg-accent shadow-glow"}`} />
       </div>
       <p className="sr-only">Breathe in for 4 seconds as the light grows, then slowly out for 6 as it shrinks.</p>
       <p aria-hidden className="mt-4 font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] font-bold text-ink">

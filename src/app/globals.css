@@ -1,85 +1,97 @@
 @import "tailwindcss";
 
-/* Paper Lantern Map tokens. Source of truth: DESIGN.md. Light (dawn) is the default; dark (night) follows the system or data-theme. */
+/* Sticker Book, calm teal (Rehearse's sibling). Source of truth: DESIGN.md.
+   Near-white canvas, white cards, one teal accent, flat sticker inks with a
+   white die-cut border. Light is the default; dark follows the system or data-theme. */
 :root {
-  --canvas: #f4e6cf;
-  --surface: #f9ead3;
-  --surface-2: #efdcc0;
-  --ink: #113c4b;
-  --muted: #6b5a4c;
-  --line: #e0c9a9;
-  --chrome: #10364b;
-  --on-chrome: #f9ead3;
-  --amber: #ffab0b;
-  --on-amber: #113c4b;
-  --stone-dim: #6a8292;
+  --canvas: #f2f6f5;
+  --surface: #ffffff;
+  --surface-2: #e8f0ef;
+  --ink: #13262b;
+  --muted: #4c6166;
+  --line: #d4e1df;
+  /* Dark ink panels (skip link, the rare dark button). Flips to light ink at night. */
+  --chrome: #13262b;
+  --on-chrome: #ffffff;
+  /* The one accent: calm teal, for the main action, progress and rewards. Text on it is always ink. */
+  --accent: #2ec4b6;
+  --on-accent: #0c2a2d;
+  /* Teal dark enough to be text or an icon on the white surface (AA). */
+  --accent-text: #0e7268;
+  --stone-dim: #7a9195;
   --focus: #1f6fd1;
-  --calm: #3e7c6b;
-  /* Outline for chrome pieces (nav, stats pill); only needed at night, when chrome is close to the canvas. */
+  /* Need a pause and the calm tools: a quiet blue, never the teal of progress. */
+  --calm: #2f6fae;
+  --help: #2f6fae;
+  --on-help: #ffffff;
   --chrome-edge: transparent;
-  /* Panic now: a calm, quiet help colour, never amber (amber means progress and rewards). */
-  --help: #2f6b5c;
-  --on-help: #f9ead3;
-  --card-shadow: 0 10px 24px -14px rgb(17 60 75 / 0.35);
-  --glow:
-    0 0 0 6px color-mix(in srgb, var(--amber) 18%, transparent), 0 6px 18px -6px color-mix(in srgb, var(--amber) 55%, transparent);
+  /* Sticker inks (flat, bright, always with ink text) and the white die-cut border. */
+  --die: #ffffff;
+  --sun: #ffc83d;
+  --sky: #7cc4ff;
+  --grape: #b8a4ff;
+  --coral: #ff8a6b;
+  --lime: #b8e62e;
+  --sticker-shadow: 0 1px 0 rgb(19 38 43 / 0.1), 0 4px 10px -4px rgb(19 38 43 / 0.28);
+  --card-shadow: 0 1px 2px rgb(19 38 43 / 0.05), 0 10px 28px -18px rgb(19 38 43 / 0.3);
+  --glow: var(--sticker-shadow);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --dur-feedback: 180ms;
-  --dur-ui: 320ms;
+  --dur-ui: 240ms;
   --dur-scene: 750ms;
-  /* Bottom-nav reserved space: keeps page content and the footer clear of the fixed nav. */
-  --nav-space: 10rem;
-  /* Panic now's fixed bottom offset: clears the nav with a gap so it never overlaps it. */
-  --panic-offset: 5.75rem;
-  /* First-visit (/start) has no bottom nav, so its own reserved space and Panic
-     offset are smaller: just enough to clear Panic now itself, floating near
-     the corner like any other page's fixed control. */
-  --nav-space-start: 5rem;
-  --panic-offset-start: 1.5rem;
+  /* Phone bottom tabs: page content and the footer stay clear of them. */
+  --nav-space: 6.5rem;
+  --nav-space-start: 2rem;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --canvas: #0e2231;
-    --surface: #17344a;
-    --surface-2: #1f4059;
-    --ink: #f9ead3;
-    --muted: #b9c6cf;
-    --line: #2c5068;
-    --chrome: #0a1b27;
-    --on-chrome: #f9ead3;
-    --amber: #ffb42e;
-    --on-amber: #0e2231;
-    --stone-dim: #7391a6;
+    --canvas: #0f1b1e;
+    --surface: #172629;
+    --surface-2: #213438;
+    --ink: #eaf4f3;
+    --muted: #a7bbbd;
+    --line: #2d4549;
+    --chrome: #eaf4f3;
+    --on-chrome: #0f1b1e;
+    --accent: #3dd6c6;
+    --on-accent: #0b2226;
+    --accent-text: #5fe3d4;
+    --stone-dim: #7c9599;
     --focus: #7fb7ff;
-    --calm: #7cc4ae;
-    --chrome-edge: #3d6a86;
-    --help: #7cc4ae;
-    --on-help: #0e2231;
-    --card-shadow: 0 12px 28px -16px rgb(0 0 0 / 0.7);
+    --calm: #8cc3f5;
+    --help: #8cc3f5;
+    --on-help: #0f1b1e;
+    --chrome-edge: #3a5a60;
+    --die: #f7fbfb;
+    --sticker-shadow: 0 1px 0 rgb(0 0 0 / 0.25), 0 6px 14px -6px rgb(0 0 0 / 0.6);
+    --card-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 14px 32px -20px rgb(0 0 0 / 0.7);
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --canvas: #0e2231;
-  --surface: #17344a;
-  --surface-2: #1f4059;
-  --ink: #f9ead3;
-  --muted: #b9c6cf;
-  --line: #2c5068;
-  --chrome: #0a1b27;
-  --on-chrome: #f9ead3;
-  --amber: #ffb42e;
-  --on-amber: #0e2231;
-  --stone-dim: #7391a6;
+  --canvas: #0f1b1e;
+  --surface: #172629;
+  --surface-2: #213438;
+  --ink: #eaf4f3;
+  --muted: #a7bbbd;
+  --line: #2d4549;
+  --chrome: #eaf4f3;
+  --on-chrome: #0f1b1e;
+  --accent: #3dd6c6;
+  --on-accent: #0b2226;
+  --accent-text: #5fe3d4;
+  --stone-dim: #7c9599;
   --focus: #7fb7ff;
-  --calm: #7cc4ae;
-  --chrome-edge: #3d6a86;
-  --help: #7cc4ae;
-  --on-help: #0e2231;
-  --card-shadow: 0 12px 28px -16px rgb(0 0 0 / 0.7);
+  --calm: #8cc3f5;
+  --help: #8cc3f5;
+  --on-help: #0f1b1e;
+  --chrome-edge: #3a5a60;
+  --die: #f7fbfb;
+  --sticker-shadow: 0 1px 0 rgb(0 0 0 / 0.25), 0 6px 14px -6px rgb(0 0 0 / 0.6);
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 14px 32px -20px rgb(0 0 0 / 0.7);
   color-scheme: dark;
 }
 
@@ -100,17 +112,26 @@
   --color-line: var(--line);
   --color-chrome: var(--chrome);
   --color-on-chrome: var(--on-chrome);
-  --color-amber: var(--amber);
-  --color-on-amber: var(--on-amber);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
   --color-stone-dim: var(--stone-dim);
   --color-focus: var(--focus);
   --color-calm: var(--calm);
   --color-chrome-edge: var(--chrome-edge);
   --color-help: var(--help);
+  --color-accent-text: var(--accent-text);
+  --color-die: var(--die);
+  --color-sun: var(--sun);
+  --color-sky: var(--sky);
+  --color-grape: var(--grape);
+  --color-coral: var(--coral);
+  --color-lime: var(--lime);
+  --shadow-sticker: var(--sticker-shadow);
   --color-on-help: var(--on-help);
   --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-body: var(--font-atkinson), ui-sans-serif, system-ui, sans-serif;
   --radius-card: 20px;
+  --radius-control: 14px;
   --shadow-card: var(--card-shadow);
   --shadow-glow: var(--glow);
   --ease-calm: var(--ease-out);
@@ -129,7 +150,7 @@ body {
   font-size: 1.0625rem;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
-  caret-color: var(--amber);
+  caret-color: var(--accent-text);
 }
 
 @media (max-width: 767px) {
@@ -157,7 +178,7 @@ a {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--amber) 45%, transparent);
+  background: color-mix(in srgb, var(--accent) 40%, transparent);
   color: var(--ink);
 }
 
@@ -205,7 +226,7 @@ a {
    motion collapses this to the end frame via the rules above. */
 @keyframes stone-pulse {
   0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 45%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent);
   }
   100% {
     box-shadow: 0 0 0 12px transparent;
@@ -216,7 +237,7 @@ a {
   animation: stone-pulse 3s var(--ease-out) infinite;
 }
 
-/* Step complete: the new stone lights up with a soft swell of amber. */
+/* Step complete: the new stone lights up with a soft swell of teal. */
 @keyframes stone-light {
   0% {
     transform: translate(-50%, -50%) scale(0.4);
@@ -266,4 +287,47 @@ a {
 
 .spark {
   animation: spark 1100ms var(--ease-out) both;
+}
+
+/* A die-cut sticker: flat ink, thick white border, short soft shadow, slight tilt. */
+@layer components {
+  .sticker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    background: var(--sun);
+    color: #13262b;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.875rem;
+    line-height: 1;
+    padding: 0.45rem 0.75rem 0.42rem;
+    border: 3px solid var(--die);
+    border-radius: 999px;
+    box-shadow: var(--sticker-shadow);
+    transform: rotate(-2deg);
+    white-space: nowrap;
+  }
+  .sticker-teal {
+    background: var(--accent);
+  }
+  .sticker-sky {
+    background: var(--sky);
+  }
+  .sticker-grape {
+    background: var(--grape);
+  }
+  .sticker-coral {
+    background: var(--coral);
+  }
+  .sticker-lime {
+    background: var(--lime);
+  }
+  /* Art as a sticker: the picture sits inside a white die-cut frame. */
+  .art-sticker {
+    border: 5px solid var(--die);
+    border-radius: 22px;
+    box-shadow: var(--sticker-shadow);
+    overflow: hidden;
+  }
 }

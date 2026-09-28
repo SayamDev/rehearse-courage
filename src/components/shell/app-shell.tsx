@@ -3,24 +3,23 @@ import { PanicLayer } from "@/components/calm/panic-view";
 import { Popups } from "@/components/popups/popups";
 import { BottomNav } from "./bottom-nav";
 import { MainFrame } from "./main-frame";
-import { PanicButton } from "./panic-button";
 import { SettingsEffects } from "./settings-effects";
 import { SkipLink } from "./skip-link";
+import { TopBar } from "./top-bar";
 
 /**
- * Global page frame: skip link, main content landmark, the ownership
- * footer, Panic now, and the bottom nav. Space is reserved below the
- * content so the fixed nav and Panic button never cover the last thing
- * on the page. BottomNav and PanicButton each hide/reposition themselves
- * on /start, which has no nav yet during first-visit setup (see MainFrame).
+ * Global page frame: skip link, the top bar (wordmark, sections from 768px,
+ * Need a pause), the main content landmark with the ownership footer, and
+ * the phone tabs. Space is reserved below the content on phones so the
+ * fixed tabs never cover the last thing on the page. /start has no tabs.
  */
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <>
       <SettingsEffects />
       <SkipLink />
+      <TopBar />
       <MainFrame>{children}</MainFrame>
-      <PanicButton />
       <BottomNav />
       <PanicLayer />
       <Popups />

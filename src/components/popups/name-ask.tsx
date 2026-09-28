@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import Image from "next/image";
 import { markPopupShown, nameAskDue, popupBlocked } from "@/lib/popups";
 import { MAX_NAME, setName } from "@/lib/state";
 import { act, useCourage } from "@/lib/store";
@@ -42,7 +41,7 @@ export function NameAsk({ pathname, quiet }: { pathname: string; quiet: boolean 
       // Any way of closing counts as asked; a typed name is kept only when Save was pressed.
       onClose={() => act((s) => (s.nameAsked ? s : setName(s, null)))}
       banner={
-        <PopupBanner art={<Image src="/art/home-class.webp" alt="" fill sizes="34rem" className="object-cover object-[50%_30%]" />}>
+        <PopupBanner>
           <Companion species={store.companion?.species ?? "firefly"} stage="waving" size={72} />
         </PopupBanner>
       }

@@ -38,6 +38,10 @@ export function activeNav(pathname: string): string {
   return "";
 }
 
+/**
+ * Phone tabs (below 768px): a flat bar on the canvas, the active tab's icon
+ * in a small teal sticker. Laptops and tablets use the top bar's links instead.
+ */
 export function BottomNav() {
   const pathname = usePathname();
   const active = activeNav(pathname);
@@ -48,34 +52,36 @@ export function BottomNav() {
   if (hidesNav(pathname)) return null;
 
   return (
-    <nav aria-label="Main" className="fixed inset-x-0 bottom-3 z-30 px-3 sm:px-6">
-      <div className="mx-auto flex h-16 max-w-[1100px] items-stretch justify-between rounded-full bg-chrome px-1 text-on-chrome shadow-card ring-1 ring-chrome-edge">
+    <nav
+      aria-label="Main"
+      className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-canvas/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden"
+    >
+      <ul className="mx-auto grid max-w-lg grid-cols-5">
         {NAV_ITEMS.map((item) => {
           const isActive = item.href === active;
           const ItemIcon = item.icon;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              aria-current={isActive ? "page" : undefined}
-              className="group flex flex-1 flex-col items-center justify-center gap-0.5 rounded-full text-xs transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-on-chrome/10 active:bg-on-chrome/15"
-            >
-              <ItemIcon
-                size={24}
-                weight="regular"
-                aria-hidden
-                className={isActive ? "text-amber" : "text-on-chrome"}
-              />
-              <span className={`relative pb-0.5 ${isActive ? "text-amber" : "text-on-chrome"}`}>
+            <li key={item.href}>
+              <Link
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                className={`flex min-h-[64px] flex-col items-center justify-center gap-0.5 text-center text-xs font-semibold leading-tight ${
+                  isActive ? "text-ink" : "text-muted"
+                }`}
+              >
+                <span
+                  className={`flex size-9 items-center justify-center rounded-full transition-transform duration-[var(--dur-ui)] ease-[var(--ease-out)] ${
+                    isActive ? "-rotate-6 border-[3px] border-die bg-accent text-on-accent shadow-sticker" : ""
+                  }`}
+                >
+                  <ItemIcon size={20} weight={isActive ? "fill" : "regular"} aria-hidden />
+                </span>
                 {item.label}
-                {isActive ? (
-                  <span aria-hidden className="absolute inset-x-1 -bottom-0.5 h-0.5 rounded-full bg-amber" />
-                ) : null}
-              </span>
-            </Link>
+              </Link>
+            </li>
           );
         })}
-      </div>
+      </ul>
     </nav>
   );
 }

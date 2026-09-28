@@ -12,7 +12,7 @@ export function KitView() {
   const { age } = useCourage();
   return (
     <div>
-      <ArtHeader art="/art/header-kit.webp" title="Body kit" line="Quick tools for when your body feels like too much." />
+      <ArtHeader lottie="/lottie/kit.json" title="Body kit" line="Quick tools for when your body feels like too much." />
       <ul role="list" className="relative mx-auto -mt-4 grid max-w-[1100px] list-none gap-3 px-4 md:grid-cols-2 md:gap-5">
         {KIT_TOOLS.map((t, i) => (
           <li key={t.id}>

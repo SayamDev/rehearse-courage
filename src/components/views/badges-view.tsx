@@ -27,7 +27,7 @@ export function BadgesView() {
 
   return (
     <div>
-      <ArtHeader art="/art/header-badges.webp" title="Badges" line="Small steps. Real courage." />
+      <ArtHeader lottie="/lottie/badges.json" title="Badges" line="Small steps. Real courage." />
 
       <div className="relative mx-auto -mt-4 max-w-[1100px] px-4">
         <PaperCard className="!p-5 sm:!p-6">

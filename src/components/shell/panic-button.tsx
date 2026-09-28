@@ -4,17 +4,14 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Lifebuoy } from "@phosphor-icons/react";
-import { hidesNav } from "./no-nav-routes";
 
 /**
- * Opens the Panic now view (built in a later task) by adding `?calm=1` to
- * the current path, so it works from any page and the back button closes it.
+ * Opens Need a pause by adding `?calm=1` to the current path, so it works
+ * from any page and the back button closes it. It lives in the top bar, in
+ * the same corner on every page, in the calm blue (never the teal of progress).
  */
-// Tailwind needs each arbitrary-value class spelled out as a full literal to
-// pick it up at build time, so the two offsets are whole strings, not
-// interpolated from a shared template.
-const OFFSET_CLASS = "fixed bottom-[var(--panic-offset)] right-3 z-40 flex h-12 items-center gap-2 rounded-2xl bg-help px-4 font-semibold text-on-help shadow-card transition-[filter] duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:brightness-110 active:brightness-95 sm:right-6";
-const OFFSET_CLASS_START = "fixed bottom-[var(--panic-offset-start)] right-3 z-40 flex h-12 items-center gap-2 rounded-2xl bg-help px-4 font-semibold text-on-help shadow-card transition-[filter] duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:brightness-110 active:brightness-95 sm:right-6";
+const CLASS =
+  "flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-help/40 bg-surface px-3 font-display font-bold text-help transition-colors duration-[var(--dur-feedback)] hover:border-help hover:bg-help/10 active:bg-help/15";
 
 /** The current URL plus calm=1, keeping the page's own params (e.g. a step's ?level) so nothing behind the dialog changes. */
 export function calmHref(pathname: string, search: string): string {
@@ -25,13 +22,8 @@ export function calmHref(pathname: string, search: string): string {
 
 function PanicLink({ search }: { search: string }) {
   const pathname = usePathname();
-  // Routes in no-nav-routes.ts have no bottom nav to clear (see BottomNav),
-  // so Panic now sits closer to the corner instead of the taller offset
-  // that clears the nav.
-  const className = hidesNav(pathname) ? OFFSET_CLASS_START : OFFSET_CLASS;
-
   return (
-    <Link href={calmHref(pathname, search)} className={className}>
+    <Link href={calmHref(pathname, search)} className={CLASS}>
       <Lifebuoy size={22} weight="regular" aria-hidden />
       Need a pause
     </Link>

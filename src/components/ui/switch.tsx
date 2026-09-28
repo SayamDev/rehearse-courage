@@ -29,14 +29,14 @@ export function Switch({
         onClick={() => onChange(!checked)}
         className={`group relative flex h-11 w-[3.25rem] shrink-0 items-center rounded-full px-1 transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3 disabled:pointer-events-none ${
           checked
-            ? "bg-amber hover:brightness-95 active:brightness-90"
+            ? "bg-accent hover:brightness-95 active:brightness-90"
             : "border border-line bg-surface-2 hover:bg-line/50 active:bg-line/70"
         }`}
       >
         <span
           aria-hidden
           className={`h-6 w-6 rounded-full bg-surface shadow-card transition-transform duration-[var(--dur-ui)] ease-[var(--ease-out)] group-active:scale-90 ${
-            checked ? "translate-x-[1.375rem] bg-on-amber" : "translate-x-0"
+            checked ? "translate-x-[1.375rem] bg-on-accent" : "translate-x-0"
           }`}
         />
       </button>

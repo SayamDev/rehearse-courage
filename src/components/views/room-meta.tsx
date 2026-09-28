@@ -8,9 +8,9 @@ export const ROOM_ICON: Record<RoomId, Icon> = {
   presenting: Microphone,
 };
 
-/** Map island art per room: the cutouts harvested from the map comp (see design/art-manifest.md). */
-export const ISLAND_ART: Record<RoomId, string> = {
-  class: "/art/island-class.webp",
-  friends: "/art/island-friends.webp",
-  presenting: "/art/island-presenting.webp",
+/** Each room's sticker colour (icon discs and labels). */
+export const ROOM_DISC: Record<RoomId, string> = {
+  class: "bg-sky",
+  friends: "bg-grape",
+  presenting: "bg-coral",
 };

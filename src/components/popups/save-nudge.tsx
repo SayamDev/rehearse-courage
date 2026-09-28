@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import Image from "next/image";
 import { AppleLogo, Broom, Devices, DownloadSimple, type Icon } from "@phosphor-icons/react";
 import { askToKeepData, markPopupShown, popupBlocked, saveNudgeDue } from "@/lib/popups";
 import { saveBackupFile } from "@/lib/save-backup";
@@ -82,7 +81,7 @@ export function SaveNudge({ quiet }: { quiet: boolean }) {
         setSaved(false);
       }}
       banner={
-        <PopupBanner art={<Image src="/art/island-class.webp" alt="" fill sizes="34rem" className="object-cover object-[50%_40%]" />}>
+        <PopupBanner>
           <Companion species="firefly" stage="waving" size={72} />
         </PopupBanner>
       }

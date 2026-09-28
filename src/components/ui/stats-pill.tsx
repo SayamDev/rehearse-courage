@@ -11,9 +11,8 @@ export function pointsLabel(n: number): string {
 }
 
 /**
- * Chrome pill showing brave days this week and courage points, matching
- * the stats row on the home comp. Numbers are tabular so the pill does not
- * jiggle as they change.
+ * Two small white tiles: brave days this week and courage points, each with
+ * a sticker icon. Numbers are tabular so they do not jiggle as they change.
  */
 /**
  * Splits a "<n> ...suffix" label (as returned by braveDaysLabel/pointsLabel)
@@ -28,30 +27,33 @@ function splitCount(label: string, n: number): { count: string; suffix: string }
 export function StatsPill({ braveDays, points }: { braveDays: number; points: number }) {
   const braveDaysText = splitCount(braveDaysLabel(braveDays), braveDays);
   const pointsText = splitCount(pointsLabel(points), points);
-
-  // Two lines per half, as on the home comp ("3 brave days" / "this week",
-  // "145" / "courage points"), so the pill never wraps mid-phrase on a phone.
   const braveMain = braveDaysText.suffix.replace(/ this week$/, "");
 
+  const tile = "flex items-center gap-3 rounded-card border-[1.5px] border-line bg-surface px-4 py-3 shadow-card";
+  const disc = "flex size-11 shrink-0 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker";
   return (
-    <div className="inline-flex items-stretch divide-x divide-on-chrome/15 overflow-hidden rounded-full bg-chrome text-on-chrome ring-1 ring-chrome-edge">
-      <span className="flex items-center gap-2.5 py-2.5 pl-5 pr-4">
-        <CalendarCheck size={24} weight="regular" aria-hidden className="shrink-0 text-amber" />
-        <span className="flex flex-col whitespace-nowrap leading-tight">
-          <span className="font-semibold">
+    <div className="grid grid-cols-2 gap-3 sm:max-w-[520px]">
+      <div className={tile}>
+        <span aria-hidden className={`${disc} -rotate-6 bg-sun`}>
+          <CalendarCheck size={22} weight="bold" />
+        </span>
+        <span className="flex flex-col leading-tight">
+          <span className="font-display text-lg font-bold text-ink">
             <span className="tabular">{braveDaysText.count}</span>
             {braveMain}
           </span>
-          <span className="text-on-chrome/85">this week</span>
+          <span className="text-sm text-muted">this week</span>
         </span>
-      </span>
-      <span className="flex items-center gap-2.5 py-2.5 pl-4 pr-5">
-        <Star size={24} weight="regular" aria-hidden className="shrink-0 text-amber" />
-        <span className="flex flex-col whitespace-nowrap leading-tight">
-          <span className="tabular font-semibold">{pointsText.count}</span>
-          <span className="text-on-chrome/85">{pointsText.suffix.trim()}</span>
+      </div>
+      <div className={tile}>
+        <span aria-hidden className={`${disc} rotate-6 bg-accent`}>
+          <Star size={22} weight="bold" />
         </span>
-      </span>
+        <span className="flex flex-col leading-tight">
+          <span className="tabular font-display text-lg font-bold text-ink">{pointsText.count}</span>
+          <span className="text-sm text-muted">{pointsText.suffix.trim()}</span>
+        </span>
+      </div>
     </div>
   );
 }

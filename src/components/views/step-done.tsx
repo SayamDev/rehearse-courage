@@ -5,12 +5,12 @@ import { ArrowRight, MapTrifold } from "@phosphor-icons/react";
 import { BADGES } from "@/lib/achievements";
 import type { Stage } from "@/lib/companion";
 import { ROOM_LABEL } from "@/lib/rooms";
-import { cropAspect, sceneCrop, SCENES } from "@/lib/scenes";
 import { headlineBadge, type StepResult } from "@/lib/step";
 import { useCourage } from "@/lib/store";
-import { useReducedMotion } from "@/lib/use-reduced-motion";
 import type { RoomId } from "@/lib/types";
-import { Celebration } from "@/components/scene/celebration";
+import { Companion } from "@/components/scene/companion";
+import { ProgressTrack } from "@/components/scene/progress-track";
+import { Lottie } from "@/components/ui/lottie";
 import { ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Sticker } from "@/components/ui/sticker";
@@ -34,7 +34,9 @@ export function secondsLine(seconds: number | null, lastSeconds: number | null):
 }
 
 /**
- * Step complete, shown in place of the step once it is saved. Celebrates
+ * Step complete, shown in place of the step once it is saved: the teal
+ * check Lottie with the companion, the six-step track with the new step
+ * lit, then the words. Celebrates
  * the attempt, never the quality: heading "You had a go." (or the first
  * new badge's title with a full stop), "That took courage.", seconds
  * spoken when measured, points earned, stickers for new badges, and the
@@ -53,32 +55,24 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
   const heading = lead ? `${badgeTitle(lead)}.` : "You had a go.";
   const seconds = secondsLine(result.seconds, result.lastSeconds);
   const grew = result.stageAfter !== result.stageBefore && store.companion;
-  const reduce = useReducedMotion();
 
   return (
-    <div className="mx-auto max-w-[1100px] px-4 pt-6 md:pt-10">
+    <div className="mx-auto max-w-[640px] px-4 pt-6 md:pt-10">
       <p className="text-muted">
         {ROOM_LABEL[room]} step <span className="tabular">{result.level}</span>: {title}
       </p>
 
-      {/* Capped by height, keeping the crop's aspect so stones line up. */}
-      <div
-        className="mx-auto mt-4 max-w-[640px]"
-        style={{ width: `min(100%, calc(${cropAspect(SCENES[room], sceneCrop(SCENES[room], "island"))} * max(36dvh, 240px)))` }}
-      >
-        <Celebration
-          room={room}
-          situationId={result.situationId}
-          level={result.level}
-          companion={store.companion ? { species: store.companion.species, stage: result.stageAfter } : null}
-          skyBefore={result.skyBefore}
-          skyAfter={result.skyAfter}
-          confetti={store.settings.confetti && !reduce}
-        />
-      </div>
-
-      <PaperCard className="relative mx-auto -mt-8 max-w-[560px]">
-        <div className="flex items-center gap-4">
+      <PaperCard className="relative mt-4">
+        <div className="relative mx-auto flex w-fit items-end">
+          <Lottie src="/lottie/step-done.json" className="size-40 sm:size-48" />
+          {store.companion ? (
+            <div className="-ml-8 mb-2">
+              <Companion species={store.companion.species} stage={result.stageAfter} size={72} />
+            </div>
+          ) : null}
+        </div>
+        <ProgressTrack situationId={result.situationId} className="mx-auto mt-4 max-w-[420px]" />
+        <div className="mt-6 flex items-center gap-4">
           {result.newBadges.length > 0 ? (
             <div className="flex shrink-0 -space-x-6">
               {result.newBadges.map((id) => (

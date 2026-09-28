@@ -68,7 +68,7 @@ const SECTIONS: { id?: string; title: string; body: string[] }[] = [
 export default function PrivacyPage() {
   return (
     <>
-      <ArtHeader title="Privacy" line="What stays on your device, in plain English." art="/art/sky-home.webp" back={{ href: "/me", label: "Me" }} reading />
+      <ArtHeader title="Privacy" line="What stays on your device, in plain English." back={{ href: "/me", label: "Me" }} reading />
       <div className="mx-auto max-w-[720px] px-4 pt-2 md:pt-4">
         <div className="max-w-[60ch]">
           {SECTIONS.map((s) => (

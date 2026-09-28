@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { markPopupShown, popupBlocked, voiceOfferDue } from "@/lib/popups";
 import { markVoiceOffered } from "@/lib/state";
 import { act, useCourage } from "@/lib/store";
@@ -51,7 +50,7 @@ export function VoiceOffer({ pathname, quiet }: { pathname: string; quiet: boole
       title="A natural voice for every line"
       onClose={() => act(markVoiceOffered)}
       banner={
-        <PopupBanner art={<Image src="/art/step-class.webp" alt="" fill sizes="34rem" className="object-cover object-[50%_25%]" />}>
+        <PopupBanner>
           <Companion species={store.companion?.species ?? "firefly"} stage="speaking" size={72} />
         </PopupBanner>
       }

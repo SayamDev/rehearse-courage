@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import { ArrowRight, DeviceMobile, Lifebuoy, Path, Star, type Icon } from "@phosphor-icons/react";
 import { markPopupShown, welcomeDue } from "@/lib/popups";
 import { markWelcomed } from "@/lib/state";
@@ -54,7 +53,7 @@ export function WelcomeGuide({ pathname, quiet }: { pathname: string; quiet: boo
       title={`${name} is ready when you are`}
       onClose={() => act(markWelcomed)}
       banner={
-        <PopupBanner art={<Image src="/art/home-class.webp" alt="" fill sizes="34rem" className="object-cover object-[50%_30%]" />}>
+        <PopupBanner>
           <Companion species="firefly" stage="hiding" size={72} />
         </PopupBanner>
       }
