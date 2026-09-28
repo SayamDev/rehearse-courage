@@ -36,7 +36,7 @@ Cards: 20px radius, 1.5px `--line` border, one soft shadow (`--card-shadow`). Co
 
 ## Layout
 
-Top bar on every page: teal sticker wordmark, section links from 768px, Need a pause in the right corner (never floating over content). Phone: bottom tabs, the active icon in a small teal sticker. Content column max 1100px (720px for reading pages, 640px for a practice step). Home on laptops: today's card left, the companion right.
+Top bar on every page: teal sticker wordmark, section links from 768px, a round light or dark switch (a moon in light colours, a sun in dark; the same setting as Colours in Me), and Need a pause in the right corner (never floating over content). Phone: bottom tabs, the active icon in a small teal sticker. Content column max 1100px (720px for reading pages, 640px for a practice step). Home on laptops: today's card left, the companion right.
 
 ## Components
 

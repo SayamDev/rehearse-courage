@@ -52,6 +52,7 @@ Also live (PR #22, 2026-09-28):
 - **Step 6:** I did it / I tried / Not yet. Trying saves a proud moment (`state.proud`); then "How did it feel?" and an optional note (crisis-checked, kept on the device). Not yet has its own kind screen and counts.
 - **Right before** (`/ready`): pick the moment, one breath, your words, a rescue phrase, go. From Home, step 6 and Not yet.
 - **Games:** Say it like, Describe it, Keep it going (8 in all). Fixed Hot seat sticking on "spinning" (the old "flake") and hydration errors in Rescue snap and Word builder.
+- **Light or dark in the top bar** (`shell/theme-toggle.tsx`, `lib/use-dark-theme.ts`): one tap flips and saves `settings.theme`; Me still has Match my device. Lottie and the Home greeting redraw in the new colours (end frame, no replay).
 - **Voices:** the new lines are in the recording script. Until the next `npm run voices:record` on the Mac they play with the on-device voice.
 
 ngs and OmniVoice reference clips deleted.
