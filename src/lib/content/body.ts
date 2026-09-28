@@ -115,7 +115,7 @@ export const REFRAME_CARDS: Record<"blushing" | "sweating", { thought: Words; tr
 };
 
 /** Speech tools: options, never rules. Offered, not required, and never measured. */
-export const SPEECH_TOOLS: { id: string; title: string; how: Words }[] = [
+export const SPEECH_TOOLS: { id: "easy-onset" | "pausing" | "light-contact"; title: string; how: Words; practice: string[] }[] = [
   {
     id: "easy-onset",
     title: "Easy start",
@@ -123,16 +123,22 @@ export const SPEECH_TOOLS: { id: string; title: string; how: Words }[] = [
       "Start your first word gently, with a little breath, like a soft sigh.",
       "Begin the first sound gently, letting a little air flow first, like a soft sigh.",
     ),
+    // Words that start with a vowel or h are the easiest place to feel a gentle start.
+    practice: ["Hello", "I think so", "Only one", "Every day", "Actually", "How are you?"],
   },
   {
     id: "pausing",
     title: "Pausing",
     how: w("Stop for a moment between groups of words. Pauses are allowed.", "Take short pauses between phrases. Pauses give you time and help listeners follow."),
+    // One sentence in speakable chunks, read along with the pacer.
+    practice: ["I think", "we should start", "with the easy part,", "and then", "try the hard one."],
   },
   {
     id: "light-contact",
     title: "Light touch",
     how: w("Let your lips and tongue touch lightly, not pressed hard.", "Keep your lips and tongue touching lightly rather than pressing hard on sounds."),
+    // Words that start with p, b, t, d, k or g, where pressing hard is most common.
+    practice: ["Pizza", "Buddy", "Today", "Dinner", "Cookie", "Good morning"],
   },
 ];
 

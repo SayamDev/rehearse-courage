@@ -64,6 +64,8 @@ export type CourageState = {
   lastBackup: string | null;
   /** The natural-voice download has been offered once by its pop-up, whatever the answer. */
   voiceOffered: boolean;
+  /** Rescue phrase ids the person starred, shown first in the deck. */
+  savedPhrases: string[];
   settings: Settings;
 };
 
@@ -85,6 +87,7 @@ export const DEFAULT_STATE: CourageState = {
   welcomed: false,
   lastBackup: null,
   voiceOffered: false,
+  savedPhrases: [],
   settings: {
     reduceMotion: false,
     textSize: "normal",
@@ -219,6 +222,7 @@ export function normalize(raw: unknown): CourageState {
     welcomed: p.welcomed === true || (p.welcomed === undefined && arr<unknown>(p.records).length > 0),
     lastBackup: isParseableDate(p.lastBackup) ? p.lastBackup : null,
     voiceOffered: p.voiceOffered === true,
+    savedPhrases: dedupe(arr<unknown>(p.savedPhrases).filter((v): v is string => typeof v === "string")).slice(0, 50),
     settings: normalizeSettings(p.settings),
   };
 }
@@ -278,4 +282,10 @@ export function updateSettings(s: CourageState, patch: Partial<Settings>): Coura
 /** The voice pop-up had its one turn. */
 export function markVoiceOffered(s: CourageState): CourageState {
   return { ...s, voiceOffered: true };
+}
+
+/** Stars or un-stars a rescue phrase. */
+export function toggleSavedPhrase(s: CourageState, id: string): CourageState {
+  const saved = s.savedPhrases.includes(id) ? s.savedPhrases.filter((p) => p !== id) : [...s.savedPhrases, id];
+  return { ...s, savedPhrases: saved };
 }

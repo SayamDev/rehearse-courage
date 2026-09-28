@@ -9,11 +9,27 @@ function prefersReducedMotion(): boolean {
 
 /**
  * Plays one of the app's Lottie animations (public/lottie, built by
- * scripts/lottie/build.mjs). The player loads only when an animation is on
- * screen. Under reduced motion it shows the final frame and never moves.
+ * scripts/lottie/build.mjs). It starts once half of it is on screen. Under reduced motion it shows the final frame and never moves.
  * Always decorative: the text beside it says what happened.
  */
-export function Lottie({ src, loop = false, className = "" }: { src: string; loop?: boolean; className?: string }) {
+/** Dark colours in use: picked in Me, or the device is dark and Me does not force light. */
+function isDark(): boolean {
+  const theme = document.documentElement.dataset.theme;
+  return theme === "dark" || (theme !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+
+export function Lottie({
+  src,
+  loop = false,
+  themed = false,
+  className = "",
+}: {
+  src: string;
+  loop?: boolean;
+  /** The animation has a "-dark.json" twin (type in light ink) for dark colours. */
+  themed?: boolean;
+  className?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -22,7 +38,7 @@ export function Lottie({ src, loop = false, className = "" }: { src: string; loo
     void (async () => {
       const [{ default: lottie }, data] = await Promise.all([
         import("lottie-web/build/player/lottie_light"),
-        fetch(src).then((r) => r.json()),
+        fetch(themed && isDark() ? src.replace(/\.json$/, "-dark.json") : src).then((r) => r.json()),
       ]);
       if (!live || !ref.current) return;
       const reduce = prefersReducedMotion();
@@ -30,17 +46,35 @@ export function Lottie({ src, loop = false, className = "" }: { src: string; loo
         container: ref.current,
         renderer: "svg",
         loop: loop && !reduce,
-        autoplay: !reduce,
+        autoplay: false,
         animationData: data,
       });
-      if (reduce) anim.addEventListener("DOMLoaded", () => anim.goToAndStop(anim.totalFrames - 1, true));
-      destroy = () => anim.destroy();
+      if (reduce) {
+        anim.addEventListener("DOMLoaded", () => anim.goToAndStop(anim.totalFrames - 1, true));
+        destroy = () => anim.destroy();
+        return;
+      }
+      // Starts when at least half of it is on screen, so nothing plays unseen.
+      const seen = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            anim.play();
+            seen.disconnect();
+          }
+        },
+        { threshold: 0.5 },
+      );
+      seen.observe(ref.current);
+      destroy = () => {
+        seen.disconnect();
+        anim.destroy();
+      };
     })().catch(() => null);
     return () => {
       live = false;
       destroy?.();
     };
-  }, [src, loop]);
+  }, [src, loop, themed]);
 
   return <div ref={ref} aria-hidden className={className} />;
 }

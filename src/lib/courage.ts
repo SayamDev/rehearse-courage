@@ -38,3 +38,19 @@ export function braveDaysThisWeek(records: StepRecord[], now: Date): number {
   }
   return days.size;
 }
+
+export type BraveDay = { key: string; label: string; brave: boolean; today: boolean; future: boolean };
+
+/** This week, Monday to Sunday, marking the days with at least one step. Missed days are simply blank, never "broken". */
+export function braveWeek(records: StepRecord[], now: Date): BraveDay[] {
+  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+  const brave = new Set(records.map((r) => dayKey(new Date(r.at))));
+  const today = dayKey(now);
+  return ["M", "T", "W", "T", "F", "S", "S"].map((label, i) => {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    const key = dayKey(d);
+    return { key, label, brave: brave.has(key), today: key === today, future: key > today };
+  });
+}

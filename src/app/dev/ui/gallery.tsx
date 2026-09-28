@@ -10,13 +10,16 @@ import { StatsPill } from "@/components/ui/stats-pill";
 import { Sticker } from "@/components/ui/sticker";
 import { Switch } from "@/components/ui/switch";
 import { ToolTile } from "@/components/ui/tool-tile";
+import { KIT_META } from "@/components/views/kit-meta";
 
 const IDEAS = ["I'm having a rough day", "I'm not sure", "I'd like to pass", "I think it's..."];
 
-const KIT_TILES = [
-  { href: "/kit/breathing", art: "/art/kit/breathing.webp", title: "Breathing", line: "Calm your mind and slow your body.", helps: "Helps with rising anxiety" },
-  { href: "/kit/grounding", art: "/art/kit/grounding.webp", title: "Grounding", line: "Get back to the present moment.", helps: "Helps when you feel lost" },
-];
+const KIT_TILES = (["breathing", "rescue"] as const).map((id) => ({
+  href: `/kit/${id}`,
+  title: id === "breathing" ? "Breathing" : "Rescue phrases",
+  line: "Slow your breathing and your body.",
+  ...KIT_META[id],
+}));
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -100,7 +103,7 @@ export function UiGallery() {
       <Section title="ToolTile">
         <div className="grid gap-3 sm:grid-cols-2">
           {KIT_TILES.map((t) => (
-            <ToolTile key={t.href} {...t} eager />
+            <ToolTile key={t.href} {...t} />
           ))}
         </div>
       </Section>

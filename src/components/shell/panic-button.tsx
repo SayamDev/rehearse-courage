@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Lifebuoy } from "@phosphor-icons/react";
+import { PauseMark } from "@/components/calm/pause-mark";
 
 /**
  * Opens Need a pause by adding `?calm=1` to the current path, so it works
@@ -11,7 +11,7 @@ import { Lifebuoy } from "@phosphor-icons/react";
  * the same corner on every page, in the calm blue (never the teal of progress).
  */
 const CLASS =
-  "flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-help/40 bg-surface px-3 font-display font-bold text-help transition-colors duration-[var(--dur-feedback)] hover:border-help hover:bg-help/10 active:bg-help/15";
+  "flex min-h-11 items-center gap-2 whitespace-nowrap rounded-full bg-[color-mix(in_srgb,var(--calm)_14%,var(--surface))] px-3.5 font-display font-bold text-help transition-colors duration-[var(--dur-feedback)] hover:bg-[color-mix(in_srgb,var(--calm)_22%,var(--surface))] active:bg-[color-mix(in_srgb,var(--calm)_28%,var(--surface))]";
 
 /** The current URL plus calm=1, keeping the page's own params (e.g. a step's ?level) so nothing behind the dialog changes. */
 export function calmHref(pathname: string, search: string): string {
@@ -24,7 +24,7 @@ function PanicLink({ search }: { search: string }) {
   const pathname = usePathname();
   return (
     <Link href={calmHref(pathname, search)} className={CLASS}>
-      <Lifebuoy size={22} weight="regular" aria-hidden />
+      <PauseMark size={22} />
       Need a pause
     </Link>
   );

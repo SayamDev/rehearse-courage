@@ -10,6 +10,7 @@ import { SPECIES } from "@/lib/companion";
 import type { AgeBand, HardThing, Species } from "@/lib/types";
 
 import { Companion } from "@/components/scene/companion";
+import { Lottie } from "@/components/ui/lottie";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Button } from "@/components/ui/button";
 
@@ -73,9 +74,19 @@ export function FirstVisit() {
 
   return (
     <div className="relative mx-auto max-w-[720px] px-4 pb-16 pt-6 sm:pt-14">
-      <div className="flex justify-center">
-        <Companion species="firefly" stage={step >= TOTAL_STEPS ? "waving" : "peeking"} size={120} />
-      </div>
+      {step === 1 ? (
+        <div className="flex items-end gap-2">
+          <Lottie src="/lottie/welcome.json" themed className="aspect-[640/300] min-w-0 flex-1" />
+          <p className="sr-only">Speak up, one small step at a time.</p>
+          <div className="mb-4 shrink-0">
+            <Companion species="firefly" stage="peeking" size={96} />
+          </div>
+        </div>
+      ) : (
+        <div className="flex justify-center">
+          <Companion species="firefly" stage={step >= TOTAL_STEPS ? "waving" : "peeking"} size={120} />
+        </div>
+      )}
 
       <PaperCard className="relative mt-5">
         <p aria-live="polite" className="mb-4 text-sm text-muted">

@@ -63,14 +63,12 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
       </p>
 
       <PaperCard className="relative mt-4">
-        <div className="relative mx-auto flex w-fit items-end">
-          <Lottie src="/lottie/step-done.json" className="size-40 sm:size-48" />
-          {store.companion ? (
-            <div className="-ml-8 mb-2">
-              <Companion species={store.companion.species} stage={result.stageAfter} size={72} />
-            </div>
-          ) : null}
-        </div>
+        {store.companion ? (
+          <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
+            <Companion species={store.companion.species} stage={result.stageAfter} size={64} />
+          </div>
+        ) : null}
+        <Lottie src="/lottie/courage.json" themed className="-ml-2 aspect-[640/260] w-full max-w-[440px]" />
         <ProgressTrack situationId={result.situationId} className="mx-auto mt-4 max-w-[420px]" />
         <div className="mt-6 flex items-center gap-4">
           {result.newBadges.length > 0 ? (
@@ -85,7 +83,7 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
           </h1>
         </div>
 
-        <p className="mt-3 text-lg text-ink">That took courage.</p>
+        <p className="sr-only">That took courage.</p>
         {seconds ? <p className="tabular mt-1 text-ink">{seconds}</p> : null}
         <p className="tabular mt-3 font-semibold text-ink">+{result.points} courage points</p>
         {result.newBadges.length > 1 ? (

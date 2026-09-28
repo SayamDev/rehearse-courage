@@ -17,7 +17,7 @@ export function BreathingLantern({
   tone = "lantern",
 }: {
   reduce: boolean;
-  /** "calm" (soft teal) in Panic now, so help never looks like the amber of rewards and progress. */
+  /** "calm" (quiet blue) in Need a pause, so help never looks like the teal of progress. */
   tone?: "lantern" | "calm";
 }) {
   const colour = tone === "calm" ? "var(--calm)" : "var(--accent)";
@@ -37,19 +37,37 @@ export function BreathingLantern({
 
   const big = reduce || phase === "in";
 
+  // A gentle count inside the circle: seconds left in this breath (never shown under reduced motion).
+  const [left, setLeft] = useState(4);
+  useEffect(() => {
+    if (reduce || phase === "rest") return;
+    const total = phase === "in" ? IN_MS / 1000 : OUT_MS / 1000;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLeft(total);
+    const t = window.setInterval(() => setLeft((n) => Math.max(1, n - 1)), 1000);
+    return () => window.clearInterval(t);
+  }, [phase, reduce]);
+
   return (
     <div className="flex flex-col items-center text-center">
-      <div aria-hidden className="relative flex h-44 w-44 items-center justify-center md:h-52 md:w-52">
+      <div aria-hidden className="relative flex size-56 items-center justify-center md:size-64">
+        {/* Two still rings mark the full breath; the filled circle grows to meet them. */}
+        <div className="absolute inset-0 rounded-full border-2" style={{ borderColor: `color-mix(in srgb, ${colour} 22%, transparent)` }} />
+        <div className="absolute inset-[16%] rounded-full border-2" style={{ borderColor: `color-mix(in srgb, ${colour} 34%, transparent)` }} />
         <div
-          className="absolute inset-0 rounded-full"
+          className="absolute inset-[6%] rounded-full"
           style={{
-            background:
-              `radial-gradient(circle, color-mix(in srgb, ${colour} 85%, transparent) 0%, color-mix(in srgb, ${colour} 35%, transparent) 45%, transparent 70%)`,
-            transform: `scale(${big ? 1 : 0.55})`,
+            background: `radial-gradient(circle, color-mix(in srgb, ${colour} 55%, transparent) 0%, color-mix(in srgb, ${colour} 22%, transparent) 60%, transparent 72%)`,
+            transform: `scale(${big ? 1 : 0.5})`,
             transition: reduce ? "none" : `transform ${phase === "out" ? OUT_MS : IN_MS}ms cubic-bezier(0.37, 0, 0.63, 1)`,
           }}
         />
-        <div className={`relative h-16 w-16 rounded-full md:h-20 md:w-20 ${tone === "calm" ? "bg-calm" : "bg-accent shadow-glow"}`} />
+        <div
+          className={`relative flex size-20 items-center justify-center rounded-full border-4 border-die font-display text-3xl font-bold shadow-sticker md:size-24 ${tone === "calm" ? "text-on-help" : "text-on-accent"}`}
+          style={{ background: colour }}
+        >
+          {reduce || phase === "rest" ? null : <span className="tabular">{left}</span>}
+        </div>
       </div>
       <p className="sr-only">Breathe in for 4 seconds as the light grows, then slowly out for 6 as it shrinks.</p>
       <p aria-hidden className="mt-4 font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] font-bold text-ink">
