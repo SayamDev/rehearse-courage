@@ -44,11 +44,11 @@ test("a typed step at level 2 is saved and earns Typed it first", async ({ page 
 });
 
 for (const route of ["/", "/map", "/step/class-answer?level=3", "/start"]) {
-  test(`Panic now opens from ${route} and closes with Escape`, async ({ page }) => {
+  test(`Need a pause opens from ${route} and closes with Escape`, async ({ page }) => {
     await seed(page);
     await page.goto(route);
-    await page.getByRole("link", { name: "Panic now" }).click();
-    const dialog = page.getByRole("dialog", { name: "Panic now" });
+    await page.getByRole("link", { name: "Need a pause" }).click();
+    const dialog = page.getByRole("dialog", { name: "Need a pause" });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText("You are safe. This feeling will pass.")).toBeVisible();
     await page.keyboard.press("Escape");

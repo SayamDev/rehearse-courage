@@ -7,7 +7,7 @@ export type StoneState = "lit" | "current" | "dim";
 export type CropBox = { x: number; y: number; w: number; h: number };
 
 /** "island" fills the frame with just the island (used by PathStones, so stones do not collide on a small phone). "wide" is a gentler crop for screens that want more of the scene (e.g. Home on a laptop); defaults to the full art. */
-export type CropKind = "island" | "wide" | "step";
+export type CropKind = "island" | "wide" | "band" | "step";
 
 export type Scene = {
   /** Path under public/, e.g. "/art/home-class.webp". */
@@ -19,6 +19,8 @@ export type Scene = {
   islandFocus: CropBox;
   /** Gentler crop for a wider view. Defaults to the full art when there is no reason to crop tighter. */
   wideFocus: CropBox;
+  /** Full-width band on laptops (SceneBand): the whole width, trimmed below the island so the band is not taller than the screen. */
+  bandFocus: CropBox;
   /** Exactly 5 stone centres, as percentages of the FULL ART (0 to 100), not the cropped frame. */
   stones: { x: number; y: number }[];
   /** Step 6: the destination hotspot (a box, as percentages of the full art), lit when the mission is done. */
@@ -28,6 +30,8 @@ export type Scene = {
 };
 
 const FULL_ART: CropBox = { x: 0, y: 0, w: 100, h: 100 };
+/** Every scene keeps its path in the top 64% of the art; below that is the island's underside and calm clouds. */
+const BAND: CropBox = { x: 0, y: 0, w: 100, h: 64 };
 
 /**
  * Scene art and stone/destination coordinates per room. Measured by hand on
@@ -42,8 +46,9 @@ export const SCENES: Record<RoomId, Scene> = {
     // The island is small inside the wide dusk-to-dawn sky/sea art, so the
     // island crop zooms tightly onto the path and school; the wide crop is
     // the untouched full art (used where the sky/sea context is wanted).
-    islandFocus: { x: 40, y: 6, w: 36, h: 48 },
+    islandFocus: { x: 37, y: 5, w: 40, h: 44 },
     wideFocus: FULL_ART,
+    bandFocus: BAND,
     // Measured on the real art with /dev/scenes: the dirt path winds from
     // the island's near edge up to the school door at the top of the island.
     stones: [
@@ -54,7 +59,7 @@ export const SCENES: Record<RoomId, Scene> = {
       { x: 59.7, y: 21.7 },
     ],
     destination: { x: 60.2, y: 11.8, w: 9, h: 9, label: "the school door" },
-    step: { art: "/art/step-class.webp", width: 1536, height: 1024, focus: { x: 12, y: 2, w: 76, h: 42 } },
+    step: { art: "/art/step-class.webp", width: 1536, height: 1024, focus: { x: 0, y: 0, w: 100, h: 44 } },
   },
   // Friends: a park island (oak, picnic table), the dirt path ends at the
   // gazebo. Coordinates measured on the real art with a percent grid.
@@ -64,6 +69,7 @@ export const SCENES: Record<RoomId, Scene> = {
     height: 1024,
     islandFocus: { x: 38, y: 10, w: 34, h: 42 },
     wideFocus: FULL_ART,
+    bandFocus: BAND,
     stones: [
       { x: 49, y: 43.5 },
       { x: 54, y: 39.5 },
@@ -81,6 +87,7 @@ export const SCENES: Record<RoomId, Scene> = {
     height: 1024,
     islandFocus: { x: 36, y: 9, w: 34, h: 43 },
     wideFocus: FULL_ART,
+    bandFocus: BAND,
     stones: [
       { x: 48.3, y: 44.5 },
       { x: 53, y: 40.2 },
@@ -94,6 +101,7 @@ export const SCENES: Record<RoomId, Scene> = {
 
 export function sceneCrop(scene: Scene, crop: CropKind): CropBox {
   if (crop === "step") return scene.step?.focus ?? scene.islandFocus;
+  if (crop === "band") return scene.bandFocus;
   return crop === "island" ? scene.islandFocus : scene.wideFocus;
 }
 

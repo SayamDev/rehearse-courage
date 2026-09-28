@@ -17,7 +17,7 @@ test("the welcome guide shows once and is remembered", async ({ page }) => {
   await page.goto("/");
   const dialog = page.getByRole("dialog", { name: "Glow is ready when you are" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByText("Panic now is always here")).toBeVisible();
+  await expect(dialog.getByText("Need a pause? It is always here")).toBeVisible();
   await axe(page);
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
@@ -53,7 +53,7 @@ test("keep your progress safe: Don't show this again sticks", async ({ page }) =
   await expect.poll(() => page.evaluate(() => JSON.parse(localStorage.getItem("courage:v1")!).settings.saveNudgeOff)).toBe(true);
 });
 
-test("never on a practice step or while Panic now is open", async ({ page }) => {
+test("never on a practice step or while Need a pause is open", async ({ page }) => {
   await seed(page, PRACTISED);
   await page.goto("/step/class-answer?level=2");
   await page.waitForTimeout(2500);

@@ -101,152 +101,159 @@ export function MeView() {
   };
 
   return (
-    <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-10">
+    <div className="mx-auto max-w-[720px] px-4 pt-6 md:pt-10 lg:max-w-[1100px] lg:px-8">
       <h1 className="text-[clamp(1.75rem,1.2rem+2vw,2.75rem)] text-ink">Me</h1>
 
-      <PaperCard className="mt-5">
-        <div className="flex items-center gap-5">
-          {store.companion ? <Companion species={store.companion.species} stage={stage} size={88} /> : null}
-          <div>
-            <p className="font-display text-2xl font-bold text-ink">{store.companion?.name ?? "No companion yet"}</p>
-            {store.companion ? <p className="text-muted">{STAGE_WORD[stage]}</p> : <Link href="/start" className="font-semibold text-ink underline">Choose a companion</Link>}
-          </div>
-        </div>
-      </PaperCard>
-      {/* Outside the card: the pill needs the full phone width. */}
-      <div className="mt-4 flex justify-center sm:justify-start">
-        <StatsPill braveDays={braveDaysThisWeek(store.records, new Date())} points={points} />
-      </div>
-
-      <Section title="Settings">
-        <div className="mt-3 divide-y divide-line">
-          <Switch checked={store.settings.reduceMotion} onChange={(v) => set({ reduceMotion: v })} label="Reduce motion" />
-          <Switch checked={store.settings.sounds} onChange={(v) => set({ sounds: v })} label="Sounds" />
-          <Switch checked={store.settings.confetti} onChange={(v) => set({ confetti: v })} label="Paper sparks when you finish a step" />
-          <Switch checked={store.settings.timers} onChange={(v) => set({ timers: v })} label="Show a timer on step 5" />
-          <Switch
-            checked={store.settings.keepRecordings}
-            onChange={(v) => set({ keepRecordings: v })}
-            label="Keep my recordings on this device"
-          />
-        </div>
-        <fieldset className="mt-4">
-          <legend className="font-semibold text-ink">Text size</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {TEXT_SIZES.map((t) => (
-              <button key={t.value} type="button" aria-pressed={store.settings.textSize === t.value} onClick={() => set({ textSize: t.value })} className={chip(store.settings.textSize === t.value)}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset className="mt-4">
-          <legend className="font-semibold text-ink">Theme</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {THEMES.map((t) => (
-              <button key={t.value} type="button" aria-pressed={store.settings.theme === t.value} onClick={() => set({ theme: t.value })} className={chip(store.settings.theme === t.value)}>
-                {t.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-      </Section>
-
-      <Section title="About you">
-        <fieldset className="mt-3">
-          <legend className="font-semibold text-ink">Age</legend>
-          <p className="text-muted">Not set means the app treats you as under 13.</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {AGE_OPTIONS.map((o) => (
-              <button key={o.value} type="button" aria-pressed={store.age === o.value} onClick={() => act((s) => setAge(s, store.age === o.value ? null : o.value))} className={chip(store.age === o.value)}>
-                {o.label}
-              </button>
-            ))}
-          </div>
-        </fieldset>
-        <fieldset className="mt-5">
-          <legend className="font-semibold text-ink">What feels hard</legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {hardThingOptions().map((o) => {
-              const on = store.hardThings.includes(o.id);
-              return (
-                <button key={o.id} type="button" aria-pressed={on} onClick={() => act((s) => setHardThings(s, toggleHardThing(s.hardThings, o.id)))} className={chip(on)}>
-                  {o.label}
-                </button>
-              );
-            })}
-          </div>
-        </fieldset>
-      </Section>
-
-      <Section title="AI help">
-        <AiSettings />
-      </Section>
-
-      <Section title="Your data">
-        <p className="mt-1 text-ink">
-          Everything is saved only on this device. A backup lets you move it or keep it safe.{" "}
-          <Link href="/privacy" className="font-semibold underline">
-            How privacy works
-          </Link>
-        </p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <Button variant="secondary" icon={DownloadSimple} onClick={download}>
-            Save a backup
-          </Button>
-          <Button variant="secondary" icon={UploadSimple} onClick={() => fileRef.current?.click()}>
-            Restore a backup
-          </Button>
-        </div>
-        <input ref={fileRef} type="file" accept="application/json,.json" onChange={restore} className="sr-only" tabIndex={-1} aria-hidden />
-        <p role="status" className="mt-3 min-h-[1.55em] text-ink">
-          {message}
-        </p>
-
-        <div className="mt-4 border-t border-line pt-4">
-          {confirming ? (
-            <div role="group" aria-labelledby="delete-q">
-              <p id="delete-q" className="font-semibold text-ink">
-                Delete everything on this device? Your companion, steps and badges will be gone.
-              </p>
-              <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                <Button
-                  variant="secondary"
-                  icon={Trash}
-                  onClick={() => {
-                    // Also delete a saved on-device model (its library only loads if there is one).
-                    if (store.settings.deviceModel) void removeModel().catch(() => {});
-                    clearEverything();
-                    router.replace("/start");
-                  }}
-                >
-                  Yes, delete everything
-                </Button>
-                <Button
-                  variant="chrome"
-                  autoFocus
-                  onClick={() => {
-                    setConfirming(false);
-                    requestAnimationFrame(() => deleteRef.current?.focus());
-                  }}
-                >
-                  Keep my progress
-                </Button>
+      {/* Laptop: two columns (you and your settings; your details and data) so the page is not one long narrow strip. */}
+      <div className="lg:grid lg:grid-cols-2 lg:items-start lg:gap-8">
+        <div>
+          <PaperCard className="mt-5">
+            <div className="flex items-center gap-5">
+              {store.companion ? <Companion species={store.companion.species} stage={stage} size={88} /> : null}
+              <div>
+                <p className="font-display text-2xl font-bold text-ink">{store.companion?.name ?? "No companion yet"}</p>
+                {store.companion ? <p className="text-muted">{STAGE_WORD[stage]}</p> : <Link href="/start" className="font-semibold text-ink underline">Choose a companion</Link>}
               </div>
             </div>
-          ) : (
-            <Button ref={deleteRef} variant="secondary" icon={Trash} onClick={() => setConfirming(true)}>
-              Delete everything
-            </Button>
-          )}
-        </div>
-      </Section>
+          </PaperCard>
+          {/* Outside the card: the pill needs the full phone width. */}
+          <div className="mt-4 flex justify-center sm:justify-start">
+            <StatsPill braveDays={braveDaysThisWeek(store.records, new Date())} points={points} />
+          </div>
 
-      <p className="mt-6 text-muted">
-        <Link href="/about" className="underline">
-          About Rehearse Courage
-        </Link>
-      </p>
+          <Section title="Settings">
+            <div className="mt-3 divide-y divide-line">
+              <Switch checked={store.settings.reduceMotion} onChange={(v) => set({ reduceMotion: v })} label="Reduce motion" />
+              <Switch checked={store.settings.sounds} onChange={(v) => set({ sounds: v })} label="Sounds" />
+              <Switch checked={store.settings.confetti} onChange={(v) => set({ confetti: v })} label="Paper sparks when you finish a step" />
+              <Switch checked={store.settings.timers} onChange={(v) => set({ timers: v })} label="Show a timer on step 5" />
+              <Switch
+                checked={store.settings.keepRecordings}
+                onChange={(v) => set({ keepRecordings: v })}
+                label="Keep my recordings on this device"
+              />
+            </div>
+            <fieldset className="mt-4">
+              <legend className="font-semibold text-ink">Text size</legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {TEXT_SIZES.map((t) => (
+                  <button key={t.value} type="button" aria-pressed={store.settings.textSize === t.value} onClick={() => set({ textSize: t.value })} className={chip(store.settings.textSize === t.value)}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset className="mt-4">
+              <legend className="font-semibold text-ink">Theme</legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {THEMES.map((t) => (
+                  <button key={t.value} type="button" aria-pressed={store.settings.theme === t.value} onClick={() => set({ theme: t.value })} className={chip(store.settings.theme === t.value)}>
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          </Section>
+        </div>
+
+        <div className="lg:[&>section:first-child]:mt-5">
+          <Section title="About you">
+            <fieldset className="mt-3">
+              <legend className="font-semibold text-ink">Age</legend>
+              <p className="text-muted">Not set means the app treats you as under 13.</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {AGE_OPTIONS.map((o) => (
+                  <button key={o.value} type="button" aria-pressed={store.age === o.value} onClick={() => act((s) => setAge(s, store.age === o.value ? null : o.value))} className={chip(store.age === o.value)}>
+                    {o.label}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+            <fieldset className="mt-5">
+              <legend className="font-semibold text-ink">What feels hard</legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {hardThingOptions().map((o) => {
+                  const on = store.hardThings.includes(o.id);
+                  return (
+                    <button key={o.id} type="button" aria-pressed={on} onClick={() => act((s) => setHardThings(s, toggleHardThing(s.hardThings, o.id)))} className={chip(on)}>
+                      {o.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+          </Section>
+
+          <Section title="AI help">
+            <AiSettings />
+          </Section>
+
+          <Section title="Your data">
+            <p className="mt-1 text-ink">
+              Everything is saved only on this device. A backup lets you move it or keep it safe.{" "}
+              <Link href="/privacy" className="font-semibold underline">
+                How privacy works
+              </Link>
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Button variant="secondary" icon={DownloadSimple} onClick={download}>
+                Save a backup
+              </Button>
+              <Button variant="secondary" icon={UploadSimple} onClick={() => fileRef.current?.click()}>
+                Restore a backup
+              </Button>
+            </div>
+            <input ref={fileRef} type="file" accept="application/json,.json" onChange={restore} className="sr-only" tabIndex={-1} aria-hidden />
+            <p role="status" className="mt-3 min-h-[1.55em] text-ink">
+              {message}
+            </p>
+
+            <div className="mt-4 border-t border-line pt-4">
+              {confirming ? (
+                <div role="group" aria-labelledby="delete-q">
+                  <p id="delete-q" className="font-semibold text-ink">
+                    Delete everything on this device? Your companion, steps and badges will be gone.
+                  </p>
+                  <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                    <Button
+                      variant="secondary"
+                      icon={Trash}
+                      onClick={() => {
+                        // Also delete a saved on-device model (its library only loads if there is one).
+                        if (store.settings.deviceModel) void removeModel().catch(() => {});
+                        clearEverything();
+                        router.replace("/start");
+                      }}
+                    >
+                      Yes, delete everything
+                    </Button>
+                    <Button
+                      variant="chrome"
+                      autoFocus
+                      onClick={() => {
+                        setConfirming(false);
+                        requestAnimationFrame(() => deleteRef.current?.focus());
+                      }}
+                    >
+                      Keep my progress
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button ref={deleteRef} variant="secondary" icon={Trash} onClick={() => setConfirming(true)}>
+                  Delete everything
+                </Button>
+              )}
+            </div>
+          </Section>
+
+          <p className="mt-6 text-muted">
+            <Link href="/about" className="underline">
+              About Rehearse Courage
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
