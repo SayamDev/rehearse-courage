@@ -48,7 +48,7 @@ test("Me has the voice settings, with the coach playing by itself by default", a
   await page.goto("/me");
   await page.getByRole("tab", { name: "Voices & AI" }).click();
   await expect(page.getByRole("heading", { name: "Voices" })).toBeVisible();
-  await expect(page.getByRole("switch", { name: "Play the coach's lines automatically" })).toBeChecked();
+  await expect(page.getByRole("switch", { name: "Read lines out automatically" })).toBeChecked();
 });
 
 test("step 5 plays the room's two short lines by themselves", async ({ page }) => {

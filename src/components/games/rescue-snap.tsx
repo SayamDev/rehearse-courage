@@ -78,7 +78,7 @@ export function RescueSnap() {
         </ol>
       </div>
       <div className="mt-3 rounded-card border-[1.5px] border-line bg-surface-2 p-5">
-        <SpokenLine role="narrator" text={words(round.moment, age)} className="font-display text-xl font-bold leading-snug text-ink" />
+        <SpokenLine role="narrator" text={words(round.moment, age)} autoPlay className="font-display text-xl font-bold leading-snug text-ink" />
       </div>
       <p className="mt-5 font-semibold text-ink">Which words would help?</p>
       <ul role="list" className="mt-2 grid list-none gap-2 p-0">

@@ -11,6 +11,8 @@ import type { RoomId } from "@/lib/types";
 import { Companion } from "@/components/scene/companion";
 import { ProgressTrack } from "@/components/scene/progress-track";
 import { Lottie } from "@/components/ui/lottie";
+import { useReadAloud } from "@/components/voice/spoken-line";
+import { FOR_REAL_LINE, STEP_DONE_LINE } from "@/lib/content/body";
 import { ButtonLink } from "@/components/ui/button";
 import { PaperCard } from "@/components/ui/paper-card";
 import { Sticker } from "@/components/ui/sticker";
@@ -51,8 +53,17 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
     headingRef.current?.focus();
   }, []);
 
+  // Said out loud too, once, when read-aloud is on.
+  const read = useReadAloud();
+  useEffect(() => {
+    read(result.level === 6 ? FOR_REAL_LINE : STEP_DONE_LINE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const lead = headlineBadge(result.newBadges);
-  const heading = lead ? `${badgeTitle(lead)}.` : "You had a go.";
+  // Step 6 is the real thing: the biggest moment in the app gets its own celebration.
+  const forReal = result.level === 6;
+  const heading = forReal ? "You did it for real." : lead ? `${badgeTitle(lead)}.` : "You had a go.";
   const seconds = secondsLine(result.seconds, result.lastSeconds);
   const grew = result.stageAfter !== result.stageBefore && store.companion;
 
@@ -65,10 +76,14 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
       <PaperCard className="relative mt-4">
         {store.companion ? (
           <div className="absolute right-4 top-4 sm:right-6 sm:top-6">
-            <Companion species={store.companion.species} stage={result.stageAfter} size={64} />
+            <Companion species={store.companion.species} stage={forReal ? "speaking" : result.stageAfter} size={forReal ? 84 : 64} />
           </div>
         ) : null}
-        <Lottie src="/lottie/courage.json" themed still={!store.settings.confetti} className="-ml-2 aspect-[640/260] w-full max-w-[440px]" />
+        {forReal ? (
+          <Lottie src="/lottie/for-real.json" themed still={!store.settings.confetti} className="-ml-2 aspect-[720/360] w-full max-w-[520px]" />
+        ) : (
+          <Lottie src="/lottie/courage.json" themed still={!store.settings.confetti} className="-ml-2 aspect-[640/260] w-full max-w-[440px]" />
+        )}
         <ProgressTrack situationId={result.situationId} className="mx-auto mt-4 max-w-[420px]" />
         <div className="mt-6 flex items-center gap-4">
           {result.newBadges.length > 0 ? (
@@ -83,7 +98,14 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
           </h1>
         </div>
 
-        <p className="sr-only">That took courage.</p>
+        {forReal ? (
+          <div className="mt-3 rounded-card bg-[color-mix(in_srgb,var(--sun)_20%,var(--surface))] p-4">
+            <p className="text-lg font-semibold text-ink">That was the real thing: the biggest step there is.</p>
+            <p className="mt-1 text-ink">Take a moment to notice how it felt. Next time it will be a little easier.</p>
+          </div>
+        ) : (
+          <p className="sr-only">That took courage.</p>
+        )}
         {seconds ? <p className="tabular mt-1 text-ink">{seconds}</p> : null}
         <p className="tabular mt-3 font-semibold text-ink">+{result.points} courage points</p>
         {result.newBadges.length > 1 ? (

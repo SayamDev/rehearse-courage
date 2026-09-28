@@ -61,6 +61,24 @@ export function kitTool(id: string) {
   return KIT_TOOLS.find((t) => t.id === id);
 }
 
+/** 5-4-3-2-1 grounding, one sense at a time (the hint is read aloud). */
+export const GROUNDING_STEPS: { n: number; sense: string; hint: string }[] = [
+  { n: 5, sense: "things you can see", hint: "Look around slowly. Name them in your head or out loud." },
+  { n: 4, sense: "things you can touch", hint: "Your sleeve, the chair, the floor under your feet." },
+  { n: 3, sense: "things you can hear", hint: "Near sounds and far away sounds both count." },
+  { n: 2, sense: "things you can smell", hint: "If nothing comes, think of two smells you like." },
+  { n: 1, sense: "thing you can taste", hint: "Or take a sip of water and notice it." },
+];
+
+/** Spoken cues for the breathing circle, one per breath. */
+export const BREATH_CUES = { in: "Breathe in slowly.", out: "And slowly out." } as const;
+
+/** Read aloud when a step is saved. */
+export const STEP_DONE_LINE = "You had a go. That took courage.";
+
+/** Read aloud when step 6, the real thing, is done: the biggest moment in the app. */
+export const FOR_REAL_LINE = "You did it for real. That was the bravest step of all.";
+
 /** What the body is doing, in plain words. No medical claims. */
 export const BODY_EXPLAINERS: Record<"blushing" | "sweating", Words[]> = {
   blushing: [

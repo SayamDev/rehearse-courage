@@ -43,6 +43,8 @@ export type Settings = {
   slowerVoice: boolean;
   /** Off by default: the companion sits beside you and practises too while you do a step (body doubling). */
   bodyDouble: boolean;
+  /** Which English the voices speak: British (the default) or American. */
+  accent: "uk" | "us";
 };
 
 export type CourageState = {
@@ -104,6 +106,7 @@ export const DEFAULT_STATE: CourageState = {
     playCoach: true,
     slowerVoice: false,
     bodyDouble: false,
+    accent: "uk",
   },
 };
 
@@ -172,7 +175,7 @@ function isValidCompanion(v: unknown): v is { species: Species; name: string } {
   return isObject(v) && SPECIES.some((s) => s.id === v.species) && typeof v.name === "string";
 }
 
-const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = [
+const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize" | "accent">[] = [
   "reduceMotion",
   "sounds",
   "confetti",
@@ -196,6 +199,7 @@ function normalizeSettings(v: unknown): Settings {
     if (typeof raw[key] === "boolean") settings[key] = raw[key];
   }
   if (THEMES.includes(raw.theme as Theme)) settings.theme = raw.theme as Theme;
+  if (raw.accent === "uk" || raw.accent === "us") settings.accent = raw.accent;
   // Older saves had a single largeText switch (115%).
   if (TEXT_SIZES.includes(raw.textSize as TextSize)) settings.textSize = raw.textSize as TextSize;
   else if (raw.largeText === true) settings.textSize = "large";

@@ -2,18 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, Coffee, Ear, Eye, Flower, HandPalm, type Icon } from "@phosphor-icons/react";
+import { GROUNDING_STEPS } from "@/lib/content/body";
 import { SpokenLine } from "@/components/voice/spoken-line";
 import { Button } from "@/components/ui/button";
 
 const SENSE_ICON: Icon[] = [Eye, HandPalm, Ear, Flower, Coffee];
 
-export const GROUNDING_STEPS: { n: number; sense: string; hint: string }[] = [
-  { n: 5, sense: "things you can see", hint: "Look around slowly. Name them in your head or out loud." },
-  { n: 4, sense: "things you can touch", hint: "Your sleeve, the chair, the floor under your feet." },
-  { n: 3, sense: "things you can hear", hint: "Near sounds and far away sounds both count." },
-  { n: 2, sense: "things you can smell", hint: "If nothing comes, think of two smells you like." },
-  { n: 1, sense: "thing you can taste", hint: "Or take a sip of water and notice it." },
-];
+export { GROUNDING_STEPS };
 
 /**
  * 5-4-3-2-1 grounding, one sense at a time. A row of sense stickers shows
@@ -78,7 +73,7 @@ export function Grounding({
         {step.n} {step.sense}
       </h2>
       <div className="mx-auto mt-2 max-w-[40ch] text-left">
-        <SpokenLine role="narrator" text={step.hint} className="text-ink" />
+        <SpokenLine role="narrator" text={step.hint} autoPlay className="text-ink" />
       </div>
 
       <p className="mt-5 text-sm text-muted">Tap a circle for each one you notice.</p>

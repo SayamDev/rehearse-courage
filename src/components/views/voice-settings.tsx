@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { DownloadSimple, Trash } from "@phosphor-icons/react";
+import { STEP_DONE_LINE } from "@/lib/content/body";
 import { updateSettings, type Settings } from "@/lib/state";
+import { ACCENTS } from "@/lib/voice/lines";
+import { speak } from "@/lib/voice/speak";
 import { act, useCourage } from "@/lib/store";
 import {
   checkKokoroCache,
@@ -128,15 +131,40 @@ export function NaturalVoice({ onDone }: { onDone?: () => void }) {
   );
 }
 
-/** Voices in Me: the coach playing by itself (on by default), a slower pace, and the optional natural voice. */
+/** Voices in Me: British or American voices, reading aloud by itself (on by default), a slower pace, and the optional natural voice. */
 export function VoiceSettings() {
   const store = useCourage();
   const set = (patch: Partial<Settings>) => act((s) => updateSettings(s, patch));
   return (
     <>
-      <p className="mt-2 text-ink">The coach&apos;s lines play by themselves. Tap Hear it beside any line to hear it again. Every line is also written on screen.</p>
+      <p className="mt-2 text-ink">Lines are read out as you reach them. Tap Hear it beside any line to hear it again. Every line is also written on screen.</p>
+      <fieldset className="mt-4">
+        <legend className="font-semibold text-ink">Voices</legend>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {ACCENTS.map((a) => {
+            const on = store.settings.accent === a.value;
+            return (
+              <button
+                key={a.value}
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  set({ accent: a.value });
+                  void speak({ role: "narrator", set: store.age === "under13" || !store.age ? "kids" : "grown", text: STEP_DONE_LINE, accent: a.value });
+                }}
+                className={`min-h-11 rounded-full border-2 px-4 font-semibold transition-colors duration-[var(--dur-feedback)] ${
+                  on ? "border-die bg-accent text-on-accent shadow-sticker" : "border-line bg-surface text-ink hover:border-stone-dim"
+                }`}
+              >
+                {a.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-1 text-sm text-muted">Tap one to hear it.</p>
+      </fieldset>
       <div className="mt-3 divide-y divide-line">
-        <Switch checked={store.settings.playCoach} onChange={(v) => set({ playCoach: v })} label="Play the coach's lines automatically" />
+        <Switch checked={store.settings.playCoach} onChange={(v) => set({ playCoach: v })} label="Read lines out automatically" />
         <Switch checked={store.settings.slowerVoice} onChange={(v) => set({ slowerVoice: v })} label="Read lines a little slower" />
       </div>
       <h3 className="mt-5 text-xl text-ink">Natural voice on this device</h3>

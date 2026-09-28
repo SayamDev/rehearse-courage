@@ -73,7 +73,7 @@ export function RescueDeck({ onCrisis }: { onCrisis: () => void }) {
 
       <div className="mt-3 rounded-card border-[1.5px] border-line bg-surface-2 p-5" aria-live="polite">
         <div className="flex items-start justify-between gap-3">
-          <SpokenLine role="narrator" text={text} className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] font-bold leading-tight text-ink">
+          <SpokenLine role="narrator" text={text} autoPlay className="font-display text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)] font-bold leading-tight text-ink">
             &ldquo;{text}&rdquo;
           </SpokenLine>
         </div>

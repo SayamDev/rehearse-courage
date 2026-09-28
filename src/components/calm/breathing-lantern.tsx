@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { BREATH_CUES } from "@/lib/content/body";
+import { useReadAloud } from "@/components/voice/spoken-line";
 
 const IN_MS = 4000;
 const OUT_MS = 6000;
@@ -36,6 +38,16 @@ export function BreathingLantern({
   }, [phase, reduce]);
 
   const big = reduce || phase === "in";
+
+  // The voice guides the first three breaths, then leaves you to it.
+  const read = useReadAloud();
+  const guided = useRef(0);
+  useEffect(() => {
+    if (reduce || phase === "rest" || guided.current >= 6) return;
+    guided.current++;
+    read(phase === "in" ? BREATH_CUES.in : BREATH_CUES.out);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, reduce]);
 
   // A gentle count inside the circle: seconds left in this breath (never shown under reduced motion).
   const [left, setLeft] = useState(4);

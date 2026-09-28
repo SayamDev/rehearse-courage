@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { checkKokoroCache, kokoroClip, kokoroState, loadKokoro } from "./kokoro";
-import { clipId, KIDS_RATE, spokenText, VOICES, type Role, type VoiceSet } from "./lines";
+import { clipId, KIDS_RATE, spokenText, voiceFor, type Accent, type Role, type VoiceSet } from "./lines";
 
 /**
  * Reads a line aloud, best first:
@@ -14,12 +14,22 @@ import { clipId, KIDS_RATE, spokenText, VOICES, type Role, type VoiceSet } from 
  * line, or stopSpeaking, interrupts the last.
  */
 
-/** Kokoro stand-ins for voices that only exist as recordings (the friends). */
+/** The closest Kokoro voice to each recorded voice, for lines without a clip (live replies, your own steps). */
 const KOKORO_STAND_IN: Record<string, string> = {
-  "omni:friend-child": "af_sky",
-  "omni:friend-young": "af_bella",
-  "omni:classmate-child": "am_puck",
-  "omni:classmate-young": "am_adam",
+  "omni:narrator-uk": "bf_isabella",
+  "omni:teacher-uk": "bf_emma",
+  "omni:host-uk": "bm_george",
+  "omni:friend-child": "bf_lily",
+  "omni:friend-young": "bf_alice",
+  "omni:classmate-child": "bm_lewis",
+  "omni:classmate-young": "bm_lewis",
+  "omni:narrator-us": "af_heart",
+  "omni:teacher-us": "af_bella",
+  "omni:host-us": "am_michael",
+  "omni:friend-child-us": "af_sky",
+  "omni:friend-young-us": "af_nicole",
+  "omni:classmate-child-us": "am_puck",
+  "omni:classmate-young-us": "am_adam",
 };
 
 /* ---------- What is playing, so the matching button can show it ---------- */
@@ -45,8 +55,8 @@ export function usePlaying(): Playing {
 }
 
 /** Identifies a line for its Hear it button, whatever engine ends up reading it. */
-export function lineKey(role: Role, set: VoiceSet, text: string): string {
-  return `${role}|${set}|${spokenText(text)}`;
+export function lineKey(role: Role, set: VoiceSet, text: string, accent: Accent = "uk"): string {
+  return `${role}|${set}|${accent}|${spokenText(text)}`;
 }
 
 /* ---------- Pre-recorded clips ---------- */
@@ -89,14 +99,20 @@ function playUrl(url: string, rate: number, token: number, key: string): Promise
 const ROBOTIC = /(compact|espeak|zarvox|trinoids|albert|bad news|bells|boing|bubbles|cellos|whisper|wobble|jester|organ|superstar)/i;
 const NATURAL = /(natural|neural|premium|enhanced|siri|google)/i;
 
-function deviceSpeak(text: string, rate: number, token: number, key: string): Promise<void> {
+function deviceSpeak(text: string, rate: number, token: number, key: string, accent: Accent): Promise<void> {
   return new Promise((resolve) => {
     if (token !== run || typeof window === "undefined" || !("speechSynthesis" in window)) return resolve();
     const u = new SpeechSynthesisUtterance(text);
     const voices = window.speechSynthesis
       .getVoices()
       .filter((v) => v.lang.toLowerCase().startsWith("en") && !ROBOTIC.test(v.name))
-      .sort((a, b) => Number(NATURAL.test(b.name)) - Number(NATURAL.test(a.name)) || Number(b.localService) - Number(a.localService));
+      .sort(
+        (a, b) =>
+          // The chosen accent first (en-GB or en-US), then natural-sounding voices, then ones on the device.
+          Number(b.lang.toLowerCase().endsWith(accent === "uk" ? "gb" : "us")) - Number(a.lang.toLowerCase().endsWith(accent === "uk" ? "gb" : "us")) ||
+          Number(NATURAL.test(b.name)) - Number(NATURAL.test(a.name)) ||
+          Number(b.localService) - Number(a.localService),
+      );
     if (voices[0]) u.voice = voices[0];
     u.rate = rate;
     u.onstart = () => token === run && setPlaying({ key, status: "speaking" });
@@ -106,14 +122,14 @@ function deviceSpeak(text: string, rate: number, token: number, key: string): Pr
   });
 }
 
-export type SpeakOptions = { role: Role; set: VoiceSet; text: string; slower?: boolean };
+export type SpeakOptions = { role: Role; set: VoiceSet; text: string; slower?: boolean; accent?: Accent };
 
 /** Reads one line aloud. Resolves when it has finished, or was interrupted. */
-export async function speak({ role, set, text, slower = false }: SpeakOptions): Promise<void> {
+export async function speak({ role, set, text, slower = false, accent = "uk" }: SpeakOptions): Promise<void> {
   stopSpeaking();
   const token = ++run;
-  const key = lineKey(role, set, text);
-  const voice = VOICES[role][set];
+  const key = lineKey(role, set, text, accent);
+  const voice = voiceFor(role, set, accent);
   const rate = (set === "kids" ? KIDS_RATE : 1) * (slower ? 0.85 : 1);
   setPlaying({ key, status: "preparing" });
   // Saved on this device earlier: wake it (no download) so later lines can use it.
@@ -134,7 +150,7 @@ export async function speak({ role, set, text, slower = false }: SpeakOptions): 
         if (ok) return;
       }
     }
-    await deviceSpeak(spokenText(text), rate, token, key);
+    await deviceSpeak(spokenText(text), rate, token, key, accent);
   } finally {
     if (token === run) setPlaying(null);
   }

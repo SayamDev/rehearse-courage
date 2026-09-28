@@ -39,13 +39,14 @@ export function SpokenLine({
   const store = useCourage();
   const set = useVoiceSet();
   const playing = usePlaying();
-  const key = lineKey(role, set, text);
+  const accent = store.settings.accent;
+  const key = lineKey(role, set, text, accent);
   const active = playing?.key === key;
   const slower = store.settings.slowerVoice;
   const auto = autoPlay && store.hydrated && store.settings.playCoach;
 
   useEffect(() => {
-    if (auto) void speak({ role, set, text, slower });
+    if (auto) void speak({ role, set, text, slower, accent });
     // Once per line: re-running on every setting change would restart it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auto, key]);
@@ -61,7 +62,7 @@ export function SpokenLine({
       </Tag>
       <button
         type="button"
-        onClick={() => (active ? stopSpeaking() : void speak({ role, set, text, slower }))}
+        onClick={() => (active ? stopSpeaking() : void speak({ role, set, text, slower, accent }))}
         aria-label={active ? "Stop" : "Hear it"}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-surface-2 text-ink transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-line/50 active:bg-line/70 focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
       >
@@ -73,4 +74,19 @@ export function SpokenLine({
       </button>
     </div>
   );
+}
+
+/**
+ * Reads a line aloud from code (breathing cues, the balloon, a finished
+ * step), in the person's voices, only when "Read lines out automatically"
+ * is on. Returns a function; calling it interrupts whatever was playing.
+ */
+export function useReadAloud(): (text: string, role?: Role) => void {
+  const store = useCourage();
+  const set = useVoiceSet();
+  const { playCoach, slowerVoice, accent } = store.settings;
+  const on = store.hydrated && playCoach;
+  return (text, role = "narrator") => {
+    if (on) void speak({ role, set, text, slower: slowerVoice, accent });
+  };
 }
