@@ -93,7 +93,8 @@ export function StepDone({ result, room, title }: { result: StepResult; room: Ro
               ))}
             </div>
           ) : null}
-          <h1 ref={headingRef} tabIndex={-1} className={`${TITLE} text-ink outline-none`}>
+          {/* Step 6: the animation already says it in big type, so the heading is for screen readers only. */}
+          <h1 ref={headingRef} tabIndex={-1} className={forReal ? "sr-only" : `${TITLE} text-ink outline-none`}>
             {heading}
           </h1>
         </div>
