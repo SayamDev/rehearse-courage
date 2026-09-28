@@ -35,6 +35,8 @@ export type Settings = {
   onlineHelp: boolean;
   /** Off by default: the person downloaded the small AI model to this device and chose to use it. */
   deviceModel: boolean;
+  /** "Don't show this again" on the keep-your-progress-safe pop-up. */
+  saveNudgeOff: boolean;
 };
 
 export type CourageState = {
@@ -48,6 +50,10 @@ export type CourageState = {
   earned: string[];
   lastSeen: string | null;
   cameBack: boolean;
+  /** The welcome guide has been seen (closing it in any way counts). */
+  welcomed: boolean;
+  /** When a backup file was last saved from Me or the pop-up. */
+  lastBackup: string | null;
   settings: Settings;
 };
 
@@ -64,6 +70,8 @@ export const DEFAULT_STATE: CourageState = {
   earned: [],
   lastSeen: null,
   cameBack: false,
+  welcomed: false,
+  lastBackup: null,
   settings: {
     reduceMotion: false,
     textSize: "normal",
@@ -74,6 +82,7 @@ export const DEFAULT_STATE: CourageState = {
     theme: "system",
     onlineHelp: true,
     deviceModel: false,
+    saveNudgeOff: false,
   },
 };
 
@@ -140,6 +149,7 @@ const KNOWN_BOOLEAN_SETTINGS: Exclude<keyof Settings, "theme" | "textSize">[] = 
   "keepRecordings",
   "onlineHelp",
   "deviceModel",
+  "saveNudgeOff",
 ];
 
 const THEMES: Theme[] = ["system", "light", "dark"];
@@ -176,6 +186,9 @@ export function normalize(raw: unknown): CourageState {
     earned: dedupe(arr<unknown>(p.earned).filter((v): v is string => typeof v === "string")),
     lastSeen: isParseableDate(p.lastSeen) ? p.lastSeen : null,
     cameBack: p.cameBack === true,
+    // Saves from before the welcome guide existed: anyone who already practised has found their way.
+    welcomed: p.welcomed === true || (p.welcomed === undefined && arr<unknown>(p.records).length > 0),
+    lastBackup: isParseableDate(p.lastBackup) ? p.lastBackup : null,
     settings: normalizeSettings(p.settings),
   };
 }
@@ -213,6 +226,14 @@ export function logEvent(s: CourageState, kind: EventKind, now: Date): Result {
 export function visit(s: CourageState, now: Date): Result {
   const gap = s.lastSeen ? daysBetween(new Date(s.lastSeen), now) : 0;
   return withBadges({ ...s, lastSeen: now.toISOString(), cameBack: s.cameBack || gap >= 7 });
+}
+
+export function markWelcomed(s: CourageState): CourageState {
+  return s.welcomed ? s : { ...s, welcomed: true };
+}
+
+export function markBackedUp(s: CourageState, now: Date): CourageState {
+  return { ...s, lastBackup: now.toISOString() };
 }
 
 export function updateSettings(s: CourageState, patch: Partial<Settings>): CourageState {
