@@ -1,7 +1,7 @@
 import { BookOpen, Microphone, Storefront, UsersThree, type Icon } from "@phosphor-icons/react";
 import type { RoomId } from "@/lib/types";
 
-/** Phosphor icon per room, as on the map comp's island labels. */
+/** Phosphor icon per practice area. */
 export const ROOM_ICON: Record<RoomId, Icon> = {
   class: BookOpen,
   friends: UsersThree,

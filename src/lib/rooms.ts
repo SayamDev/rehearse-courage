@@ -4,7 +4,7 @@ import { highestLevel, LEVELS, nextLevel } from "./ladder";
 import type { CourageState } from "./state";
 import { ROOM_IDS, type Level, type RoomId, type StepRecord } from "./types";
 
-/** Short island labels used on the map and as the room page title. */
+/** Short practice area labels used on the area list and room page. */
 export const ROOM_LABEL: Record<RoomId, string> = {
   class: "Class",
   friends: "Friends",

@@ -1,8 +1,8 @@
 /**
  * Builds the Home greeting as a Lottie document in the browser, from the
  * glyph atlas (public/lottie/glyphs.json, Bricolage Grotesque as vector
- * paths): "Hi Sam," stamps in letter by letter over a sun sweep, then
- * "today's one step" rises in. Returns null when the name has a letter the
+ * paths): "Hi Sam" stamps in letter by letter over a sun sweep, then
+ * "Today's one step" rises in. Returns null when the name has a letter the
  * atlas does not have, so the page falls back to plain text.
  */
 
@@ -80,14 +80,14 @@ function typeLayer(atlas: GlyphAtlas, text: string, o: { x: number; y: number; s
   return { ddd: 0, ind: ++ind, ty: 4, nm: text, sr: 1, ks: { o: fixed(100), r: fixed(0), p: fixed([o.x, o.y, 0]), a: fixed([0, 0, 0]), s: fixed([100, 100, 100]) }, ao: 0, shapes: letters, ip: 0, op: o.op, st: 0, bm: 0 };
 }
 
-export function greetingLottie(atlas: GlyphAtlas, name: string | null, theme: "light" | "dark", rest = "today’s one step") {
+export function greetingLottie(atlas: GlyphAtlas, name: string | null, theme: "light" | "dark", rest = "Today’s one step") {
   ind = 0;
   const op = 110;
   const big = 96;
   const small = 58;
   const pad = 16;
-  const hi = "Hi ";
-  const who = name ? `${name},` : "Hello,";
+  const hi = name ? "Hi " : "";
+  const who = name ?? "Hello";
   const wHi = measure(atlas, hi, big);
   const wWho = measure(atlas, who, big);
   const wRest = measure(atlas, rest, small);

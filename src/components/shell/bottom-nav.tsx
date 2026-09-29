@@ -6,7 +6,7 @@ import { FirstAidKit, House, MapTrifold, Medal, User, type Icon } from "@phospho
 import { hidesNav } from "./no-nav-routes";
 
 export type NavHref = "/" | "/map" | "/kit" | "/badges" | "/me";
-export type NavLabel = "Home" | "Map" | "Kit" | "Badges" | "Me";
+export type NavLabel = "Home" | "Areas" | "Kit" | "Badges" | "Me";
 
 export type NavItem = {
   href: NavHref;
@@ -16,7 +16,7 @@ export type NavItem = {
 
 export const NAV_ITEMS: NavItem[] = [
   { href: "/", label: "Home", icon: House },
-  { href: "/map", label: "Map", icon: MapTrifold },
+  { href: "/map", label: "Areas", icon: MapTrifold },
   { href: "/kit", label: "Kit", icon: FirstAidKit },
   { href: "/badges", label: "Badges", icon: Medal },
   { href: "/me", label: "Me", icon: User },

@@ -18,8 +18,8 @@ describe("activeNav", () => {
 });
 
 describe("NAV_ITEMS", () => {
-  test("has five items in order Home, Map, Kit, Badges, Me", () => {
-    expect(NAV_ITEMS.map((i) => i.label)).toEqual(["Home", "Map", "Kit", "Badges", "Me"]);
+  test("has five items in order Home, Areas, Kit, Badges, Me", () => {
+    expect(NAV_ITEMS.map((i) => i.label)).toEqual(["Home", "Areas", "Kit", "Badges", "Me"]);
     expect(NAV_ITEMS.map((i) => i.href)).toEqual(["/", "/map", "/kit", "/badges", "/me"]);
   });
 

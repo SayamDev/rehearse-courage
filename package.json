@@ -8,7 +8,7 @@
     "predev": "node scripts/vendor-webllm.mjs",
     "dev": "next dev --port 3330",
     "prebuild": "node scripts/vendor-webllm.mjs",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

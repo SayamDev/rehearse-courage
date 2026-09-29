@@ -29,7 +29,7 @@ test("first visit, first step, step done, back to the map", async ({ page }) => 
   await expect(page.getByText("That took courage.")).toBeVisible();
   await expect(page.getByText("+15 courage points")).toBeVisible();
 
-  await page.getByRole("link", { name: "Back to the map" }).click();
+  await page.getByRole("link", { name: "Back to practice areas" }).click();
   await expect(page).toHaveURL(/\/map$/);
   await expect(page.getByText("Furthest step: 1 of 6")).toBeVisible();
 });

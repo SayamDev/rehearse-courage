@@ -24,7 +24,7 @@ import { DareCard } from "./dare-card";
 import { Greeting } from "./greeting";
 import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 
-/** Each island's sticker colour, used for its label wherever the room is named. */
+/** Each practice area's sticker colour, used wherever the room is named. */
 export const ROOM_STICKER: Record<RoomId, string> = { class: "sticker-sky", friends: "sticker-grape", presenting: "sticker-coral", out: "sticker-lime" };
 
 /** What the companion is doing, growing with courage points. */
@@ -47,7 +47,7 @@ const DISC = "flex shrink-0 items-center justify-center rounded-full border-[3px
 
 /**
  * Home ("/"): a greeting, today's one step (with its six-step track and one
- * Start button) and the four islands; beside them the companion, this
+ * Start button) and the four practice areas; beside them the companion, this
  * week's brave days, today's optional quests and quick calm tools. Renders
  * nothing until the store has hydrated and a companion exists (RedirectIfNew
  * sends first-time visitors to /start).
@@ -164,13 +164,13 @@ export function HomeView() {
             </ul>
           </section>
 
-          <section aria-labelledby="islands-heading">
+          <section aria-labelledby="areas-heading">
             <div className="flex items-baseline justify-between gap-3">
-              <h2 id="islands-heading" className="text-xl text-ink">
-                Your islands
+              <h2 id="areas-heading" className="text-xl text-ink">
+                Your practice areas
               </h2>
               <Link href="/map" className="font-semibold text-accent-text hover:underline">
-                Open the map
+                See all areas
               </Link>
             </div>
             <ul role="list" className="mt-3 grid list-none gap-3 p-0 sm:grid-cols-2">

@@ -16,8 +16,8 @@ import { ROOM_DISC, ROOM_ICON } from "./room-meta";
 const TITLE = "text-[clamp(1.75rem,1.2rem+2vw,2.75rem)]";
 const CARD_TITLE = "text-[clamp(1.5rem,1.1rem+1.4vw,2.1rem)]";
 
-/** One island: a card linking to its room, with its sticker icon and how far it has come. */
-function Island({ room, line }: { room: RoomId; line: string | null }) {
+/** One practice area: a card linking to its situations and progress. */
+function Area({ room, line }: { room: RoomId; line: string | null }) {
   const RoomIcon = ROOM_ICON[room];
   return (
     // min-w-0 so a long label at the largest text size wraps instead of widening the page.
@@ -41,7 +41,7 @@ function Island({ room, line }: { room: RoomId; line: string | null }) {
 }
 
 /**
- * Courage map ("/map"): the four islands with how far each has come, and
+ * Practice areas ("/map"): the four areas with how far each has come, and
  * a card to continue the suggested step. Progress text waits for the store
  * to hydrate so a returning person never sees "Not started yet" flash.
  */
@@ -54,13 +54,13 @@ export function MapView() {
     <div className="mx-auto max-w-[1100px] px-4 pt-6 md:px-8 md:pt-10">
       <div>
         <header>
-          <h1 className={`${TITLE} text-ink`}>Courage map</h1>
-          <p className="mt-1 text-muted">Four islands. One small step at a time.</p>
+          <h1 className={`${TITLE} text-ink`}>Practice areas</h1>
+          <p className="mt-1 text-muted">Choose a place to practise speaking up. One small step at a time.</p>
         </header>
 
         <ul role="list" className="mt-6 grid list-none gap-3 p-0 md:mt-8 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
           {ROOM_IDS.map((room) => (
-            <Island key={room} room={room} line={store.hydrated ? furthestLine(furthestInRoom(store.records, room)) : null} />
+            <Area key={room} room={room} line={store.hydrated ? furthestLine(furthestInRoom(store.records, room)) : null} />
           ))}
         </ul>
 
@@ -96,7 +96,7 @@ export function MapView() {
             ) : (
               <>
                 <h2 className={`${CARD_TITLE} text-ink`}>You have walked every path.</h2>
-                <p className="mt-2 text-ink">You can add a step of your own on any island.</p>
+                <p className="mt-2 text-ink">You can add a step of your own in any practice area.</p>
                 <ButtonLink href="/room/class#add" className="mt-6" icon={ArrowRight} iconEnd>
                   Add your own step
                 </ButtonLink>

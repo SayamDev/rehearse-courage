@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Offline - Rehearse Courage" };
 const WORKS = [
   { href: "/", label: "Today's step", note: "Practise with the built-in lines and replies" },
   { href: "/kit", label: "Body kit", note: "Breathing, grounding, rescue phrases" },
-  { href: "/map", label: "Courage map", note: "Your islands and steps" },
+  { href: "/map", label: "Practice areas", note: "Places and steps to practise" },
   { href: "/me", label: "Me", note: "Your progress and settings" },
 ];
 

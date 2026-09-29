@@ -148,11 +148,11 @@ export function StepDone({
 
         <div className="mt-6 grid gap-3 sm:grid-cols-2">
           <ButtonLink href="/map" icon={MapTrifold}>
-            Back to the map
+            Back to practice areas
           </ButtonLink>
           {result.level === 6 ? (
             <ButtonLink href={`/room/${room}`} variant="secondary" icon={ArrowRight} iconEnd>
-              Back to the island
+              Back to the area
             </ButtonLink>
           ) : (
             <ButtonLink href={`/step/${result.situationId}?level=${result.nextLevel}`} variant="secondary" icon={ArrowRight} iconEnd>
@@ -313,7 +313,7 @@ export function NotYet({ situationId, room, title }: { situationId: string; room
           </ButtonLink>
         </div>
         <Link href={`/room/${room}`} className="mt-4 inline-flex min-h-11 items-center gap-1.5 font-semibold text-accent-text hover:underline">
-          Back to the island
+          Back to the area
           <ArrowRight size={18} weight="bold" aria-hidden />
         </Link>
       </PaperCard>

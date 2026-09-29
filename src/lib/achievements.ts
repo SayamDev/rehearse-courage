@@ -31,7 +31,7 @@ const RULES: Badge[] = [
   {
     id: "room-explorer",
     title: "Room explorer",
-    description: "You tried a step on every island.",
+    description: "You tried a step in every practice area.",
     earned: (i) => new Set(i.records.map((r) => roomOf(r.situationId)).filter(Boolean)).size >= ROOM_IDS.length,
   },
   { id: "my-own-step", title: "My own step", description: "You added a step of your own.", earned: (i) => i.customSteps.length > 0 },

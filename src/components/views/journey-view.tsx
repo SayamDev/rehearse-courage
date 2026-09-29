@@ -90,7 +90,7 @@ export function JourneyView() {
             <PaperCard className="mt-4 !p-5">
               <p className="text-ink">When you try a step for real, at step 6, it goes here.</p>
               <Link href="/map" className="mt-2 inline-flex min-h-11 items-center gap-1.5 font-semibold text-accent-text hover:underline">
-                Open the map
+                See practice areas
                 <ArrowRight size={18} weight="bold" aria-hidden />
               </Link>
             </PaperCard>

@@ -97,7 +97,7 @@ export function RoomView({ room }: { room: RoomId }) {
     <>
       <Link href="/map" className="-ml-2 inline-flex min-h-11 items-center gap-2 rounded-full px-2 font-semibold text-muted hover:text-ink">
         <ArrowLeft size={20} weight="bold" aria-hidden />
-        Map
+        Practice areas
       </Link>
       <div className="mt-2 flex items-center gap-4">
         <span aria-hidden className={`flex size-14 shrink-0 -rotate-6 items-center justify-center rounded-full border-[3px] border-die text-[#13262b] shadow-sticker ${ROOM_DISC[room]}`}>
@@ -141,7 +141,7 @@ export function RoomView({ room }: { room: RoomId }) {
             <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-8 lg:gap-12">
               <section aria-labelledby="steps-heading">
                 <h2 id="steps-heading" className="text-2xl text-ink">
-                  Steps on this island
+                  Steps in this area
                 </h2>
                 <ul role="list" className="mt-4 grid list-none gap-3 p-0">
                   {builtIn.map((s) => (
