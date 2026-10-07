@@ -1,7 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { kitTool } from "@/lib/content/body";
+import { KIT_TOOLS, kitTool } from "@/lib/content/body";
 import { KitToolView } from "@/components/views/kit-tool-view";
+
+export function generateStaticParams() {
+  return KIT_TOOLS.map(({ id }) => ({ tool: id }));
+}
+
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }: { params: Promise<{ tool: string }> }): Promise<Metadata> {
   const { tool } = await params;

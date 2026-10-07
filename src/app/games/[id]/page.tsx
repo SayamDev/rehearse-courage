@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { gameById } from "@/lib/games";
+import { GAMES, gameById } from "@/lib/games";
 import { GameView } from "@/components/games/game-view";
+
+// Build the known activity pages once instead of rendering them on each
+// request within Cloudflare's free-plan CPU limit. Settings hydrate locally.
+export function generateStaticParams() {
+  return GAMES.map(({ id }) => ({ id }));
+}
+
+export const dynamicParams = false;
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
