@@ -55,7 +55,7 @@ export function KitToolView({ tool }: { tool: KitToolId }) {
         {tool === "breathing" ? (
           <>
             <BreathingLantern reduce={reduce} />
-            <p className="mt-4 text-center text-ink">Stay as long as you like. Three or four slow breaths is enough to notice a change.</p>
+            <p className="mt-4 text-center text-ink">Let your breath stay comfortable. Follow the light if it helps, or breathe at your own pace. You can pause whenever you like.</p>
           </>
         ) : null}
 
@@ -87,7 +87,7 @@ export function KitToolView({ tool }: { tool: KitToolId }) {
             <h2 className="text-2xl text-ink">What your body is doing</h2>
             {BODY_EXPLAINERS[tool].map((w) => (
               <div key={w.kid} className="mt-2">
-                <SpokenLine role="narrator" text={words(w, age)} className="text-ink" />
+                <SpokenLine role="narrator" delivery="calm" text={words(w, age)} className="text-ink" />
               </div>
             ))}
             <div className="mt-8">

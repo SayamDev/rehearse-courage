@@ -63,15 +63,16 @@ export function kitTool(id: string) {
 
 /** 5-4-3-2-1 grounding, one sense at a time (the hint is read aloud). */
 export const GROUNDING_STEPS: { n: number; sense: string; hint: string }[] = [
-  { n: 5, sense: "things you can see", hint: "Look around slowly. Name them in your head or out loud." },
-  { n: 4, sense: "things you can touch", hint: "Your sleeve, the chair, the floor under your feet." },
-  { n: 3, sense: "things you can hear", hint: "Near sounds and far away sounds both count." },
-  { n: 2, sense: "things you can smell", hint: "If nothing comes, think of two smells you like." },
-  { n: 1, sense: "thing you can taste", hint: "Or take a sip of water and notice it." },
+  { n: 5, sense: "things you can see", hint: "Look around for five things you can see. Name them in your head or out loud." },
+  { n: 4, sense: "things you can touch", hint: "Notice four things you can feel, like your sleeve or the floor under your feet." },
+  { n: 3, sense: "things you can hear", hint: "Listen for three sounds. They can be nearby or far away." },
+  { n: 2, sense: "things you can smell", hint: "Notice two smells. If nothing comes to mind, think of two smells you like." },
+  { n: 1, sense: "thing you can taste", hint: "Notice one taste, or take a sip of water and notice how it feels." },
 ];
 
 /** Spoken cues for the breathing circle, one per breath. */
-export const BREATH_CUES = { in: "Breathe in slowly.", out: "And slowly out." } as const;
+export const BREATH_INTRO = "Let your shoulders relax. Follow the light, at a pace that feels comfortable.";
+export const BREATH_CUES = { in: "Breathe in slowly.", out: "And breathe out." } as const;
 
 /** Read aloud when a step is saved. */
 export const STEP_DONE_LINE = "You had a go. That took courage.";
@@ -142,7 +143,7 @@ export const SPEECH_TOOLS: { id: "easy-onset" | "pausing" | "light-contact"; tit
       "Begin the first sound gently, letting a little air flow first, like a soft sigh.",
     ),
     // Words that start with a vowel or h are the easiest place to feel a gentle start.
-    practice: ["Hello", "I think so", "Only one", "Every day", "Actually", "How are you?"],
+    practice: ["Hello", "I think so", "Only one, please.", "Every day", "Actually", "How are you?"],
   },
   {
     id: "pausing",

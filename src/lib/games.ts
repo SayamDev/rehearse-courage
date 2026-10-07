@@ -147,10 +147,10 @@ export const STORY_STARTS = ["Once upon a time,", "Yesterday, something odd happ
 /** Breath balloon: what the balloon says, read aloud as the breath changes. */
 export const BALLOON_CUES = {
   start: "Hold the button and breathe in.",
-  in: "Breathe in...",
-  full: "Full. Now let go and breathe out slowly.",
-  out: "And slowly out...",
-  done: "Five slow breaths. Nicely done.",
+  in: "Breathe in slowly.",
+  full: "Let go when you are ready. Breathe out gently.",
+  out: "And breathe out.",
+  done: "That is five breaths. Take your time before moving on.",
 } as const;
 
 /* ---------- Say it like ---------- */

@@ -26,10 +26,10 @@ export function ReframeCards({ kind, age }: { kind: "blushing" | "sweating"; age
           Card {i + 1} of {cards.length}
         </p>
         <div className="mt-2">
-          <SpokenLine role="narrator" text={words(card.thought, age)} className="font-display text-xl font-bold text-ink" />
+          <SpokenLine role="narrator" delivery="calm" text={words(card.thought, age)} className="font-display text-xl font-bold text-ink" />
         </div>
         <p className="mt-3 font-semibold text-ink">Try this:</p>
-        <SpokenLine role="narrator" text={words(card.tryThis, age)} className="text-ink" />
+        <SpokenLine role="narrator" delivery="calm" text={words(card.tryThis, age)} className="text-ink" />
       </div>
       <div className="mt-4 flex flex-wrap gap-3">
         <Button variant="secondary" size="md" icon={ArrowLeft} onClick={() => go(i - 1)}>

@@ -45,7 +45,7 @@ function WordPractice({ tool }: { tool: Tool }) {
           {tool.id === "easy-onset" ? "Let a little breath out first, then let the sound grow, like the bar." : "Touch the first sound lightly, as if it were fragile."}
         </p>
         <div className="mt-3 flex justify-center">
-          <SpokenLine role="narrator" text={word} autoPlay className="sr-only">
+          <SpokenLine role="narrator" text={word} delivery="practice" autoPlay className="sr-only">
             {word}
           </SpokenLine>
         </div>
@@ -159,7 +159,7 @@ export function SpeechPractice({ age }: { age: AgeBand | null }) {
       </div>
 
       <div className="mt-5">
-        <SpokenLine role="narrator" text={words(tool.how, age)} className="text-ink" />
+        <SpokenLine role="narrator" text={words(tool.how, age)} delivery="calm" className="text-ink" />
       </div>
       <div className="mt-4">{tool.id === "pausing" ? <Pacer key={tool.id} tool={tool} /> : <WordPractice key={tool.id} tool={tool} />}</div>
 

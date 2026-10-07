@@ -46,8 +46,8 @@ export function DescribeIt() {
         <summary className="flex min-h-11 cursor-pointer items-center font-semibold text-ink">Stuck? Questions that help</summary>
         <ul className="grid gap-1 pb-3">
           {DESCRIBE_HINTS.map((h) => (
-            <li key={h.grown}>
-              <SpokenLine role="narrator" text={words(h, age)} className="py-2 text-ink" />
+            <li key={`${turn}-${h.grown}`}>
+              <SpokenLine role="narrator" delivery="game" text={words(h, age)} className="py-2 text-ink" />
             </li>
           ))}
         </ul>

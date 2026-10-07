@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, type ElementType, type ReactNode } from "react";
+import { useCallback, useEffect, type ElementType, type ReactNode } from "react";
 import { SpeakerHigh, Stop } from "@phosphor-icons/react";
 import { effectiveAge } from "@/lib/age";
 import { useCourage } from "@/lib/store";
-import type { Role, VoiceSet } from "@/lib/voice/lines";
-import { lineKey, speak, stopSpeaking, usePlaying } from "@/lib/voice/speak";
+import type { Delivery, Role, VoiceSet } from "@/lib/voice/lines";
+import { lineKey, speak, stopLine, stopSpeaking, usePlaying } from "@/lib/voice/speak";
 
 /** Kids (and a skipped age) get the kids voice set: kid wording, a child-sounding friend, a little slower. */
 export function useVoiceSet(): VoiceSet {
@@ -26,9 +26,11 @@ export function SpokenLine({
   as: Tag = "p",
   className = "",
   autoPlay = false,
+  delivery = "neutral",
   children,
 }: {
   role: Role;
+  delivery?: Delivery;
   text: string;
   as?: ElementType;
   className?: string;
@@ -40,13 +42,14 @@ export function SpokenLine({
   const set = useVoiceSet();
   const playing = usePlaying();
   const accent = store.settings.accent;
-  const key = lineKey(role, set, text, accent);
+  const key = lineKey(role, set, text, accent, delivery);
   const active = playing?.key === key;
   const slower = store.settings.slowerVoice;
   const auto = autoPlay && store.hydrated && store.settings.playCoach;
 
   useEffect(() => {
-    if (auto) void speak({ role, set, text, slower, accent });
+    if (auto) void speak({ role, set, text, slower, accent, delivery });
+    return () => stopLine(key);
     // Once per line: re-running on every setting change would restart it.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auto, key]);
@@ -62,7 +65,8 @@ export function SpokenLine({
       </Tag>
       <button
         type="button"
-        onClick={() => (active ? stopSpeaking() : void speak({ role, set, text, slower, accent }))}
+        disabled={!store.hydrated}
+        onClick={() => (active ? stopSpeaking() : void speak({ role, set, text, slower, accent, delivery }))}
         aria-label={active ? "Stop" : "Hear it"}
         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-line bg-surface-2 text-ink transition-colors duration-[var(--dur-ui)] ease-[var(--ease-out)] hover:bg-line/50 active:bg-line/70 focus-visible:outline-3 focus-visible:outline-[var(--focus)] focus-visible:outline-offset-3"
       >
@@ -81,12 +85,12 @@ export function SpokenLine({
  * step), in the person's voices, only when "Read lines out automatically"
  * is on. Returns a function; calling it interrupts whatever was playing.
  */
-export function useReadAloud(): (text: string, role?: Role) => void {
+export function useReadAloud(delivery: Delivery = "neutral"): (text: string, role?: Role) => Promise<void> {
   const store = useCourage();
   const set = useVoiceSet();
   const { playCoach, slowerVoice, accent } = store.settings;
   const on = store.hydrated && playCoach;
-  return (text, role = "narrator") => {
-    if (on) void speak({ role, set, text, slower: slowerVoice, accent });
-  };
+  return useCallback(async (text, role = "narrator") => {
+    if (on) await speak({ role, set, text, slower: slowerVoice, accent, delivery });
+  }, [on, set, slowerVoice, accent, delivery]);
 }

@@ -28,8 +28,8 @@ export function SayItLike() {
   return (
     <div>
       <div className="rounded-card border-[1.5px] border-line bg-surface-2 p-5 text-center sm:p-6" aria-live="polite">
-        <p className="text-muted">Say</p>
-        <SpokenLine role="narrator" text={text} className="font-display text-[clamp(1.4rem,1.1rem+1.2vw,1.9rem)] font-bold leading-tight text-ink">
+        <p className="text-muted">Hear the everyday version, then make it your own</p>
+        <SpokenLine role="narrator" delivery="practice" text={text} className="font-display text-[clamp(1.4rem,1.1rem+1.2vw,1.9rem)] font-bold leading-tight text-ink">
           &ldquo;{text}&rdquo;
         </SpokenLine>
         {how ? (
