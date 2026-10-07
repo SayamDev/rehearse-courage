@@ -39,7 +39,7 @@ export function KeepItGoing() {
       <figure className="rounded-card border-[1.5px] border-line bg-surface-2 p-5 sm:p-6" aria-live="polite">
         <figcaption className="text-muted">A friend says</figcaption>
         <div className="mt-1">
-          <SpokenLine key={i} role="friend" text={says} as="blockquote" autoPlay className="font-display text-[clamp(1.4rem,1.1rem+1.2vw,1.9rem)] font-bold leading-tight text-ink">
+          <SpokenLine key={i} role="friend" delivery="game" text={says} as="blockquote" autoPlay className="font-display text-[clamp(1.4rem,1.1rem+1.2vw,1.9rem)] font-bold leading-tight text-ink">
             &ldquo;{says}&rdquo;
           </SpokenLine>
         </div>
@@ -51,7 +51,7 @@ export function KeepItGoing() {
         <ul className="grid gap-1 pb-3">
           {turn.ideas.map((idea) => (
             <li key={idea.grown}>
-              <SpokenLine role="narrator" text={words(idea, age)} className="py-2 text-ink" />
+              <SpokenLine role="narrator" delivery="practice" text={words(idea, age)} className="py-2 text-ink" />
             </li>
           ))}
         </ul>

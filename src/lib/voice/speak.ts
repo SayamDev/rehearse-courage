@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { checkKokoroCache, kokoroClip, kokoroState, loadKokoro } from "./kokoro";
-import { clipId, KIDS_RATE, spokenText, voiceFor, type Accent, type Role, type VoiceSet } from "./lines";
+import { clipId, deliveryRate, KIDS_RATE, spokenText, voiceFor, type Accent, type Delivery, type Role, type VoiceSet } from "./lines";
 
 /**
  * Reads a line aloud, best first:
@@ -55,8 +55,8 @@ export function usePlaying(): Playing {
 }
 
 /** Identifies a line for its Hear it button, whatever engine ends up reading it. */
-export function lineKey(role: Role, set: VoiceSet, text: string, accent: Accent = "uk"): string {
-  return `${role}|${set}|${accent}|${spokenText(text)}`;
+export function lineKey(role: Role, set: VoiceSet, text: string, accent: Accent = "uk", delivery: Delivery = "neutral"): string {
+  return `${role}|${set}|${accent}|${delivery}|${spokenText(text)}`;
 }
 
 /* ---------- Pre-recorded clips ---------- */
@@ -82,24 +82,51 @@ function recorded(): Promise<Set<string>> {
 
 let run = 0;
 let audio: HTMLAudioElement | null = null;
+let cancelPlayback: (() => void) | null = null;
 
 function playUrl(url: string, rate: number, token: number, key: string): Promise<boolean> {
   return new Promise((resolve) => {
     if (token !== run) return resolve(true);
-    audio = new Audio(url);
-    audio.preservesPitch = true;
-    audio.playbackRate = rate;
-    audio.onplaying = () => token === run && setPlaying({ key, status: "speaking" });
-    audio.onended = () => resolve(true);
-    audio.onerror = () => resolve(false);
-    audio.play().catch(() => resolve(false));
+    const current = new Audio(url);
+    audio = current;
+    let settled = false;
+    const startup = setTimeout(() => finish(false), 8000);
+    const finish = (ok: boolean) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(startup);
+      current.onplaying = current.onended = current.onerror = null;
+      if (audio === current) audio = null;
+      if (cancelPlayback === cancel) cancelPlayback = null;
+      if (!ok) current.pause();
+      resolve(ok);
+    };
+    const cancel = () => { current.pause(); finish(true); };
+    cancelPlayback = cancel;
+    current.preservesPitch = true;
+    current.playbackRate = rate;
+    current.onplaying = () => {
+      clearTimeout(startup);
+      if (token === run) setPlaying({ key, status: "speaking" });
+    };
+    current.onended = () => finish(true);
+    current.onerror = () => finish(false);
+    current.play().catch(() => finish(false));
   });
 }
 
 const ROBOTIC = /(compact|espeak|zarvox|trinoids|albert|bad news|bells|boing|bubbles|cellos|whisper|wobble|jester|organ|superstar)/i;
 const NATURAL = /(natural|neural|premium|enhanced|siri|google)/i;
 
-function deviceSpeak(text: string, rate: number, token: number, key: string, accent: Accent): Promise<void> {
+async function deviceSpeak(text: string, rate: number, token: number, key: string, accent: Accent): Promise<void> {
+  if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+  if (!window.speechSynthesis.getVoices().length) {
+    await new Promise<void>((resolve) => {
+      const done = () => { clearTimeout(timer); window.speechSynthesis.removeEventListener("voiceschanged", done); resolve(); };
+      const timer = setTimeout(done, 400);
+      window.speechSynthesis.addEventListener("voiceschanged", done);
+    });
+  }
   return new Promise((resolve) => {
     if (token !== run || typeof window === "undefined" || !("speechSynthesis" in window)) return resolve();
     const u = new SpeechSynthesisUtterance(text);
@@ -108,29 +135,35 @@ function deviceSpeak(text: string, rate: number, token: number, key: string, acc
       .filter((v) => v.lang.toLowerCase().startsWith("en") && !ROBOTIC.test(v.name))
       .sort(
         (a, b) =>
-          // The chosen accent first (en-GB or en-US), then natural-sounding voices, then ones on the device.
+          // The chosen accent first, then voices on the device, then natural-sounding voices.
           Number(b.lang.toLowerCase().endsWith(accent === "uk" ? "gb" : "us")) - Number(a.lang.toLowerCase().endsWith(accent === "uk" ? "gb" : "us")) ||
-          Number(NATURAL.test(b.name)) - Number(NATURAL.test(a.name)) ||
-          Number(b.localService) - Number(a.localService),
+          Number(b.localService) - Number(a.localService) ||
+          Number(NATURAL.test(b.name)) - Number(NATURAL.test(a.name)),
       );
     if (voices[0]) u.voice = voices[0];
+    u.lang = accent === "uk" ? "en-GB" : "en-US";
     u.rate = rate;
     u.onstart = () => token === run && setPlaying({ key, status: "speaking" });
-    u.onend = () => resolve();
-    u.onerror = () => resolve();
+    const finish = () => {
+      if (cancelPlayback === finish) cancelPlayback = null;
+      resolve();
+    };
+    cancelPlayback = finish;
+    u.onend = finish;
+    u.onerror = finish;
     window.speechSynthesis.speak(u);
   });
 }
 
-export type SpeakOptions = { role: Role; set: VoiceSet; text: string; slower?: boolean; accent?: Accent };
+export type SpeakOptions = { role: Role; set: VoiceSet; text: string; slower?: boolean; accent?: Accent; delivery?: Delivery };
 
 /** Reads one line aloud. Resolves when it has finished, or was interrupted. */
-export async function speak({ role, set, text, slower = false, accent = "uk" }: SpeakOptions): Promise<void> {
+export async function speak({ role, set, text, slower = false, accent = "uk", delivery = "neutral" }: SpeakOptions): Promise<void> {
   stopSpeaking();
   const token = ++run;
-  const key = lineKey(role, set, text, accent);
-  const voice = voiceFor(role, set, accent);
-  const rate = (set === "kids" ? KIDS_RATE : 1) * (slower ? 0.85 : 1);
+  const key = lineKey(role, set, text, accent, delivery);
+  const voice = voiceFor(role, set, accent, delivery);
+  const rate = (set === "kids" ? KIDS_RATE : 1) * (slower ? 0.85 : 1) * deliveryRate(delivery);
   setPlaying({ key, status: "preparing" });
   // Saved on this device earlier: wake it (no download) so later lines can use it.
   void checkKokoroCache().then((saved) => {
@@ -141,9 +174,12 @@ export async function speak({ role, set, text, slower = false, accent = "uk" }: 
     if ((await recorded()).has(id) && (await playUrl(`/voice/${id}.m4a`, rate, token, key))) return;
     if (token !== run) return;
     if (kokoroState().status === "ready") {
-      const name = voice.engine === "kokoro" ? voice.name : KOKORO_STAND_IN[voice.id];
+      const name = voice.engine === "kokoro" ? voice.name : KOKORO_STAND_IN[voice.id] ?? KOKORO_STAND_IN[voiceFor(role, set, accent).id];
       const url = name ? await kokoroClip(spokenText(text), name, rate) : null;
-      if (token !== run) return;
+      if (token !== run) {
+        if (url) URL.revokeObjectURL(url);
+        return;
+      }
       if (url) {
         const ok = await playUrl(url, 1, token, key);
         URL.revokeObjectURL(url);
@@ -156,8 +192,15 @@ export async function speak({ role, set, text, slower = false, accent = "uk" }: 
   }
 }
 
+/** A disappearing card only stops its own line, never a newer card's voice. */
+export function stopLine(key: string) {
+  if (playing?.key === key) stopSpeaking();
+}
+
 export function stopSpeaking() {
   run++;
+  cancelPlayback?.();
+  cancelPlayback = null;
   audio?.pause();
   audio = null;
   if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();

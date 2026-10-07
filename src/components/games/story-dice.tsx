@@ -60,7 +60,7 @@ export function StoryDice() {
           <p className="mt-2 text-muted">
             Stuck? Start with:
           </p>
-          <SpokenLine role="narrator" text={start} className="font-semibold text-ink">
+          <SpokenLine key={roll} role="narrator" delivery="practice" text={start} className="font-semibold text-ink">
             &ldquo;{start}&rdquo;
           </SpokenLine>
           <div className="mt-4">

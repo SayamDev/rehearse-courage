@@ -5,6 +5,7 @@ import { ArrowCounterClockwise } from "@phosphor-icons/react";
 import { BALLOON_CUES, BREATHS, deflate, FULL_ENOUGH, inflate } from "@/lib/games";
 import { useReducedMotion } from "@/lib/use-reduced-motion";
 import { Button } from "@/components/ui/button";
+import { stopSpeaking } from "@/lib/voice/speak";
 import { useReadAloud } from "@/components/voice/spoken-line";
 
 /**
@@ -20,6 +21,7 @@ export function BreathBalloon() {
   const [breaths, setBreaths] = useState(0);
   const fillRef = useRef(0);
   const peak = useRef(0);
+  const exhaling = useRef(false);
   const frame = useRef<number | null>(null);
   const done = breaths >= BREATHS;
 
@@ -33,6 +35,10 @@ export function BreathBalloon() {
       if (next !== fillRef.current) {
         fillRef.current = next;
         setFill(next);
+        if (next === 0 && exhaling.current) {
+          exhaling.current = false;
+          setBreaths((b) => b + 1);
+        }
       }
       frame.current = requestAnimationFrame(tick);
     };
@@ -44,16 +50,20 @@ export function BreathBalloon() {
 
   const start = () => {
     if (done || holding) return;
+    exhaling.current = false;
     peak.current = fillRef.current;
     setHolding(true);
   };
   const stop = () => {
     if (!holding) return;
     setHolding(false);
-    if (fillRef.current >= FULL_ENOUGH && fillRef.current > peak.current) setBreaths((b) => b + 1);
+    if (fillRef.current >= FULL_ENOUGH && fillRef.current > peak.current) exhaling.current = true;
   };
 
   const again = () => {
+    stopSpeaking();
+    exhaling.current = false;
+    setHolding(false);
     fillRef.current = 0;
     setFill(0);
     setBreaths(0);
@@ -62,13 +72,14 @@ export function BreathBalloon() {
   const scale = 0.35 + fill * 0.65;
   const cueKey: keyof typeof BALLOON_CUES = done ? "done" : holding ? (fill >= 1 ? "full" : "in") : fill > 0.02 ? "out" : "start";
   const cue = BALLOON_CUES[cueKey];
-  const read = useReadAloud();
+  const read = useReadAloud("calm");
+  useEffect(() => () => stopSpeaking(), []);
   // Say each new cue once (not the resting one), as the breath changes.
   const lastCue = useRef(cueKey);
   useEffect(() => {
     if (cueKey === lastCue.current) return;
     lastCue.current = cueKey;
-    if (cueKey !== "start") read(BALLOON_CUES[cueKey]);
+    if (cueKey === "in" || cueKey === "out" || cueKey === "done") void read(BALLOON_CUES[cueKey]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cueKey]);
 
@@ -113,6 +124,8 @@ export function BreathBalloon() {
           }}
           onPointerUp={stop}
           onPointerCancel={stop}
+          onLostPointerCapture={stop}
+          onBlur={stop}
           onKeyDown={(e) => {
             if ((e.key === " " || e.key === "Enter") && !e.repeat) {
               e.preventDefault();

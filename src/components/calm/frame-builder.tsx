@@ -89,7 +89,7 @@ export function FrameBuilder({ age, onCrisis, heading = false }: { age: AgeBand 
           <>
             <p className="text-sm font-semibold text-muted">Hear it read back</p>
             <div className="mt-1">
-              <SpokenLine role="narrator" text={filled} className="text-lg text-ink" />
+              <SpokenLine role="narrator" delivery="practice" text={filled} className="text-lg text-ink" />
             </div>
           </>
         ) : (

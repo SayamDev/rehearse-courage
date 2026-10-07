@@ -41,8 +41,8 @@ export default function AboutPage() {
         <p className="mt-1 text-muted">Designed and built by Sayam Ajmal, as part of the Rehearse project.</p>
         <p className="mt-6 font-semibold text-ink">Voices</p>
         <p className="mt-1 text-muted">
-          Recorded with Qwen3-TTS by the Qwen team (Apache 2.0) through VoiceStudio, free and on the maker&apos;s own computer, in British
-          and American English. The optional voice you can save on your device is Kokoro (Apache 2.0). Nothing you say or type is used to
+          Recorded on the maker&apos;s own computer in British and American English. Room characters use Qwen3-TTS through VoiceStudio;
+          the games and Body kit use Kokoro. Both models are Apache 2.0. Kokoro is also the optional voice you can save on your device. Nothing you say or type is used to
           make them.
         </p>
       </div>

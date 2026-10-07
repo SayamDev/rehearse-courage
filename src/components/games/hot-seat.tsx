@@ -76,7 +76,7 @@ export function HotSeat() {
             {q}
           </p>
         ) : (
-          <SpokenLine role="narrator" text={q} autoPlay className="font-display text-[clamp(1.4rem,1.1rem+1.2vw,1.9rem)] font-bold leading-tight text-ink" />
+          <SpokenLine role="narrator" delivery="game" text={q} autoPlay className="font-display text-[clamp(1.4rem,1.1rem+1.2vw,1.9rem)] font-bold leading-tight text-ink" />
         )}
       </div>
 

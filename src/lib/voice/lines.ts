@@ -1,4 +1,4 @@
-import { ACCEPTANCE_LINES, BODY_EXPLAINERS, BREATH_CUES, FOR_REAL_LINE, GROUNDING_STEPS, REFRAME_CARDS, SPEECH_TOOLS, STEP_DONE_LINE } from "@/lib/content/body";
+import { ACCEPTANCE_LINES, BODY_EXPLAINERS, BREATH_CUES, BREATH_INTRO, FOR_REAL_LINE, GROUNDING_STEPS, REFRAME_CARDS, SPEECH_TOOLS, STEP_DONE_LINE } from "@/lib/content/body";
 import { COACH_FALLBACK, COACH_LINES, PRESSURE_CUES, PRESSURE_LINES } from "@/lib/content/coach";
 import { COACH_REPLIES } from "@/lib/content/coach-replies";
 import { RESCUE_PHRASES } from "@/lib/content/phrases";
@@ -21,6 +21,8 @@ export type Role = "teacher" | "friend" | "host" | "narrator" | "classmate";
 export type VoiceSet = "kids" | "grown";
 
 /** British English (the default) or American English voices, chosen in Me. */
+export type Delivery = "neutral" | "calm" | "game" | "practice";
+
 export type Accent = "uk" | "us";
 export const ACCENTS: { value: Accent; label: string }[] = [
   { value: "uk", label: "British" },
@@ -28,9 +30,8 @@ export const ACCENTS: { value: Accent; label: string }[] = [
 ];
 
 /**
- * One voice. Every voice is Qwen3-TTS (VoiceDesign) run through VoiceStudio
- * on the maker's Mac: free, natural, and designed from a plain description
- * (`describe`). The maker listened to the cast before recording.
+ * Room characters use Qwen3-TTS VoiceDesign. Activities use stable Kokoro
+ * voices, recorded locally so no download is needed by the person practising.
  */
 export type Voice = { id: string; engine: "kokoro" | "omnivoice" | "qwen"; name: string; describe?: string; instruct?: string; seed?: number };
 
@@ -58,8 +59,23 @@ function cast(accent: "British" | "American", tag: "uk" | "us"): Record<Role, Ca
 /** The cast, by accent. */
 export const VOICES: Record<Accent, Record<Role, Cast>> = { uk: cast("British", "uk"), us: cast("American", "us") };
 
-export function voiceFor(role: Role, set: VoiceSet, accent: Accent = "uk"): Voice {
-  return VOICES[accent][role][set];
+/** Stable natural voices for activities: one identity throughout each exercise. */
+const ACTIVITY_VOICES: Record<Accent, Record<Exclude<Delivery, "neutral">, string>> = {
+  uk: { calm: "bf_isabella", game: "bf_emma", practice: "bf_isabella" },
+  us: { calm: "af_heart", game: "af_bella", practice: "af_heart" },
+};
+
+export function voiceFor(role: Role, set: VoiceSet, accent: Accent = "uk", delivery: Delivery = "neutral"): Voice {
+  if (delivery === "neutral" || (role !== "narrator" && role !== "friend")) return VOICES[accent][role][set];
+  const name = role === "friend"
+    ? accent === "uk" ? (set === "kids" ? "bf_lily" : "bf_alice") : (set === "kids" ? "af_sky" : "af_bella")
+    : ACTIVITY_VOICES[accent][delivery];
+  return { id: `kokoro:${name}:${delivery}:v1`, engine: "kokoro", name };
+}
+
+/** Keep the calm guide unhurried; sentence examples stay easy to follow. */
+export function deliveryRate(delivery: Delivery): number {
+  return delivery === "calm" ? 0.88 : delivery === "practice" ? 0.96 : 1;
 }
 
 /** Kids hear pre-recorded lines about 10% slower (pitch kept). */
@@ -87,14 +103,15 @@ export function clipId(voice: Voice, text: string): string {
   return hash(`${voice.id}|${spokenText(text)}`);
 }
 
-export type Line = { role: Role; set: VoiceSet; accent: Accent; voice: Voice; text: string; id: string };
+export type Line = { role: Role; set: VoiceSet; accent: Accent; delivery: Delivery; voice: Voice; text: string; id: string };
 
 const plain = (s: string): Words => ({ kid: s, grown: s });
 
 /** Every fixed line the app reads aloud, as [role, wording] pairs. */
-function script(): [Role, Words][] {
-  const out: [Role, Words][] = [];
-  const say = (role: Role, ...ws: Words[]) => ws.forEach((w) => out.push([role, w]));
+function script(): [Role, Words, Delivery][] {
+  const out: [Role, Words, Delivery][] = [];
+  let delivery: Delivery = "neutral";
+  const say = (role: Role, ...ws: Words[]) => ws.forEach((w) => out.push([role, w, delivery]));
   for (const s of SITUATIONS) {
     say("narrator", s.scene, s.mission, ...s.ideas);
     const coach = COACH_LINES[s.id];
@@ -106,16 +123,28 @@ function script(): [Role, Words][] {
     for (const c of PRESSURE_CUES[room]) say(c.role, c.text);
   }
   say("narrator", ...RESCUE_PHRASES.map((p) => p.text), ...RESCUE_PHRASES.map((p) => p.when));
+  delivery = "practice";
+  say("narrator", ...RESCUE_PHRASES.map((p) => p.text));
   // Body kit.
-  say("narrator", ...GROUNDING_STEPS.map((g) => plain(g.hint)), plain(BREATH_CUES.in), plain(BREATH_CUES.out), plain(STEP_DONE_LINE), plain(FOR_REAL_LINE));
-  say("narrator", ...ACCEPTANCE_LINES, ...SPEECH_TOOLS.map((t) => t.how), ...SPEECH_TOOLS.flatMap((t) => t.practice.map(plain)));
+  delivery = "calm";
+  say("narrator", ...GROUNDING_STEPS.map((g) => plain(g.hint)), plain(BREATH_INTRO), plain(BREATH_CUES.in), plain(BREATH_CUES.out));
+  say("narrator", ...ACCEPTANCE_LINES, ...SPEECH_TOOLS.map((t) => t.how));
+  delivery = "practice";
+  say("narrator", ...SPEECH_TOOLS.flatMap((t) => t.practice.map(plain)));
+  delivery = "calm";
   for (const kind of ["blushing", "sweating"] as const) {
     say("narrator", ...BODY_EXPLAINERS[kind], ...REFRAME_CARDS[kind].flatMap((c) => [c.thought, c.tryThis]));
   }
-  // Games.
-  say("narrator", ...HOT_SEAT, ...SNAP_ROUNDS.map((r) => r.moment), ...BUILD_SENTENCES, ...STORY_STARTS.map(plain), ...Object.values(BALLOON_CUES).map(plain));
-  say("narrator", ...SAY_LINES, ...DESCRIBE_HINTS, ...KEEP_GOING.flatMap((k) => k.ideas));
+  // Games: curiosity for prompts, everyday delivery for examples, calm for breaths.
+  say("narrator", ...Object.values(BALLOON_CUES).map(plain));
+  delivery = "game";
+  say("narrator", ...HOT_SEAT, ...SNAP_ROUNDS.map((r) => r.moment), ...DESCRIBE_HINTS);
+  delivery = "practice";
+  say("narrator", ...BUILD_SENTENCES, ...STORY_STARTS.map(plain), ...SAY_LINES, ...KEEP_GOING.flatMap((k) => k.ideas));
+  delivery = "game";
   say("friend", ...KEEP_GOING.map((k) => k.says));
+  delivery = "neutral";
+  say("narrator", plain(STEP_DONE_LINE), plain(FOR_REAL_LINE));
   // Tiny dares and Right before.
   say("narrator", ...DARES.map((d) => d.text), READY_LINES.wobbly, READY_LINES.go);
   return out;
@@ -130,11 +159,11 @@ function script(): [Role, Words][] {
 export function allLines(): Line[] {
   const out: Line[] = [];
   for (const accent of ["uk", "us"] as Accent[]) {
-    for (const [role, w] of script()) {
+    for (const [role, w, delivery] of script()) {
       for (const set of ["kids", "grown"] as VoiceSet[]) {
-        const voice = voiceFor(role, set, accent);
+        const voice = voiceFor(role, set, accent, delivery);
         const text = spokenText(set === "kids" ? w.kid : w.grown);
-        out.push({ role, set, accent, voice, text, id: clipId(voice, text) });
+        out.push({ role, set, accent, delivery, voice, text, id: clipId(voice, text) });
       }
     }
   }

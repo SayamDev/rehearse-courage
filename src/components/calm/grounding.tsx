@@ -73,7 +73,7 @@ export function Grounding({
         {step.n} {step.sense}
       </h2>
       <div className="mx-auto mt-2 max-w-[40ch] text-left">
-        <SpokenLine role="narrator" text={step.hint} autoPlay className="text-ink" />
+        <SpokenLine role="narrator" delivery="calm" text={step.hint} autoPlay className="text-ink" />
       </div>
 
       <p className="mt-5 text-sm text-muted">Tap a circle for each one you notice.</p>

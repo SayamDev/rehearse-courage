@@ -82,7 +82,7 @@ export function WordBuilder() {
         <div className="mt-5 border-t border-line pt-5" aria-live="polite">
           <p className="font-semibold text-ink">{same ? "That reads well." : "Your way works. The usual order is:"}</p>
           <div className="mt-1">
-            <SpokenLine role="narrator" text={target.join(" ")} autoPlay className="text-ink">
+            <SpokenLine role="narrator" delivery="practice" text={target.join(" ")} autoPlay className="text-ink">
               &ldquo;{target.join(" ")}&rdquo;
             </SpokenLine>
           </div>

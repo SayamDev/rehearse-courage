@@ -3,7 +3,7 @@
 //
 // Maker-only, free, runs on this Mac:
 //   - Kokoro lines use kokoro-js in Node (downloads the model once, about 90 MB).
-//   - Every voice today is Qwen3-TTS (VoiceDesign) through VoiceStudio's
+//   - Room characters use Qwen3-TTS (VoiceDesign) through VoiceStudio's
 //     MLX-Audio engine. Start the VoiceStudio app first (its API listens on
 //     http://localhost:3900) and choose MLX-Audio with the Qwen3-TTS
 //     VoiceDesign model. Each voice comes from its description in lines.ts.
@@ -14,6 +14,7 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { levelWav } from "./level.mjs";
 import { allLines, type Line, type Voice } from "../../src/lib/voice/lines";
 
 const ROOT = join(import.meta.dirname, "../..");
@@ -84,6 +85,8 @@ async function qwenWav(voice: Voice, text: string, wav: string) {
   form.set("language", "en");
   form.set("instruct", voice.describe ?? "");
   form.set("engine", "mlx-audio");
+  form.set("effect_preset", "raw");
+  if (voice.seed !== undefined) form.set("seed", String(voice.seed));
   writeFileSync(wav, await studio(form));
 }
 
@@ -94,20 +97,25 @@ async function record(line: Line) {
   if (line.voice.engine === "kokoro") await kokoroWav(line.voice, line.text, wav);
   else if (line.voice.engine === "qwen") await qwenWav(line.voice, line.text, wav);
   else await omniWav(line.voice, line.text, wav);
+  levelWav(wav, line.delivery);
   encode(wav, out);
   return true;
 }
 
 const lines = allLines();
+const selected = process.env.VOICE_DELIVERY
+  ? lines.filter((l) => process.env.VOICE_DELIVERY === "activities" ? l.delivery !== "neutral" : l.delivery === process.env.VOICE_DELIVERY)
+  : lines;
 let made = 0;
 const failed: string[] = [];
-for (const [i, line] of lines.entries()) {
+for (const [i, line] of selected.entries()) {
   try {
     if (await record(line)) {
       made++;
-      console.log(`${i + 1}/${lines.length} ${line.voice.id}: ${line.text}`);
+      console.log(`${i + 1}/${selected.length} ${line.voice.id}: ${line.text}`);
     }
   } catch (err) {
+    console.error(`Failed ${line.id}: ${String(err).slice(0, 160)}`);
     failed.push(`${line.voice.id}: ${line.text} (${String(err).slice(0, 160)})`);
   }
 }
