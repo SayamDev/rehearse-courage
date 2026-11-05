@@ -5,5 +5,6 @@ import staticAssetsIncrementalCache from "@opennextjs/cloudflare/overrides/incre
 
 export default defineCloudflareConfig({
   incrementalCache: staticAssetsIncrementalCache,
-  enableCacheInterception: true,
+  // Next 16 segment prefetches can loop when cache interception returns full-page data.
+  enableCacheInterception: false,
 });
